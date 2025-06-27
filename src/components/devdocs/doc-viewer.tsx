@@ -36,7 +36,7 @@ export function DocViewer({ doc }: DocViewerProps) {
   };
   
   const contentWithoutFrontmatter = doc.content.replace(/^---[\s\S]*?---/, '').trim();
-  const contentForRendering = contentWithoutFrontmatter.replace(/^tags:.*[\r\n]*/gm, '');
+  const contentForRendering = contentWithoutFrontmatter.replace(/^tags:.*$\n?/gm, '');
   const contentParts = contentForRendering.split(/(```[\s\S]*?```)/g);
 
   return (
