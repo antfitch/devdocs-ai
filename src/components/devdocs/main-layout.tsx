@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -189,6 +190,14 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   }
 
   const isSearching = searchQuery.length > 0;
+
+  let breadcrumbTypeLabel = null;
+  if (activeTab === 'filters' && activeDoc) {
+    const typeTag = activeDoc.tags?.find(t => typeFilterTags.includes(t.toLowerCase()));
+    if (typeTag) {
+      breadcrumbTypeLabel = typeFilters.find(f => f.tag === typeTag)?.label;
+    }
+  }
 
   return (
     <SidebarProvider defaultOpen={true}>
@@ -428,11 +437,17 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
           </Tabs>
         </SidebarContent>
       </Sidebar>
-      <SidebarInset className="p-4 max-h-screen overflow-hidden flex flex-col">
+      <SidebarInset className="p-4 max-h-screen flex flex-col">
         <div className="flex items-center gap-2 mb-4">
           <SidebarTrigger />
           <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
             <span className="capitalize">{activeTab}</span>
+            {breadcrumbTypeLabel && (
+              <>
+                <ChevronRight className="h-4 w-4" />
+                <span>{breadcrumbTypeLabel}</span>
+              </>
+            )}
             {activeDoc && (
               <>
                 <ChevronRight className="h-4 w-4" />
