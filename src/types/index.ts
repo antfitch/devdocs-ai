@@ -3,4 +3,5 @@ export interface DocItem {
   title: string;
   content: string;
   icon?: string;
+  subtopics?: DocItem[];
 }

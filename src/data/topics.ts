@@ -1,6 +1,10 @@
 import type { DocItem } from '@/types';
 
-export const topics: Omit<DocItem, 'content'>[] = [
+type Topic = Omit<DocItem, 'content'> & {
+  subtopics?: Omit<DocItem, 'content' | 'subtopics'>[];
+};
+
+export const topics: Topic[] = [
   {
     id: 'introduction',
     title: 'Introduction',
@@ -10,6 +14,10 @@ export const topics: Omit<DocItem, 'content'>[] = [
     id: 'getting-started',
     title: 'Getting Started',
     icon: 'Rocket',
+    subtopics: [
+      { id: 'installation', title: 'Installation', icon: 'Download' },
+      { id: 'authentication', title: 'Authentication', icon: 'KeyRound' },
+    ],
   },
   {
     id: 'core-concepts',
