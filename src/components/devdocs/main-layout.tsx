@@ -405,7 +405,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                                 </Label>
                             </div>
                             <CollapsibleTrigger asChild>
-                                <Button variant="ghost" size="sm" className="w-9 p-0">
+                                <Button variant="ghost" size="icon" className="h-6 w-6">
                                     <ChevronRight className="h-4 w-4 transition-transform duration-200 data-[state=open]:rotate-90" />
                                     <span className="sr-only">Toggle</span>
                                 </Button>
@@ -545,5 +545,3 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     </SidebarProvider>
   );
 }
-
-    
