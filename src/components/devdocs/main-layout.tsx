@@ -48,6 +48,14 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState('topics');
 
+  const typeFilters = [
+    { label: 'User Guide', tag: 'how-to' },
+    { label: 'Reference', tag: 'reference' },
+    { label: 'Concept', tag: 'concept' },
+  ];
+  const typeFilterTags = typeFilters.map((filter) => filter.tag);
+  const remainingTags = allTags.filter((tag) => !typeFilterTags.includes(tag));
+
   const handleTagToggle = (tag: string) => {
     setSelectedTags((prev) =>
       prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
@@ -254,12 +262,28 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
               <div className="p-4 pt-0 space-y-4">
                 <div>
                   <h3 className="mb-2 text-sm font-medium text-muted-foreground">Type</h3>
-                  {/* Empty for now */}
+                  <div className="space-y-2">
+                    {typeFilters.map((filter) => (
+                      <div key={filter.tag} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`filter-type-${filter.tag}`}
+                          checked={selectedTags.includes(filter.tag)}
+                          onCheckedChange={() => handleTagToggle(filter.tag)}
+                        />
+                        <Label
+                          htmlFor={`filter-type-${filter.tag}`}
+                          className="font-normal cursor-pointer"
+                        >
+                          {filter.label}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
                 </div>
                 <div>
                   <h3 className="mb-2 text-sm font-medium text-muted-foreground">Tags</h3>
                   <div className="space-y-2">
-                    {allTags.map((tag) => (
+                    {remainingTags.map((tag) => (
                       <div key={tag} className="flex items-center space-x-2">
                         <Checkbox
                           id={`filter-${tag}`}
