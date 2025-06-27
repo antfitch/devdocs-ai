@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -63,6 +64,30 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
         : [],
     [searchQuery, allDocs]
   );
+  
+  const displayedTopics = useMemo(() => {
+    if (selectedTags.length === 0) {
+      return topics;
+    }
+
+    const itemAndDescendantsMatchTags = (doc: DocItem, tags: string[]): boolean => {
+      // Check current item's tags
+      if (doc.tags?.some(tag => tags.includes(tag))) {
+        return true;
+      }
+      // Check current item's headings' tags
+      if (doc.headings?.some(h => h.tags?.some(tag => tags.includes(tag)))) {
+        return true;
+      }
+      // Recursively check subtopics
+      if (doc.subtopics?.some(subtopic => itemAndDescendantsMatchTags(subtopic, tags))) {
+        return true;
+      }
+      return false;
+    };
+
+    return topics.filter(topic => itemAndDescendantsMatchTags(topic, selectedTags));
+  }, [topics, selectedTags]);
 
   const handleSelectDoc = (doc: DocItem) => {
     setSearchQuery('');
@@ -87,9 +112,6 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   };
 
   const isSearching = searchQuery.length > 0;
-
-  // TODO: Filter topics based on selectedTags
-  const displayedTopics = topics;
 
   return (
     <SidebarProvider defaultOpen={true}>
