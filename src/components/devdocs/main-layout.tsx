@@ -120,12 +120,9 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   const displayedTopics = topics;
 
   const handleSelectDoc = (doc: DocItem, headingId?: string) => {
-    // If coming from a filter view, we want to show the doc, not the filter list.
     if (activeTab === 'filters') {
       setShowDocWhileFiltering(true);
     } else {
-      // This is a "normal" navigation from topics/prompts list.
-      // Reset any filter-related state.
       setShowDocWhileFiltering(false);
       setSelectedTags([]);
       if (prompts.some(p => p.id === doc.id)) {
@@ -142,8 +139,6 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
       setScrollToHeading(headingId);
     }
 
-    // This toggles the sub-headings in the main "Topics" list.
-    // We don't want to do this if we are navigating from the filters tab.
     if (activeTab !== 'filters') {
       if (doc.id === toggledTopicId) {
         setToggledTopicId(null);
@@ -436,8 +431,14 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
       <SidebarInset className="p-4 max-h-screen overflow-hidden flex flex-col">
         <div className="flex items-center gap-2 mb-4">
           <SidebarTrigger />
-          <div className="capitalize text-sm font-medium text-muted-foreground">
-            {activeTab}
+          <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+            <span className="capitalize">{activeTab}</span>
+            {activeDoc && (
+              <>
+                <ChevronRight className="h-4 w-4" />
+                <span>{activeDoc.title}</span>
+              </>
+            )}
           </div>
         </div>
         
