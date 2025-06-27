@@ -29,14 +29,18 @@ export function DocViewer({ doc }: DocViewerProps) {
       .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
       .replace(/\*(.*)\*/gim, '<em>$1</em>')
       .replace(/`([^`]+)`/gim, '<code class="bg-muted text-muted-foreground px-1 py-0.5 rounded-sm font-mono text-sm">$1</code>')
-      .replace(/> (.*$)/gim, '<blockquote class="mt-6 border-l-2 pl-6 italic">$1</code>')
+      .replace(/> (.*$)/gim, '<blockquote class="mt-6 border-l-2 pl-6 italic">$1</blockquote>')
       .replace(/\n/g, '<br />');
 
     return { __html: html };
   };
   
   const contentWithoutFrontmatter = doc.content.replace(/^---[\s\S]*?---/, '').trim();
-  const contentForRendering = contentWithoutFrontmatter.replace(/^tags:.*$\n?/gm, '');
+  const contentForRendering = contentWithoutFrontmatter
+    // Remove tags lines used for metadata
+    .replace(/^tags:.*$\n?/gm, '')
+    // Normalize newlines after H2 to a single newline to remove extra vertical space.
+    .replace(/(^##.*$)\n+/gm, '$1\n');
   const contentParts = contentForRendering.split(/(```[\s\S]*?```)/g);
 
   return (
