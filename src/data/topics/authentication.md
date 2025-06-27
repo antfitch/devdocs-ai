@@ -3,6 +3,7 @@ tags:
   - authentication
   - api-key
   - security
+  - how-to
 ---
 # Authentication
 

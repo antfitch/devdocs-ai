@@ -3,6 +3,7 @@ tags:
   - installation
   - npm
   - setup
+  - how-to
 ---
 # Installation
 

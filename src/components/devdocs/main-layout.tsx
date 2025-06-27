@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -252,19 +251,31 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
             </TabsContent>
             <TabsContent value="filters" className="m-0">
               <h2 className="p-4 pb-2 text-base font-bold">Filters</h2>
-              <div className="p-4 pt-0 space-y-2">
-                {allTags.map((tag) => (
-                  <div key={tag} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`filter-${tag}`}
-                      checked={selectedTags.includes(tag)}
-                      onCheckedChange={() => handleTagToggle(tag)}
-                    />
-                    <Label htmlFor={`filter-${tag}`} className="font-normal capitalize cursor-pointer">
-                      {tag.replace(/-/g, ' ')}
-                    </Label>
+              <div className="p-4 pt-0 space-y-4">
+                <div>
+                  <h3 className="mb-2 text-sm font-medium text-muted-foreground">Type</h3>
+                  {/* Empty for now */}
+                </div>
+                <div>
+                  <h3 className="mb-2 text-sm font-medium text-muted-foreground">Tags</h3>
+                  <div className="space-y-2">
+                    {allTags.map((tag) => (
+                      <div key={tag} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`filter-${tag}`}
+                          checked={selectedTags.includes(tag)}
+                          onCheckedChange={() => handleTagToggle(tag)}
+                        />
+                        <Label
+                          htmlFor={`filter-${tag}`}
+                          className="font-normal capitalize cursor-pointer"
+                        >
+                          {tag.replace(/-/g, ' ')}
+                        </Label>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </div>
               </div>
             </TabsContent>
           </Tabs>

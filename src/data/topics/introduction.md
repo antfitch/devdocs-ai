@@ -4,6 +4,7 @@ tags:
   - overview
   - features
   - welcome
+  - concept
 ---
 # Welcome to DevDocs AI
 
