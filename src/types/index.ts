@@ -5,11 +5,11 @@ export interface DocItem {
   content: string;
   icon?: string;
   subtopics?: DocItem[];
-  headings?: { id: string; title: string }[];
+  headings?: DocItemHeading[];
 }
 
 export interface DocItemHeading {
   id: string;
   title: string;
-  tags?: string[]; // Add optional tags array
+  tags?: string[];
 }
