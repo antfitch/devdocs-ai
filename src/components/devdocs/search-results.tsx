@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 interface SearchResultsProps {
   query: string;
   results: DocItem[];
-  onSelect: (doc: DocItem) => void;
+  onSelect: (doc: DocItem, headingId?: string) => void;
 }
 
 export function SearchResults({ query, results, onSelect }: SearchResultsProps) {

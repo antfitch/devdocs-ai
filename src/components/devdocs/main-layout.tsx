@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Book, Bot, ChevronRight, MessageSquare, Search, Filter } from 'lucide-react';
 import {
   SidebarProvider,
@@ -48,6 +48,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   const [toggledTopicId, setToggledTopicId] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState('topics');
+  const [scrollToHeading, setScrollToHeading] = useState<string | null>(null);
 
   const typeFilters = useMemo(() => [
     { label: 'User Guide', tag: 'how-to' },
@@ -106,9 +107,12 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   
   const displayedTopics = topics;
 
-  const handleSelectDoc = (doc: DocItem) => {
+  const handleSelectDoc = (doc: DocItem, headingId?: string) => {
     setSearchQuery('');
     setActiveDoc(doc);
+    if (headingId) {
+      setScrollToHeading(headingId);
+    }
     if (doc.id === toggledTopicId) {
       setToggledTopicId(null);
     } else if (doc.headings && doc.headings.length > 0) {
@@ -127,6 +131,13 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   const handleHeadingClick = (headingId: string) => {
     document.getElementById(headingId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
+  
+  useEffect(() => {
+    if (scrollToHeading) {
+      document.getElementById(scrollToHeading)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setScrollToHeading(null);
+    }
+  }, [scrollToHeading, activeDoc]);
 
   const handleToggle = (id: string) => {
     setOpenItems((prev) =>

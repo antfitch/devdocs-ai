@@ -5,12 +5,13 @@ import type { DocItem } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
+import { ChevronRight } from 'lucide-react';
 
 interface FilteredDocsViewerProps {
   tags: string[];
   typeFilterTags: string[];
   docs: DocItem[];
-  onSelect: (doc: DocItem) => void;
+  onSelect: (doc: DocItem, headingId?: string) => void;
 }
 
 export function FilteredDocsViewer({ tags, typeFilterTags, docs, onSelect }: FilteredDocsViewerProps) {
@@ -59,12 +60,31 @@ export function FilteredDocsViewer({ tags, typeFilterTags, docs, onSelect }: Fil
                         <CardTitle className="text-lg">{item.title}</CardTitle>
                         </CardHeader>
                         <CardContent>
-                        <p className="text-muted-foreground line-clamp-3">
-                            {item.content.replace(/^---[\s\S]*?---/, '').trim().replace(/#+ /g, '').replace(/```[\s\S]*?```/g, '[Code Block]').substring(0, 300)}...
-                        </p>
-                        <Button variant="link" className="p-0 h-auto mt-2" onClick={() => onSelect(item)}>
-                            Go to topic
-                        </Button>
+                            <p className="text-muted-foreground line-clamp-3">
+                                {item.content.replace(/^---[\s\S]*?---/, '').trim().replace(/#+ /g, '').replace(/```[\s\S]*?```/g, '[Code Block]').substring(0, 300)}...
+                            </p>
+                            <Button variant="link" className="p-0 h-auto mt-2" onClick={() => onSelect(item)}>
+                                Go to topic
+                            </Button>
+                            {item.headings && item.headings.length > 0 && (
+                                <div className="mt-4 pt-4 border-t">
+                                    <h4 className="text-sm font-medium mb-2">Relevant Sections</h4>
+                                    <ul className="space-y-1">
+                                    {item.headings.map((heading) => (
+                                        <li key={heading.id}>
+                                            <Button
+                                                variant="link"
+                                                className="p-0 h-auto text-muted-foreground hover:text-primary justify-start text-left font-normal"
+                                                onClick={() => onSelect(item, heading.id)}
+                                            >
+                                                <ChevronRight className="h-4 w-4 mr-1" />
+                                                {heading.title}
+                                            </Button>
+                                        </li>
+                                    ))}
+                                    </ul>
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
                     ))
