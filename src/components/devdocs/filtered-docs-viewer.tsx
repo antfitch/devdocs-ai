@@ -14,6 +14,30 @@ interface FilteredDocsViewerProps {
   onSelect: (doc: DocItem, headingId?: string) => void;
 }
 
+const getSummary = (markdown: string): string => {
+  // Remove frontmatter, headings, code blocks, and other common markdown constructs.
+  const content = markdown
+    .replace(/^---[\s\S]*?---/, '') // Remove frontmatter
+    .replace(/^#+.*$/gm, '')         // Remove headings
+    .replace(/```[\s\S]*?```/g, '')   // Remove code blocks
+    .replace(/`[^`]+`/g, '')          // Remove inline code
+    .replace(/\[(.*?)\]\(.*?\)/g, '$1') // Remove links, keep text
+    .replace(/(\*\*|\*|_|__)/g, '')     // Remove bold/italic markers
+    .replace(/^> /gm, '')             // Remove blockquote markers
+    .replace(/^- /gm, '')             // Remove list item markers
+    .trim();
+
+  // Find the first line that isn't just whitespace.
+  const firstMeaningfulLine = content.split('\n').find(line => line.trim() !== '') || '';
+  
+  // Try to find the first full sentence.
+  const sentenceMatch = firstMeaningfulLine.match(/^[^.!?]+[.!?]/);
+
+  // Return the matched sentence, or the full line if no sentence-ending punctuation is found.
+  return sentenceMatch ? sentenceMatch[0] : firstMeaningfulLine;
+}
+
+
 export function FilteredDocsViewer({ tags, typeFilterTags, docs, onSelect }: FilteredDocsViewerProps) {
   const selectedTypeTags = tags.filter(t => typeFilterTags.includes(t.toLowerCase())).map(t => t.toLowerCase());
   const selectedRegularTags = tags.filter(t => !typeFilterTags.includes(t.toLowerCase())).map(t => t.toLowerCase());
@@ -60,8 +84,8 @@ export function FilteredDocsViewer({ tags, typeFilterTags, docs, onSelect }: Fil
                         <CardTitle className="text-lg">{item.title}</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-muted-foreground line-clamp-3">
-                                {item.content.replace(/^---[\s\S]*?---/, '').trim().replace(/#+ /g, '').replace(/```[\s\S]*?```/g, '[Code Block]').substring(0, 300)}...
+                            <p className="text-muted-foreground">
+                                {getSummary(item.content)}
                             </p>
                             <div className="mt-4 pt-4 border-t">
                                 <h4 className="text-sm font-medium mb-2">Relevant Sections</h4>
