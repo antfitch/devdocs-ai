@@ -122,15 +122,24 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     setActiveDoc(doc);
     if (headingId) {
       setScrollToHeading(headingId);
+    } else {
+      // Scroll to top when a new doc is selected without a specific heading
+      const docViewerTop = document.getElementById('doc-viewer-top');
+      if (docViewerTop) docViewerTop.parentElement?.parentElement?.scrollTo(0, 0);
     }
+
     if (doc.id === toggledTopicId) {
       setToggledTopicId(null);
-    } else if (doc.headings && doc.headings.length > 1) {
+    } else if (doc.headings && doc.headings.length > 0) {
       setToggledTopicId(doc.id);
     } else {
       setToggledTopicId(null);
     }
-    setSelectedTags([]);
+
+    if (activeTab === 'filters') {
+      setSelectedTags([]);
+    }
+
     if (prompts.some(p => p.id === doc.id)) {
       setActiveTab('prompts');
     } else {
@@ -154,11 +163,14 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   };
   
   useEffect(() => {
-    if (scrollToHeading) {
-      document.getElementById(scrollToHeading)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (scrollToHeading && activeTab !== 'filters') {
+      const element = document.getElementById(scrollToHeading);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
       setScrollToHeading(null);
     }
-  }, [scrollToHeading, activeDoc]);
+  }, [scrollToHeading, activeDoc, activeTab]);
 
   const handleToggle = (id: string) => {
     setOpenItems((prev) =>
@@ -167,6 +179,14 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   };
 
   const isSearching = searchQuery.length > 0;
+  
+  const handleTabChange = (value: string) => {
+    if (value !== 'filters') {
+      setSelectedTags([]);
+      setToggledTopicId(null);
+    }
+    setActiveTab(value);
+  }
 
   return (
     <SidebarProvider defaultOpen={true}>
@@ -187,7 +207,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
           </div>
         </SidebarHeader>
         <SidebarContent className="p-0">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
             <TabsList className="w-full rounded-none">
               <TooltipProvider>
                 <Tooltip>
@@ -347,7 +367,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                                 <div key={doc.id} className="w-full">
                                   <Button
                                     variant="link"
-                                    className="p-0 h-auto w-full text-left justify-start font-normal text-muted-foreground hover:text-primary"
+                                    className="p-0 h-auto w-full text-left justify-start font-normal"
                                     onClick={() => handleFilterTopicClick(doc)}
                                   >
                                     {doc.title}
@@ -416,7 +436,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
             results={searchResults}
             onSelect={handleSelectDoc}
           />
-        ) : activeTab === 'filters' || selectedTags.length > 0 ? (
+        ) : activeTab === 'filters' || (selectedTags.length > 0 && activeTab !== 'topics' && activeTab !== 'prompts') ? (
           <FilteredDocsViewer 
             tags={selectedTags}
             typeFilterTags={typeFilterTags}
