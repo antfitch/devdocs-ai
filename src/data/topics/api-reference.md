@@ -8,7 +8,7 @@ tags:
 
 This section provides a detailed reference for all available API endpoints.
 
-## /v1/compute
+## POST /v1/compute
 
 This endpoint allows you to submit a quantum circuit for computation.
 
@@ -24,7 +24,7 @@ This endpoint allows you to submit a quantum circuit for computation.
 
 The `circuit` parameter should be a string representation of your quantum circuit in QASM format. The `shots` parameter specifies how many times to run the circuit.
 
-## /v1/jobs/{jobId}
+## GET /v1/jobs/{jobId}
 
 Retrieve the status of a previously submitted job.
 
@@ -33,7 +33,7 @@ Retrieve the status of a previously submitted job.
 **Parameters:**
 - `jobId` (string): The unique identifier for the job.
 
-## /v1/jobs/{jobId}/cancel
+## POST /v1/jobs/{jobId}/cancel
 
 Cancel a job that is currently running.
 
@@ -42,7 +42,7 @@ Cancel a job that is currently running.
 **Parameters:**
 - `jobId` (string): The unique identifier for the job.
 
-## /v1/jobs/{jobId}/results
+## GET /v1/jobs/{jobId}/results
 
 Fetch the results of a completed job.
 
@@ -63,13 +63,13 @@ Fetch the results of a completed job.
 }
 ```
 
-## /v1/backends
+## GET /v1/backends
 
 Get a list of all available quantum computer backends.
 
 **Method:** `GET`
 
-## /v1/backends/{backendId}
+## GET /v1/backends/{backendId}
 
 Retrieve detailed information about a specific quantum backend, including its topology and gate set.
 
@@ -78,7 +78,7 @@ Retrieve detailed information about a specific quantum backend, including its to
 **Parameters:**
 - `backendId` (string): The identifier for the backend.
 
-## /v1/experiments
+## POST /v1/experiments
 
 Create a new experiment to group related jobs.
 
@@ -92,7 +92,7 @@ Create a new experiment to group related jobs.
 }
 ```
 
-## /v1/experiments/{experimentId}
+## GET /v1/experiments/{experimentId}
 
 Get details for a specific experiment.
 
@@ -101,7 +101,7 @@ Get details for a specific experiment.
 **Parameters:**
 - `experimentId` (string): The unique identifier for the experiment.
 
-## /v1/experiments/{experimentId}
+## PUT /v1/experiments/{experimentId}
 
 Update the details of an existing experiment.
 
@@ -118,7 +118,7 @@ Update the details of an existing experiment.
 }
 ```
 
-## /v1/experiments/{experimentId}
+## DELETE /v1/experiments/{experimentId}
 
 Delete a specific experiment.
 
@@ -127,7 +127,7 @@ Delete a specific experiment.
 **Parameters:**
 - `experimentId` (string): The unique identifier for the experiment.
 
-## /v1/algorithms
+## GET /v1/algorithms
 
 List all supported quantum algorithms.
 
