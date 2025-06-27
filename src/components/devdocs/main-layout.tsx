@@ -33,6 +33,7 @@ export function MainLayout({ topics, prompts, allDocs }: MainLayoutProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeDoc, setActiveDoc] = useState<DocItem | null>(topics[0]);
   const [openItems, setOpenItems] = useState<string[]>(['getting-started']);
+  const [expandedHeadingTopicId, setExpandedHeadingTopicId] = useState<string | null>(null);
 
   const searchResults = useMemo(
     () =>
@@ -49,6 +50,11 @@ export function MainLayout({ topics, prompts, allDocs }: MainLayoutProps) {
   const handleSelectDoc = (doc: DocItem) => {
     setSearchQuery('');
     setActiveDoc(doc);
+    if (doc.headings && doc.headings.length > 1) {
+      setExpandedHeadingTopicId((prevId) => (prevId === doc.id ? null : doc.id));
+    } else {
+      setExpandedHeadingTopicId(null);
+    }
   };
 
   const handleToggle = (id: string) => {
@@ -137,11 +143,11 @@ export function MainLayout({ topics, prompts, allDocs }: MainLayoutProps) {
                                   )}
                                   <span>{subDoc.title}</span>
                                 </SidebarMenuButton>
-                                {activeDoc?.id === subDoc.id &&
-                                  activeDoc.headings &&
-                                  activeDoc.headings.length > 1 && (
+                                {subDoc.headings &&
+                                  subDoc.headings.length > 1 &&
+                                  expandedHeadingTopicId === subDoc.id && (
                                     <SidebarMenuSub>
-                                      {activeDoc.headings.map((heading) => (
+                                      {subDoc.headings.map((heading) => (
                                         <SidebarMenuItem key={heading.id}>
                                           <SidebarMenuButton
                                             size="sm"
@@ -171,11 +177,11 @@ export function MainLayout({ topics, prompts, allDocs }: MainLayoutProps) {
                           {doc.icon && <DynamicIcon name={doc.icon} />}
                           <span>{doc.title}</span>
                         </SidebarMenuButton>
-                        {activeDoc?.id === doc.id &&
-                          activeDoc.headings &&
-                          activeDoc.headings.length > 1 && (
+                        {doc.headings &&
+                          doc.headings.length > 1 &&
+                          expandedHeadingTopicId === doc.id && (
                           <SidebarMenuSub>
-                              {activeDoc.headings.map((heading) => (
+                              {doc.headings.map((heading) => (
                                 <SidebarMenuItem key={heading.id}>
                                   <SidebarMenuButton
                                     size="sm"
