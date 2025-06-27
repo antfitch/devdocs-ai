@@ -4,7 +4,7 @@ export const prompts: DocItem[] = [
   {
     id: 'ask-a-question',
     title: 'Ask a Question',
-    icon: 'HelpCircle',
+    icon: 'MessageCircleQuestion',
     content: `
 # Ask a Question
 
