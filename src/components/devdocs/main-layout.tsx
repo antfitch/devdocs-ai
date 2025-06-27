@@ -54,6 +54,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   const [showDocWhileFiltering, setShowDocWhileFiltering] = useState(false);
   const [activeFilterTypeTag, setActiveFilterTypeTag] = useState<string | null>(null);
   const [includeSections, setIncludeSections] = useState(false);
+  const [openFilterTypes, setOpenFilterTypes] = useState<string[]>([]);
 
   const typeFilters = useMemo(() => [
     { label: 'Get Started', tag: 'get-started' },
@@ -71,6 +72,12 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     );
   };
   
+  const handleToggleFilterType = (tag: string) => {
+    setOpenFilterTypes((prev) =>
+        prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+    );
+  };
+
   const displayedTags = useMemo(() => {
     const selectedTypeTags = selectedTags.filter((tag) =>
       typeFilterTags.includes(tag.toLowerCase())
@@ -207,6 +214,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   const handleReturnToFilters = () => {
     setShowDocWhileFiltering(false);
     setActiveFilterTypeTag(null);
+    setToggledTopicId(null);
   };
 
   return (
@@ -375,59 +383,69 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                 </div>
                 <div>
                   <h3 className="mb-2 text-sm font-medium text-muted-foreground">Types</h3>
-                  <div className="space-y-2">
+                  <div className="space-y-1">
                     {typeFilters.map((filter) => (
-                      <Collapsible key={filter.tag} open={selectedTags.includes(filter.tag)} >
-                        <div>
-                          <div className="flex items-center space-x-2">
-                            <Checkbox
-                              id={`filter-type-${filter.tag}`}
-                              checked={selectedTags.includes(filter.tag)}
-                              onCheckedChange={() => handleTagToggle(filter.tag)}
-                            />
-                            <Label
-                              htmlFor={`filter-type-${filter.tag}`}
-                              className="font-normal cursor-pointer"
-                            >
-                              {filter.label}
-                            </Label>
-                          </div>
-                          <CollapsibleContent>
-                            <div className="pl-6 mt-2 space-y-1">
-                              {(docsByType.get(filter.tag) || []).map(doc => (
-                                <div key={doc.id} className="w-full">
-                                  <Button
-                                    variant="link"
-                                    className="p-0 h-auto w-full text-left justify-start font-normal text-muted-foreground hover:text-primary"
-                                    onClick={() => handleFilterTopicClick(doc, filter.tag)}
-                                  >
-                                    {doc.title}
-                                  </Button>
-                                  {toggledTopicId === doc.id && doc.headings && doc.headings.length > 0 && (
-                                    <SidebarMenuSub>
-                                      <SidebarMenuItem key={`${doc.id}-overview`}>
+                      <Collapsible 
+                        key={filter.tag}
+                        open={openFilterTypes.includes(filter.tag)}
+                        onOpenChange={() => handleToggleFilterType(filter.tag)}
+                      >
+                        <div className="flex items-center justify-between pr-2">
+                            <div className="flex items-center space-x-2">
+                                <Checkbox
+                                id={`filter-type-${filter.tag}`}
+                                checked={selectedTags.includes(filter.tag)}
+                                onCheckedChange={() => handleTagToggle(filter.tag)}
+                                />
+                                <Label
+                                htmlFor={`filter-type-${filter.tag}`}
+                                className="font-normal cursor-pointer"
+                                >
+                                {filter.label}
+                                </Label>
+                            </div>
+                            <CollapsibleTrigger asChild>
+                                <Button variant="ghost" size="sm" className="w-9 p-0">
+                                    <ChevronRight className="h-4 w-4 transition-transform duration-200 data-[state=open]:rotate-90" />
+                                    <span className="sr-only">Toggle</span>
+                                </Button>
+                            </CollapsibleTrigger>
+                        </div>
+                        <CollapsibleContent>
+                          <div className="pl-6 mt-2 space-y-1">
+                            {(docsByType.get(filter.tag) || []).map(doc => (
+                              <div key={doc.id} className="w-full">
+                                <Button
+                                  variant="link"
+                                  className="p-0 h-auto w-full text-left justify-start font-normal text-muted-foreground hover:text-primary"
+                                  onClick={() => handleFilterTopicClick(doc, filter.tag)}
+                                >
+                                  {doc.title}
+                                </Button>
+                                {toggledTopicId === doc.id && doc.headings && doc.headings.length > 0 && (
+                                  <SidebarMenuSub>
+                                    <SidebarMenuItem key={`${doc.id}-overview`}>
+                                      <SidebarMenuSubButton asChild size="sm">
+                                        <button onClick={() => handleHeadingClick('doc-viewer-top')} className="w-full text-left justify-start">
+                                          <span>Overview</span>
+                                        </button>
+                                      </SidebarMenuSubButton>
+                                    </SidebarMenuItem>
+                                    {doc.headings.map((heading) => (
+                                      <SidebarMenuItem key={heading.id}>
                                         <SidebarMenuSubButton asChild size="sm">
-                                          <button onClick={() => handleHeadingClick('doc-viewer-top')} className="w-full text-left justify-start">
-                                            <span>Overview</span>
+                                          <button onClick={() => handleHeadingClick(heading.id)} className="w-full text-left justify-start">
+                                            <span>{heading.title}</span>
                                           </button>
                                         </SidebarMenuSubButton>
                                       </SidebarMenuItem>
-                                      {doc.headings.map((heading) => (
-                                        <SidebarMenuItem key={heading.id}>
-                                          <SidebarMenuSubButton asChild size="sm">
-                                            <button onClick={() => handleHeadingClick(heading.id)} className="w-full text-left justify-start">
-                                              <span>{heading.title}</span>
-                                            </button>
-                                          </SidebarMenuSubButton>
-                                        </SidebarMenuItem>
-                                      ))}
-                                    </SidebarMenuSub>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          </CollapsibleContent>
-                        </div>
+                                    ))}
+                                  </SidebarMenuSub>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </CollapsibleContent>
                       </Collapsible>
                     ))}
                   </div>
@@ -527,3 +545,5 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     </SidebarProvider>
   );
 }
+
+    
