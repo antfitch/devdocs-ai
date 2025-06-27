@@ -434,12 +434,11 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
         </SidebarContent>
       </Sidebar>
       <SidebarInset className="p-4 max-h-screen overflow-hidden flex flex-col">
-        <div className="absolute top-2 left-2 z-20">
+        <div className="flex items-center gap-2 mb-4">
           <SidebarTrigger />
-        </div>
-        
-        <div className="pl-8 mb-4 capitalize text-sm font-medium text-muted-foreground">
-          {activeTab}
+          <div className="capitalize text-sm font-medium text-muted-foreground">
+            {activeTab}
+          </div>
         </div>
         
         <div className="flex-1 min-h-0">
