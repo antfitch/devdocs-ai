@@ -31,7 +31,8 @@ export function DocViewer({ doc }: DocViewerProps) {
     return { __html: html };
   };
   
-  const contentParts = doc.content.split(/(```[\s\S]*?```)/g);
+  const contentWithoutFrontmatter = doc.content.replace(/^---[\s\S]*?---/, '').trim();
+  const contentParts = contentWithoutFrontmatter.split(/(```[\s\S]*?```)/g);
 
   return (
     <Card className="h-full w-full overflow-hidden">

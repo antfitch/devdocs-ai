@@ -1,3 +1,9 @@
+---
+tags:
+  - installation
+  - npm
+  - setup
+---
 # Installation
 
 To get started, you need to install the client library.

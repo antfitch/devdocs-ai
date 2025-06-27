@@ -1,3 +1,9 @@
+---
+tags:
+  - authentication
+  - api-key
+  - security
+---
 # Authentication
 
 Authenticating with the Quantum API is straightforward.

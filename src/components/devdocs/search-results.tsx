@@ -27,7 +27,7 @@ export function SearchResults({ query, results, onSelect }: SearchResultsProps) 
                         </CardHeader>
                         <CardContent>
                         <p className="text-muted-foreground line-clamp-3">
-                            {item.content.replace(/#+ /g, '').replace(/```[\s\S]*?```/g, '[Code Block]').substring(0, 300)}...
+                            {item.content.replace(/^---[\s\S]*?---/, '').trim().replace(/#+ /g, '').replace(/```[\s\S]*?```/g, '[Code Block]').substring(0, 300)}...
                         </p>
                         <Button variant="link" className="p-0 h-auto mt-2" onClick={() => onSelect(item)}>
                             Go to topic

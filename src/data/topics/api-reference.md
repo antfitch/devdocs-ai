@@ -1,3 +1,9 @@
+---
+tags:
+  - api-reference
+  - endpoints
+  - quantum-computing
+---
 # API Reference
 
 This section provides a detailed reference for all available API endpoints.

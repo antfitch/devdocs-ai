@@ -1,3 +1,10 @@
+---
+tags:
+  - core-concepts
+  - qubits
+  - entanglement
+  - quantum-mechanics
+---
 # Core Concepts
 
 Understanding these core concepts is crucial for using the Quantum API effectively.
