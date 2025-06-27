@@ -51,6 +51,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   const [activeTab, setActiveTab] = useState('topics');
   const [scrollToHeading, setScrollToHeading] = useState<string | null>(null);
   const [showDocWhileFiltering, setShowDocWhileFiltering] = useState(false);
+  const [activeFilterTypeTag, setActiveFilterTypeTag] = useState<string | null>(null);
 
   const typeFilters = useMemo(() => [
     { label: 'Get Started', tag: 'get-started' },
@@ -151,7 +152,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     }
   };
 
-  const handleFilterTopicClick = (doc: DocItem) => {
+  const handleFilterTopicClick = (doc: DocItem, typeTag: string) => {
     setActiveDoc(doc);
     if (toggledTopicId === doc.id) {
         setToggledTopicId(null);
@@ -160,6 +161,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     } else {
         setToggledTopicId(null);
     }
+    setActiveFilterTypeTag(typeTag);
     setShowDocWhileFiltering(true);
   };
 
@@ -187,13 +189,14 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     }
     setShowDocWhileFiltering(false);
     setActiveTab(value);
+    setActiveFilterTypeTag(null);
   }
 
   const isSearching = searchQuery.length > 0;
 
   let breadcrumbTypeLabel = null;
   if (activeTab === 'filters' && activeDoc && showDocWhileFiltering) {
-    const typeTag = activeDoc.tags?.find(t => typeFilterTags.includes(t.toLowerCase()));
+    const typeTag = activeFilterTypeTag || activeDoc.tags?.find(t => typeFilterTags.includes(t.toLowerCase()));
     if (typeTag) {
       breadcrumbTypeLabel = typeFilters.find(f => f.tag === typeTag)?.label;
     }
@@ -201,6 +204,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
 
   const handleReturnToFilters = () => {
     setShowDocWhileFiltering(false);
+    setActiveFilterTypeTag(null);
   };
 
   return (
@@ -383,7 +387,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                                   <Button
                                     variant="link"
                                     className="p-0 h-auto w-full text-left justify-start font-normal text-muted-foreground hover:text-primary"
-                                    onClick={() => handleFilterTopicClick(doc)}
+                                    onClick={() => handleFilterTopicClick(doc, filter.tag)}
                                   >
                                     {doc.title}
                                   </Button>
