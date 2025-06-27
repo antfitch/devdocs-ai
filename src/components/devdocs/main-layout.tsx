@@ -24,6 +24,8 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import type { DocItem } from '@/types';
 import { DocViewer } from './doc-viewer';
 import { SearchResults } from './search-results';
@@ -34,13 +36,21 @@ interface MainLayoutProps {
   topics: DocItem[];
   prompts: DocItem[];
   allDocs: DocItem[];
+  allTags: string[];
 }
 
-export function MainLayout({ topics, prompts, allDocs }: MainLayoutProps) {
+export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeDoc, setActiveDoc] = useState<DocItem | null>(topics[0]);
   const [openItems, setOpenItems] = useState<string[]>(['getting-started']);
   const [toggledTopicId, setToggledTopicId] = useState<string | null>(null);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+  const handleTagToggle = (tag: string) => {
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+    );
+  };
 
   const searchResults = useMemo(
     () =>
@@ -77,6 +87,9 @@ export function MainLayout({ topics, prompts, allDocs }: MainLayoutProps) {
   };
 
   const isSearching = searchQuery.length > 0;
+
+  // TODO: Filter topics based on selectedTags
+  const displayedTopics = topics;
 
   return (
     <SidebarProvider defaultOpen={true}>
@@ -135,7 +148,7 @@ export function MainLayout({ topics, prompts, allDocs }: MainLayoutProps) {
             <TabsContent value="topics" className="m-0">
               <h2 className="p-4 pb-2 text-base font-bold">Topics</h2>
               <SidebarMenu className="p-2 pt-0">
-                {topics.map((doc) => (
+                {displayedTopics.map((doc) => (
                   <SidebarMenuItem key={doc.id}>
                     {doc.subtopics && doc.subtopics.length > 0 ? (
                       <Collapsible
@@ -230,7 +243,20 @@ export function MainLayout({ topics, prompts, allDocs }: MainLayoutProps) {
             </TabsContent>
             <TabsContent value="filters" className="m-0">
               <h2 className="p-4 pb-2 text-base font-bold">Filters</h2>
-              {/* Content for filters will go here */}
+              <div className="p-4 pt-0 space-y-2">
+                {allTags.map((tag) => (
+                  <div key={tag} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`filter-${tag}`}
+                      checked={selectedTags.includes(tag)}
+                      onCheckedChange={() => handleTagToggle(tag)}
+                    />
+                    <Label htmlFor={`filter-${tag}`} className="font-normal capitalize cursor-pointer">
+                      {tag.replace(/-/g, ' ')}
+                    </Label>
+                  </div>
+                ))}
+              </div>
             </TabsContent>
           </Tabs>
         </SidebarContent>

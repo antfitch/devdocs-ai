@@ -7,9 +7,18 @@ export default function Home() {
   const topics = getTopicsWithContent();
   const allDocs = getAllDocsWithContent();
 
+  const allTags = Array.from(
+    new Set(
+      allDocs.flatMap(doc => [
+        ...(doc.tags || []),
+        ...(doc.headings?.flatMap(h => h.tags || []) || [])
+      ])
+    )
+  ).sort();
+
   return (
     <>
-      <MainLayout topics={topics} prompts={prompts} allDocs={allDocs} />
+      <MainLayout topics={topics} prompts={prompts} allDocs={allDocs} allTags={allTags} />
       <Toaster />
     </>
   );

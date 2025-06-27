@@ -13,6 +13,24 @@ const addContentToTopics = (topics: any[]): DocItem[] => {
       ? fs.readFileSync(fullPath, 'utf8')
       : '';
 
+    const frontmatterMatch = content.match(/^---([\s\S]*?)---/);
+    const documentTags: string[] = [];
+    if (frontmatterMatch) {
+      const frontmatter = frontmatterMatch[1];
+      const lines = frontmatter.split('\n');
+      let inTags = false;
+      for (const line of lines) {
+        if (line.startsWith('tags:')) {
+          inTags = true;
+        } else if (inTags && line.trim().startsWith('- ')) {
+          documentTags.push(line.trim().substring(2).trim());
+        } else if (inTags && line.trim() !== '') {
+          // If a non-empty line that is not a tag item is found, stop parsing tags
+          inTags = false;
+        }
+      }
+    }
+
     const contentWithoutFrontmatter = content.replace(/^---[\s\S]*?---/, '').trim();
 
     const lines = content.replace(/^---[\s\S]*?---/, '').trim().split('\n');
@@ -39,6 +57,7 @@ const addContentToTopics = (topics: any[]): DocItem[] => {
     const topicWithContent: DocItem = {
       ...topic,
       content,
+      tags: documentTags,
       headings: headings.length > 1 ? headings : [],
     };
 
