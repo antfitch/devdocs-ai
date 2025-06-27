@@ -93,14 +93,14 @@ export function MainLayout({ topics, prompts, allDocs }: MainLayoutProps) {
         <SidebarContent className="p-0">
           <Tabs defaultValue="topics" className="w-full">
             <TabsList className="w-full rounded-none">
-              <TabsTrigger value="topics" className="flex-1 gap-2">
-                <Book className="h-4 w-4" /> Topics
+              <TabsTrigger value="topics" className="flex-1">
+                <Book className="h-4 w-4" />
               </TabsTrigger>
-              <TabsTrigger value="prompts" className="flex-1 gap-2">
-                <MessageSquare className="h-4 w-4" /> Prompts
+              <TabsTrigger value="prompts" className="flex-1">
+                <MessageSquare className="h-4 w-4" />
               </TabsTrigger>
-              <TabsTrigger value="filters" className="flex-1 gap-2">
-                <Filter className="h-4 w-4" /> Filters
+              <TabsTrigger value="filters" className="flex-1">
+                <Filter className="h-4 w-4" />
               </TabsTrigger>
             </TabsList>
             <TabsContent value="topics" className="m-0">
