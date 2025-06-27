@@ -115,7 +115,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     }
     if (doc.id === toggledTopicId) {
       setToggledTopicId(null);
-    } else if (doc.headings && doc.headings.length > 0) {
+    } else if (doc.headings && doc.headings.length > 1) {
       setToggledTopicId(doc.id);
     } else {
       setToggledTopicId(null);
@@ -260,7 +260,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                           {doc.icon && <DynamicIcon name={doc.icon} />}
                           <span>{doc.title}</span>
                         </SidebarMenuButton>
-                        {toggledTopicId === doc.id && doc.headings && doc.headings.length > 0 && (
+                        {toggledTopicId === doc.id && doc.headings && doc.headings.length > 1 && (
                            <SidebarMenuSub>
                              {doc.headings.map((heading) => (
                                <SidebarMenuItem key={heading.id}>
