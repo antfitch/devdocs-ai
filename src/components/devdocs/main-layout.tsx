@@ -133,7 +133,7 @@ export function MainLayout({ topics, prompts, allDocs }: MainLayoutProps) {
               </TooltipProvider>
             </TabsList>
             <TabsContent value="topics" className="m-0">
-              <h2 className="p-4 pb-2 text-lg font-bold">Topics</h2>
+              <h2 className="p-4 pb-2 text-base font-bold">Topics</h2>
               <SidebarMenu className="p-2 pt-0">
                 {topics.map((doc) => (
                   <SidebarMenuItem key={doc.id}>
@@ -213,7 +213,7 @@ export function MainLayout({ topics, prompts, allDocs }: MainLayoutProps) {
               </SidebarMenu>
             </TabsContent>
             <TabsContent value="prompts" className="m-0">
-              <h2 className="p-4 pb-2 text-lg font-bold">Prompts</h2>
+              <h2 className="p-4 pb-2 text-base font-bold">Prompts</h2>
               <SidebarMenu className="p-2 pt-0">
                 {prompts.map((doc) => (
                   <SidebarMenuItem key={doc.id}>
@@ -229,7 +229,7 @@ export function MainLayout({ topics, prompts, allDocs }: MainLayoutProps) {
               </SidebarMenu>
             </TabsContent>
             <TabsContent value="filters" className="m-0">
-              <h2 className="p-4 pb-2 text-lg font-bold">Filters</h2>
+              <h2 className="p-4 pb-2 text-base font-bold">Filters</h2>
               {/* Content for filters will go here */}
             </TabsContent>
           </Tabs>
