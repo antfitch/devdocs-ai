@@ -120,24 +120,38 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   const displayedTopics = topics;
 
   const handleSelectDoc = (doc: DocItem, headingId?: string) => {
-    setShowDocWhileFiltering(false);
+    // If coming from a filter view, we want to show the doc, not the filter list.
+    if (activeTab === 'filters') {
+      setShowDocWhileFiltering(true);
+    } else {
+      // This is a "normal" navigation from topics/prompts list.
+      // Reset any filter-related state.
+      setShowDocWhileFiltering(false);
+      setSelectedTags([]);
+      if (prompts.some(p => p.id === doc.id)) {
+        setActiveTab('prompts');
+      } else {
+        setActiveTab('topics');
+      }
+    }
+    
     setSearchQuery('');
     setActiveDoc(doc);
+
     if (headingId) {
       setScrollToHeading(headingId);
     }
-    if (doc.id === toggledTopicId) {
-      setToggledTopicId(null);
-    } else if (doc.headings && doc.headings.length > 1) {
-      setToggledTopicId(doc.id);
-    } else {
-      setToggledTopicId(null);
-    }
-    setSelectedTags([]);
-    if (prompts.some(p => p.id === doc.id)) {
-      setActiveTab('prompts');
-    } else {
-      setActiveTab('topics');
+
+    // This toggles the sub-headings in the main "Topics" list.
+    // We don't want to do this if we are navigating from the filters tab.
+    if (activeTab !== 'filters') {
+      if (doc.id === toggledTopicId) {
+        setToggledTopicId(null);
+      } else if (doc.headings && doc.headings.length > 1) {
+        setToggledTopicId(doc.id);
+      } else {
+        setToggledTopicId(null);
+      }
     }
   };
 
