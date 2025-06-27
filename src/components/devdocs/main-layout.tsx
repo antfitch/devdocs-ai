@@ -53,6 +53,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   const [scrollToHeading, setScrollToHeading] = useState<string | null>(null);
   const [showDocWhileFiltering, setShowDocWhileFiltering] = useState(false);
   const [activeFilterTypeTag, setActiveFilterTypeTag] = useState<string | null>(null);
+  const [includeSections, setIncludeSections] = useState(false);
 
   const typeFilters = useMemo(() => [
     { label: 'Get Started', tag: 'get-started' },
@@ -363,8 +364,14 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
               <h2 className="p-4 pb-2 text-base font-bold">Filters</h2>
               <div className="p-4 pt-0 space-y-4">
                 <div className="flex items-center space-x-2">
-                  <Switch id="include-sections" />
-                  <Label htmlFor="include-sections" className="cursor-pointer">Include sections</Label>
+                  <Switch
+                    id="include-sections"
+                    checked={includeSections}
+                    onCheckedChange={setIncludeSections}
+                  />
+                  <Label htmlFor="include-sections" className="cursor-pointer">
+                    {includeSections ? 'Sections only' : 'Topics only'}
+                  </Label>
                 </div>
                 <div>
                   <h3 className="mb-2 text-sm font-medium text-muted-foreground">Types</h3>
