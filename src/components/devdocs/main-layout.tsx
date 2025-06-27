@@ -192,7 +192,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   const isSearching = searchQuery.length > 0;
 
   let breadcrumbTypeLabel = null;
-  if (activeTab === 'filters' && activeDoc) {
+  if (activeTab === 'filters' && activeDoc && showDocWhileFiltering) {
     const typeTag = activeDoc.tags?.find(t => typeFilterTags.includes(t.toLowerCase()));
     if (typeTag) {
       breadcrumbTypeLabel = typeFilters.find(f => f.tag === typeTag)?.label;
@@ -448,7 +448,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                 <span>{breadcrumbTypeLabel}</span>
               </>
             )}
-            {activeDoc && (
+            {activeDoc && (activeTab !== 'filters' || showDocWhileFiltering) && (
               <>
                 <ChevronRight className="h-4 w-4" />
                 <span>{activeDoc.title}</span>
