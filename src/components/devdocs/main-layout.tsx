@@ -35,6 +35,7 @@ import { AskMeAssistant } from './ask-me-assistant';
 import DynamicIcon from './dynamic-icon';
 import { FilteredDocsViewer } from './filtered-docs-viewer';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface MainLayoutProps {
   topics: DocItem[];
@@ -412,14 +413,19 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                                 {filter.label}
                                 </Label>
                             </div>
-                            {selectedTags.includes(filter.tag) && (
-                              <CollapsibleTrigger asChild>
-                                  <Button variant="ghost" size="icon" className="h-6 w-6">
-                                      <ChevronRight className="h-4 w-4 transition-transform duration-200 data-[state=open]:rotate-90" />
-                                      <span className="sr-only">Toggle</span>
-                                  </Button>
-                              </CollapsibleTrigger>
-                            )}
+                            <CollapsibleTrigger asChild disabled={!selectedTags.includes(filter.tag)}>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className={cn(
+                                    "h-6 w-6",
+                                    !selectedTags.includes(filter.tag) && "invisible"
+                                  )}
+                                >
+                                    <ChevronRight className="h-4 w-4 transition-transform duration-200 data-[state=open]:rotate-90" />
+                                    <span className="sr-only">Toggle</span>
+                                </Button>
+                            </CollapsibleTrigger>
                         </div>
                         <CollapsibleContent>
                           <div className="pl-6 mt-2 space-y-1">
