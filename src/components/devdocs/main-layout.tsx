@@ -516,6 +516,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                 typeFilterTags={typeFilterTags}
                 docs={allDocs}
                 onSelect={handleSelectDoc}
+                includeSections={includeSections}
               />
             ) : (
               <DocViewer doc={activeDoc} />
