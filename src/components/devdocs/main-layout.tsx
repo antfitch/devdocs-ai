@@ -353,7 +353,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
               <h2 className="p-4 pb-2 text-base font-bold">Filters</h2>
               <div className="p-4 pt-0 space-y-4">
                 <div>
-                  <h3 className="mb-2 text-sm font-medium text-muted-foreground">Type</h3>
+                  <h3 className="mb-2 text-sm font-medium text-muted-foreground">Types</h3>
                   <div className="space-y-2">
                     {typeFilters.map((filter) => (
                       <Collapsible key={filter.tag} open={selectedTags.includes(filter.tag)} >
