@@ -139,7 +139,7 @@ export function MainLayout({ topics, prompts, allDocs }: MainLayoutProps) {
                                 </SidebarMenuButton>
                                 {activeDoc?.id === subDoc.id &&
                                   activeDoc.headings &&
-                                  activeDoc.headings.length > 0 && (
+                                  activeDoc.headings.length > 1 && (
                                     <SidebarMenuSub>
                                       {activeDoc.headings.map((heading) => (
                                         <SidebarMenuItem key={heading.id}>
@@ -173,7 +173,7 @@ export function MainLayout({ topics, prompts, allDocs }: MainLayoutProps) {
                         </SidebarMenuButton>
                         {activeDoc?.id === doc.id &&
                           activeDoc.headings &&
-                          activeDoc.headings.length > 0 && (
+                          activeDoc.headings.length > 1 && (
                           <SidebarMenuSub>
                               {activeDoc.headings.map((heading) => (
                                 <SidebarMenuItem key={heading.id}>
