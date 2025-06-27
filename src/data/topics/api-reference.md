@@ -9,6 +9,7 @@ tags:
 This section provides a detailed reference for all available API endpoints.
 
 ## POST /v1/compute
+tags: POST, compute, v1, endpoints
 
 This endpoint allows you to submit a quantum circuit for computation.
 

@@ -7,3 +7,9 @@ export interface DocItem {
   subtopics?: DocItem[];
   headings?: { id: string; title: string }[];
 }
+
+export interface DocItemHeading {
+  id: string;
+  title: string;
+  tags?: string[]; // Add optional tags array
+}

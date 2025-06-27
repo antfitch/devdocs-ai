@@ -14,14 +14,27 @@ const addContentToTopics = (topics: any[]): DocItem[] => {
       : '';
 
     const contentWithoutFrontmatter = content.replace(/^---[\s\S]*?---/, '').trim();
-    const headings = contentWithoutFrontmatter
-        .split('\n')
-        .filter(line => line.startsWith('## '))
-        .map(line => {
-            const title = line.replace('## ', '').trim();
+
+    const lines = content.replace(/^---[\s\S]*?---/, '').trim().split('\n');
+
+    const headings: { id: string; title: string; tags?: string[] }[] = [];
+    let currentHeading: { id: string; title: string; tags?: string[] } | null = null;
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const h2Match = line.match(/^## (.*$)/);
+        const tagsMatch = line.match(/^tags: (.*$)/);
+
+        if (h2Match) {
+            const title = h2Match[1].trim();
             const id = title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
-            return { id, title };
-        });
+            currentHeading = { id, title };
+            headings.push(currentHeading);
+        } else if (tagsMatch && currentHeading) {
+            const tags = tagsMatch[1].split(',').map(tag => tag.trim());
+            currentHeading.tags = tags;
+        }
+    }
 
     const topicWithContent: DocItem = {
       ...topic,
