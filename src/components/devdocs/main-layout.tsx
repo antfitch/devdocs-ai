@@ -433,30 +433,39 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
           </Tabs>
         </SidebarContent>
       </Sidebar>
-      <SidebarInset className="p-4 max-h-screen overflow-hidden">
+      <SidebarInset className="p-4 max-h-screen overflow-hidden flex flex-col">
         <div className="absolute top-2 left-2 z-20">
           <SidebarTrigger />
         </div>
-        {isSearching ? (
-          <SearchResults
-            query={searchQuery}
-            results={searchResults}
-            onSelect={handleSelectDoc}
-          />
-        ) : showDocWhileFiltering ? (
-          <DocViewer doc={activeDoc} />
-        ) : activeTab === 'filters' || selectedTags.length > 0 ? (
-          <FilteredDocsViewer 
-            tags={selectedTags}
-            typeFilterTags={typeFilterTags}
-            docs={allDocs}
-            onSelect={handleSelectDoc}
-          />
-        ) : (
-          <DocViewer doc={activeDoc} />
-        )}
+        
+        <div className="pl-8 mb-4 capitalize text-sm font-medium text-muted-foreground">
+          {activeTab}
+        </div>
+        
+        <div className="flex-1 min-h-0">
+            {isSearching ? (
+              <SearchResults
+                query={searchQuery}
+                results={searchResults}
+                onSelect={handleSelectDoc}
+              />
+            ) : showDocWhileFiltering ? (
+              <DocViewer doc={activeDoc} />
+            ) : activeTab === 'filters' || selectedTags.length > 0 ? (
+              <FilteredDocsViewer 
+                tags={selectedTags}
+                typeFilterTags={typeFilterTags}
+                docs={allDocs}
+                onSelect={handleSelectDoc}
+              />
+            ) : (
+              <DocViewer doc={activeDoc} />
+            )}
+        </div>
         <AskMeAssistant />
       </SidebarInset>
     </SidebarProvider>
   );
 }
+
+    
