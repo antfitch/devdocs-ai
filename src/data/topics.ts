@@ -19,6 +19,6 @@ export const topics: Omit<DocItem, 'content'>[] = [
   {
     id: 'api-reference',
     title: 'API Reference',
-    icon: 'Code2',
+    icon: 'CodeXml',
   },
 ];
