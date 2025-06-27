@@ -63,6 +63,7 @@ The AI assistant is a floating widget located at the bottom-right of the screen.
 *   **Styling:** Tailwind CSS
 *   **AI Integration:** Genkit with Google Gemini
 *   **Icons:** `lucide-react`
+*   **Fonts:** 'Inter' for body/headlines, `monospace` for code.
 
 ## 6. Non-Functional Requirements
 *   **Performance:** The application should be fast and responsive, with lazy loading and server components where appropriate.
