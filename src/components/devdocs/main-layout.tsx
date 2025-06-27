@@ -17,6 +17,11 @@ import {
 } from '@/components/ui/sidebar';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import type { DocItem } from '@/types';
 import { DocViewer } from './doc-viewer';
@@ -93,15 +98,36 @@ export function MainLayout({ topics, prompts, allDocs }: MainLayoutProps) {
         <SidebarContent className="p-0">
           <Tabs defaultValue="topics" className="w-full">
             <TabsList className="w-full rounded-none">
-              <TabsTrigger value="topics" className="flex-1">
-                <Book className="h-4 w-4" />
-              </TabsTrigger>
-              <TabsTrigger value="prompts" className="flex-1">
-                <MessageSquare className="h-4 w-4" />
-              </TabsTrigger>
-              <TabsTrigger value="filters" className="flex-1">
-                <Filter className="h-4 w-4" />
-              </TabsTrigger>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger value="topics" className="flex-1">
+                    <Book className="h-4 w-4" />
+                  </TabsTrigger>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  <p>Topics</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger value="prompts" className="flex-1">
+                    <MessageSquare className="h-4 w-4" />
+                  </TabsTrigger>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  <p>Prompts</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger value="filters" className="flex-1">
+                    <Filter className="h-4 w-4" />
+                  </TabsTrigger>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  <p>Filters</p>
+                </TooltipContent>
+              </Tooltip>
             </TabsList>
             <TabsContent value="topics" className="m-0">
               <SidebarMenu className="p-2">
