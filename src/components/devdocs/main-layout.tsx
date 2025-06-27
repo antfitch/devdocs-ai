@@ -354,6 +354,13 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                                   </Button>
                                   {toggledTopicId === doc.id && doc.headings && doc.headings.length > 0 && (
                                     <SidebarMenuSub>
+                                      <SidebarMenuItem key={`${doc.id}-overview`}>
+                                        <SidebarMenuSubButton asChild size="sm">
+                                          <button onClick={() => handleHeadingClick('doc-viewer-top')} className="w-full text-left justify-start">
+                                            <span>Overview</span>
+                                          </button>
+                                        </SidebarMenuSubButton>
+                                      </SidebarMenuItem>
                                       {doc.headings.map((heading) => (
                                         <SidebarMenuItem key={heading.id}>
                                           <SidebarMenuSubButton asChild size="sm">
