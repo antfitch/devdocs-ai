@@ -1,5 +1,3 @@
-
-
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -414,7 +412,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                   </div>
                 </div>
                 <div>
-                  <h3 className="mb-2 text-sm font-medium text-muted-foreground">Tags</h3>
+                  <h3 className="mb-2 text-sm font-medium text-muted-foreground">Stories</h3>
                   <div className="space-y-2">
                     {displayedTags.map((tag) => (
                       <div key={tag} className="flex items-center space-x-2">
