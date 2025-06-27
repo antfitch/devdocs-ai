@@ -63,14 +63,20 @@ export function FilteredDocsViewer({ tags, typeFilterTags, docs, onSelect }: Fil
                             <p className="text-muted-foreground line-clamp-3">
                                 {item.content.replace(/^---[\s\S]*?---/, '').trim().replace(/#+ /g, '').replace(/```[\s\S]*?```/g, '[Code Block]').substring(0, 300)}...
                             </p>
-                            <Button variant="link" className="p-0 h-auto mt-2" onClick={() => onSelect(item)}>
-                                Go to topic
-                            </Button>
-                            {item.headings && item.headings.length > 0 && (
-                                <div className="mt-4 pt-4 border-t">
-                                    <h4 className="text-sm font-medium mb-2">Relevant Sections</h4>
-                                    <ul className="space-y-1">
-                                    {item.headings.map((heading) => (
+                            <div className="mt-4 pt-4 border-t">
+                                <h4 className="text-sm font-medium mb-2">Relevant Sections</h4>
+                                <ul className="space-y-1">
+                                    <li>
+                                        <Button
+                                            variant="link"
+                                            className="p-0 h-auto text-muted-foreground hover:text-primary justify-start text-left font-normal"
+                                            onClick={() => onSelect(item)}
+                                        >
+                                            <ChevronRight className="h-4 w-4 mr-1" />
+                                            Overview
+                                        </Button>
+                                    </li>
+                                    {item.headings?.map((heading) => (
                                         <li key={heading.id}>
                                             <Button
                                                 variant="link"
@@ -82,9 +88,8 @@ export function FilteredDocsViewer({ tags, typeFilterTags, docs, onSelect }: Fil
                                             </Button>
                                         </li>
                                     ))}
-                                    </ul>
-                                </div>
-                            )}
+                                </ul>
+                            </div>
                         </CardContent>
                     </Card>
                     ))
