@@ -39,7 +39,8 @@ export function DocViewer({ doc }: DocViewerProps) {
   const contentForRendering = contentWithoutFrontmatter
     // Remove tags lines used for metadata
     .replace(/^tags:.*$\n?/gm, '')
-    // Normalize newlines after H2 to a single newline to remove extra vertical space.
+    // Normalize newlines after headings to a single newline to remove extra vertical space.
+    .replace(/(^# .*$)\n+/gm, '$1\n')
     .replace(/(^##.*$)\n+/gm, '$1\n');
   const contentParts = contentForRendering.split(/(```[\s\S]*?```)/g);
 
