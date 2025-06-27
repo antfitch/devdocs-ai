@@ -21,7 +21,10 @@ export function DocViewer({ doc }: DocViewerProps) {
   const renderSimpleMarkdown = (text: string) => {
     const html = text
       .replace(/^# (.*$)/gim, '<h1 class="text-4xl font-extrabold mt-8 mb-4 tracking-tight">$1</h1>')
-      .replace(/^## (.*$)/gim, '<h2 class="text-2xl font-bold mt-6 mb-3 border-b pb-2">$1</h2>')
+      .replace(/^## (.*$)/gim, (match, p1) => {
+        const id = p1.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+        return `<h2 id="${id}" class="text-2xl font-bold mt-6 mb-3 border-b pb-2">${p1}</h2>`;
+      })
       .replace(/^### (.*$)/gim, '<h3 class="text-xl font-bold mt-4 mb-2">$1</h3>')
       .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
       .replace(/\*(.*)\*/gim, '<em>$1</em>')

@@ -5,4 +5,5 @@ export interface DocItem {
   content: string;
   icon?: string;
   subtopics?: DocItem[];
+  headings?: { id: string; title: string }[];
 }

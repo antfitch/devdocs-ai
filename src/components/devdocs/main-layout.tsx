@@ -13,6 +13,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarMenuSub,
+  SidebarMenuSubButton,
 } from '@/components/ui/sidebar';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -33,6 +34,7 @@ export function MainLayout({ topics, prompts, allDocs }: MainLayoutProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeDoc, setActiveDoc] = useState<DocItem | null>(topics[0]);
   const [openItems, setOpenItems] = useState<string[]>(['getting-started']);
+  const [toggledTopicId, setToggledTopicId] = useState<string | null>(null);
 
   const searchResults = useMemo(
     () =>
@@ -49,6 +51,17 @@ export function MainLayout({ topics, prompts, allDocs }: MainLayoutProps) {
   const handleSelectDoc = (doc: DocItem) => {
     setSearchQuery('');
     setActiveDoc(doc);
+    if (doc.id === toggledTopicId) {
+      setToggledTopicId(null);
+    } else if (doc.headings && doc.headings.length > 0) {
+      setToggledTopicId(doc.id);
+    } else {
+      setToggledTopicId(null);
+    }
+  };
+
+  const handleHeadingClick = (headingId: string) => {
+    document.getElementById(headingId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   const handleToggle = (id: string) => {
@@ -136,13 +149,31 @@ export function MainLayout({ topics, prompts, allDocs }: MainLayoutProps) {
                         </CollapsibleContent>
                       </Collapsible>
                     ) : (
-                      <SidebarMenuButton
-                        onClick={() => handleSelectDoc(doc)}
-                        isActive={!isSearching && activeDoc?.id === doc.id}
-                      >
-                        {doc.icon && <DynamicIcon name={doc.icon} />}
-                        <span>{doc.title}</span>
-                      </SidebarMenuButton>
+                      <>
+                        <SidebarMenuButton
+                          onClick={() => handleSelectDoc(doc)}
+                          isActive={!isSearching && activeDoc?.id === doc.id}
+                        >
+                          {doc.icon && <DynamicIcon name={doc.icon} />}
+                          <span>{doc.title}</span>
+                        </SidebarMenuButton>
+                        {toggledTopicId === doc.id && doc.headings && doc.headings.length > 0 && (
+                           <SidebarMenuSub>
+                             {doc.headings.map((heading) => (
+                               <SidebarMenuItem key={heading.id}>
+                                 <SidebarMenuSubButton
+                                   asChild
+                                   size="sm"
+                                 >
+                                   <button onClick={() => handleHeadingClick(heading.id)} className="w-full text-left justify-start">
+                                     <span>{heading.title}</span>
+                                   </button>
+                                 </SidebarMenuSubButton>
+                               </SidebarMenuItem>
+                             ))}
+                           </SidebarMenuSub>
+                         )}
+                      </>
                     )}
                   </SidebarMenuItem>
                 ))}
