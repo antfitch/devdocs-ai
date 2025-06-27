@@ -37,7 +37,7 @@ export function DocViewer({ doc }: DocViewerProps) {
   return (
     <Card className="h-full w-full overflow-hidden">
         <ScrollArea className="h-full">
-            <div className="p-8 prose prose-slate max-w-none dark:prose-invert">
+            <div className="p-8 pb-24 prose prose-slate max-w-none dark:prose-invert">
                 {contentParts.map((part, index) => {
                     if (part.startsWith('```')) {
                         const lines = part.split('\n');

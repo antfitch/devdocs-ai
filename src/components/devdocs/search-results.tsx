@@ -18,7 +18,7 @@ export function SearchResults({ query, results, onSelect }: SearchResultsProps) 
         </CardHeader>
         <CardContent>
             <ScrollArea className="h-[calc(100vh-200px)]">
-                <div className="space-y-4">
+                <div className="space-y-4 pb-24">
                 {results.length > 0 ? (
                     results.map((item) => (
                     <Card key={item.id}>
