@@ -19,6 +19,7 @@ const performVectorSearch = (query: string): string => {
 }
 
 export function AskMeAssistant() {
+  const [mounted, setMounted] = useState(false);
   const [selectedText, setSelectedText] = useState('');
   const [isAskOpen, setIsAskOpen] = useState(false);
   const [isResultOpen, setIsResultOpen] = useState(false);
@@ -28,6 +29,12 @@ export function AskMeAssistant() {
   const { toast } = useToast();
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
     const handleMouseUp = () => {
       const text = window.getSelection()?.toString().trim() || '';
       // Only update if the selection is not inside the assistant itself
@@ -46,7 +53,7 @@ export function AskMeAssistant() {
     return () => {
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, []);
+  }, [mounted]);
 
   const handleExplain = async () => {
     if (!selectedText) return;
@@ -103,6 +110,10 @@ export function AskMeAssistant() {
   };
   
   const clearSelection = () => setSelectedText('');
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <>
