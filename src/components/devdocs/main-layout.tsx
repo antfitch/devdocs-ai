@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -366,8 +367,8 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                               {(docsByType.get(filter.tag) || []).map(doc => (
                                 <div key={doc.id} className="w-full">
                                   <Button
-                                    variant="link"
-                                    className="p-0 h-auto w-full text-left justify-start font-normal"
+                                    variant="ghost"
+                                    className="p-0 h-auto w-full text-left justify-start font-normal text-muted-foreground hover:text-primary"
                                     onClick={() => handleFilterTopicClick(doc)}
                                   >
                                     {doc.title}
