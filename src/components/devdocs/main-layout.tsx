@@ -138,6 +138,17 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     }
   };
 
+  const handleFilterTopicClick = (doc: DocItem) => {
+    setActiveDoc(doc);
+    if (toggledTopicId === doc.id) {
+        setToggledTopicId(null);
+    } else if (doc.headings && doc.headings.length > 0) {
+        setToggledTopicId(doc.id);
+    } else {
+        setToggledTopicId(null);
+    }
+  };
+
   const handleHeadingClick = (headingId: string) => {
     document.getElementById(headingId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
@@ -333,14 +344,28 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                           <CollapsibleContent>
                             <div className="pl-6 mt-2 space-y-1">
                               {(docsByType.get(filter.tag) || []).map(doc => (
-                                <Button
-                                  key={doc.id}
-                                  variant="link"
-                                  className="p-0 h-auto w-full text-left justify-start font-normal text-muted-foreground hover:text-primary"
-                                  onClick={() => handleSelectDoc(doc)}
-                                >
-                                  {doc.title}
-                                </Button>
+                                <div key={doc.id} className="w-full">
+                                  <Button
+                                    variant="link"
+                                    className="p-0 h-auto w-full text-left justify-start font-normal text-muted-foreground hover:text-primary"
+                                    onClick={() => handleFilterTopicClick(doc)}
+                                  >
+                                    {doc.title}
+                                  </Button>
+                                  {toggledTopicId === doc.id && doc.headings && doc.headings.length > 0 && (
+                                    <SidebarMenuSub>
+                                      {doc.headings.map((heading) => (
+                                        <SidebarMenuItem key={heading.id}>
+                                          <SidebarMenuSubButton asChild size="sm">
+                                            <button onClick={() => handleHeadingClick(heading.id)} className="w-full text-left justify-start">
+                                              <span>{heading.title}</span>
+                                            </button>
+                                          </SidebarMenuSubButton>
+                                        </SidebarMenuItem>
+                                      ))}
+                                    </SidebarMenuSub>
+                                  )}
+                                </div>
                               ))}
                             </div>
                           </CollapsibleContent>
