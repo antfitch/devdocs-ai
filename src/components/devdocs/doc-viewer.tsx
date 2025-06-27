@@ -40,8 +40,8 @@ export function DocViewer({ doc }: DocViewerProps) {
     // Remove tags lines used for metadata
     .replace(/^tags:.*$\n?/gm, '')
     // Normalize newlines after headings to a single newline to remove extra vertical space.
-    .replace(/(^# .*$)\n+/gm, '$1')
-    .replace(/(^##.*$)\n+/gm, '$1');
+    .replace(/(^# .*$)\n+/gm, '$1\n')
+    .replace(/(^##.*$)\n+/gm, '$1\n');
   const contentParts = contentForRendering.split(/(```[\s\S]*?```)/g);
 
   return (
