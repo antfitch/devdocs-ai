@@ -58,7 +58,7 @@ const addContentToTopics = (topics: any[]): DocItem[] => {
       ...topic,
       content,
       tags: documentTags,
-      headings: headings.length > 1 ? headings : [],
+      headings: headings,
     };
 
     if (topic.subtopics) {
