@@ -48,19 +48,48 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState('topics');
 
-  const typeFilters = [
+  const typeFilters = useMemo(() => [
     { label: 'User Guide', tag: 'how-to' },
     { label: 'Reference', tag: 'reference' },
     { label: 'Concept', tag: 'concept' },
-  ];
-  const typeFilterTags = typeFilters.map((filter) => filter.tag);
-  const remainingTags = allTags.filter((tag) => !typeFilterTags.includes(tag));
+  ], []);
 
+  const typeFilterTags = useMemo(() => typeFilters.map((filter) => filter.tag), [typeFilters]);
+  
   const handleTagToggle = (tag: string) => {
     setSelectedTags((prev) =>
       prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
     );
   };
+  
+  const displayedTags = useMemo(() => {
+    const selectedTypeTags = selectedTags.filter((tag) =>
+      typeFilterTags.includes(tag)
+    );
+
+    if (selectedTypeTags.length > 0) {
+      const relevantDocs = allDocs.filter((doc) => {
+        const docTypeTags = doc.tags || [];
+        return selectedTypeTags.some((typeTag) =>
+          docTypeTags.includes(typeTag)
+        );
+      });
+
+      const tagsFromRelevantDocs = new Set<string>();
+      relevantDocs.forEach((doc) => {
+        (doc.tags || []).forEach((tag) => tagsFromRelevantDocs.add(tag));
+        (doc.headings || []).forEach((heading) => {
+          (heading.tags || []).forEach((tag) => tagsFromRelevantDocs.add(tag));
+        });
+      });
+
+      return Array.from(tagsFromRelevantDocs)
+        .filter((tag) => !typeFilterTags.includes(tag))
+        .sort();
+    }
+
+    return allTags.filter((tag) => !typeFilterTags.includes(tag)).sort();
+  }, [selectedTags, allDocs, allTags, typeFilterTags]);
 
   const searchResults = useMemo(
     () =>
@@ -283,7 +312,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                 <div>
                   <h3 className="mb-2 text-sm font-medium text-muted-foreground">Tags</h3>
                   <div className="space-y-2">
-                    {remainingTags.map((tag) => (
+                    {displayedTags.map((tag) => (
                       <div key={tag} className="flex items-center space-x-2">
                         <Checkbox
                           id={`filter-${tag}`}
@@ -315,7 +344,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
             results={searchResults}
             onSelect={handleSelectDoc}
           />
-        ) : activeTab === 'filters' ? (
+        ) : activeTab === 'filters' || selectedTags.length > 0 ? (
           <FilteredDocsViewer 
             tags={selectedTags}
             docs={allDocs}
