@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -52,9 +53,9 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   const [showDocWhileFiltering, setShowDocWhileFiltering] = useState(false);
 
   const typeFilters = useMemo(() => [
-    { label: 'User Guide', tag: 'how-to', icon: 'BookUser' },
-    { label: 'Reference', tag: 'reference', icon: 'BookText' },
-    { label: 'Concept', tag: 'concept', icon: 'Lightbulb' },
+    { label: 'User Guide', tag: 'how-to' },
+    { label: 'Reference', tag: 'reference' },
+    { label: 'Concept', tag: 'concept' },
   ], []);
 
   const typeFilterTags = useMemo(() => typeFilters.map((filter) => filter.tag), [typeFilters]);
@@ -365,9 +366,8 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                             />
                             <Label
                               htmlFor={`filter-type-${filter.tag}`}
-                              className="font-normal cursor-pointer flex items-center gap-2"
+                              className="font-normal cursor-pointer"
                             >
-                              <DynamicIcon name={filter.icon} className="h-4 w-4 text-muted-foreground" />
                               {filter.label}
                             </Label>
                           </div>
