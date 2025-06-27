@@ -27,6 +27,7 @@ import {
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import type { DocItem } from '@/types';
 import { DocViewer } from './doc-viewer';
 import { SearchResults } from './search-results';
@@ -361,6 +362,10 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
             <TabsContent value="filters" className="m-0">
               <h2 className="p-4 pb-2 text-base font-bold">Filters</h2>
               <div className="p-4 pt-0 space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Switch id="include-sections" />
+                  <Label htmlFor="include-sections" className="cursor-pointer">Include sections</Label>
+                </div>
                 <div>
                   <h3 className="mb-2 text-sm font-medium text-muted-foreground">Types</h3>
                   <div className="space-y-2">
