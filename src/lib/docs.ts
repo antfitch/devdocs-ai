@@ -13,22 +13,9 @@ const addContentToTopics = (topics: any[]): DocItem[] => {
       ? fs.readFileSync(fullPath, 'utf8')
       : '';
 
-    const headings = content
-      .split('\n')
-      .filter((line) => line.startsWith('## '))
-      .map((line) => {
-        const title = line.replace('## ', '').trim();
-        const id = title
-          .toLowerCase()
-          .replace(/\s+/g, '-')
-          .replace(/[^\w-]+/g, '');
-        return { id, title };
-      });
-
     const topicWithContent: DocItem = {
       ...topic,
       content,
-      headings,
     };
 
     if (topic.subtopics) {

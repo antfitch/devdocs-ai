@@ -33,7 +33,6 @@ export function MainLayout({ topics, prompts, allDocs }: MainLayoutProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeDoc, setActiveDoc] = useState<DocItem | null>(topics[0]);
   const [openItems, setOpenItems] = useState<string[]>(['getting-started']);
-  const [expandedHeadingTopicId, setExpandedHeadingTopicId] = useState<string | null>(null);
 
   const searchResults = useMemo(
     () =>
@@ -50,24 +49,12 @@ export function MainLayout({ topics, prompts, allDocs }: MainLayoutProps) {
   const handleSelectDoc = (doc: DocItem) => {
     setSearchQuery('');
     setActiveDoc(doc);
-    if (doc.headings && doc.headings.length > 1) {
-      setExpandedHeadingTopicId((prevId) => (prevId === doc.id ? null : doc.id));
-    } else {
-      setExpandedHeadingTopicId(null);
-    }
   };
 
   const handleToggle = (id: string) => {
     setOpenItems((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
     );
-  };
-  
-  const handleSelectHeading = (headingId: string) => {
-    document.getElementById(headingId)?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-    });
   };
 
   const isSearching = searchQuery.length > 0;
@@ -143,61 +130,19 @@ export function MainLayout({ topics, prompts, allDocs }: MainLayoutProps) {
                                   )}
                                   <span>{subDoc.title}</span>
                                 </SidebarMenuButton>
-                                {subDoc.headings &&
-                                  subDoc.headings.length > 1 &&
-                                  expandedHeadingTopicId === subDoc.id && (
-                                    <SidebarMenuSub>
-                                      {subDoc.headings.map((heading) => (
-                                        <SidebarMenuItem key={heading.id}>
-                                          <SidebarMenuButton
-                                            size="sm"
-                                            className="h-auto w-full justify-start py-1 font-normal text-muted-foreground"
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              handleSelectHeading(heading.id);
-                                            }}
-                                          >
-                                            <span className="truncate">{heading.title}</span>
-                                          </SidebarMenuButton>
-                                        </SidebarMenuItem>
-                                      ))}
-                                    </SidebarMenuSub>
-                                  )}
                               </SidebarMenuItem>
                             ))}
                           </SidebarMenuSub>
                         </CollapsibleContent>
                       </Collapsible>
                     ) : (
-                      <>
-                        <SidebarMenuButton
-                          onClick={() => handleSelectDoc(doc)}
-                          isActive={!isSearching && activeDoc?.id === doc.id}
-                        >
-                          {doc.icon && <DynamicIcon name={doc.icon} />}
-                          <span>{doc.title}</span>
-                        </SidebarMenuButton>
-                        {doc.headings &&
-                          doc.headings.length > 1 &&
-                          expandedHeadingTopicId === doc.id && (
-                          <SidebarMenuSub>
-                              {doc.headings.map((heading) => (
-                                <SidebarMenuItem key={heading.id}>
-                                  <SidebarMenuButton
-                                    size="sm"
-                                    className="h-auto w-full justify-start py-1 font-normal text-muted-foreground"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleSelectHeading(heading.id);
-                                    }}
-                                  >
-                                    <span className="truncate">{heading.title}</span>
-                                  </SidebarMenuButton>
-                                </SidebarMenuItem>
-                              ))}
-                            </SidebarMenuSub>
-                          )}
-                      </>
+                      <SidebarMenuButton
+                        onClick={() => handleSelectDoc(doc)}
+                        isActive={!isSearching && activeDoc?.id === doc.id}
+                      >
+                        {doc.icon && <DynamicIcon name={doc.icon} />}
+                        <span>{doc.title}</span>
+                      </SidebarMenuButton>
                     )}
                   </SidebarMenuItem>
                 ))}
