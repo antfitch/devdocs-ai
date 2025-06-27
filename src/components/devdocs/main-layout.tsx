@@ -53,7 +53,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   const [showDocWhileFiltering, setShowDocWhileFiltering] = useState(false);
 
   const typeFilters = useMemo(() => [
-    { label: 'User Guide', tag: 'how-to' },
+    { label: 'How to', tag: 'how-to' },
     { label: 'Reference', tag: 'reference' },
     { label: 'Concept', tag: 'concept' },
   ], []);
