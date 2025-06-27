@@ -99,39 +99,41 @@ export function MainLayout({ topics, prompts, allDocs }: MainLayoutProps) {
         <SidebarContent className="p-0">
           <Tabs defaultValue="topics" className="w-full">
             <TabsList className="w-full rounded-none">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <TabsTrigger value="topics" className="flex-1">
-                    <Book className="h-4 w-4" />
-                  </TabsTrigger>
-                </TooltipTrigger>
-                <TooltipContent side="bottom">
-                  <p>Topics</p>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <TabsTrigger value="prompts" className="flex-1">
-                    <MessageSquare className="h-4 w-4" />
-                  </TabsTrigger>
-                </TooltipTrigger>
-                <TooltipContent side="bottom">
-                  <p>Prompts</p>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <TabsTrigger value="filters" className="flex-1">
-                    <Filter className="h-4 w-4" />
-                  </TabsTrigger>
-                </TooltipTrigger>
-                <TooltipContent side="bottom">
-                  <p>Filters</p>
-                </TooltipContent>
-              </Tooltip>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TabsTrigger value="topics" className="flex-1">
+                      <Book className="h-4 w-4" />
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">
+                    <p>Topics</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TabsTrigger value="prompts" className="flex-1">
+                      <MessageSquare className="h-4 w-4" />
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">
+                    <p>Prompts</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TabsTrigger value="filters" className="flex-1">
+                      <Filter className="h-4 w-4" />
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">
+                    <p>Filters</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </TabsList>
             <TabsContent value="topics" className="m-0">
-              <h2 className="p-4 pb-2 text-xl font-bold">Topics</h2>
+              <h2 className="p-4 pb-2 text-lg font-bold">Topics</h2>
               <SidebarMenu className="p-2 pt-0">
                 {topics.map((doc) => (
                   <SidebarMenuItem key={doc.id}>
@@ -211,7 +213,7 @@ export function MainLayout({ topics, prompts, allDocs }: MainLayoutProps) {
               </SidebarMenu>
             </TabsContent>
             <TabsContent value="prompts" className="m-0">
-              <h2 className="p-4 pb-2 text-xl font-bold">Prompts</h2>
+              <h2 className="p-4 pb-2 text-lg font-bold">Prompts</h2>
               <SidebarMenu className="p-2 pt-0">
                 {prompts.map((doc) => (
                   <SidebarMenuItem key={doc.id}>
@@ -227,7 +229,7 @@ export function MainLayout({ topics, prompts, allDocs }: MainLayoutProps) {
               </SidebarMenu>
             </TabsContent>
             <TabsContent value="filters" className="m-0">
-              <h2 className="p-4 pb-2 text-xl font-bold">Filters</h2>
+              <h2 className="p-4 pb-2 text-lg font-bold">Filters</h2>
               {/* Content for filters will go here */}
             </TabsContent>
           </Tabs>
