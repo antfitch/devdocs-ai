@@ -130,7 +130,8 @@ export function MainLayout({ topics, prompts, allDocs }: MainLayoutProps) {
               </Tooltip>
             </TabsList>
             <TabsContent value="topics" className="m-0">
-              <SidebarMenu className="p-2">
+              <h2 className="p-4 pb-2 text-xl font-bold">Topics</h2>
+              <SidebarMenu className="p-2 pt-0">
                 {topics.map((doc) => (
                   <SidebarMenuItem key={doc.id}>
                     {doc.subtopics && doc.subtopics.length > 0 ? (
@@ -209,7 +210,8 @@ export function MainLayout({ topics, prompts, allDocs }: MainLayoutProps) {
               </SidebarMenu>
             </TabsContent>
             <TabsContent value="prompts" className="m-0">
-              <SidebarMenu className="p-2">
+              <h2 className="p-4 pb-2 text-xl font-bold">Prompts</h2>
+              <SidebarMenu className="p-2 pt-0">
                 {prompts.map((doc) => (
                   <SidebarMenuItem key={doc.id}>
                     <SidebarMenuButton
@@ -224,6 +226,7 @@ export function MainLayout({ topics, prompts, allDocs }: MainLayoutProps) {
               </SidebarMenu>
             </TabsContent>
             <TabsContent value="filters" className="m-0">
+              <h2 className="p-4 pb-2 text-xl font-bold">Filters</h2>
               {/* Content for filters will go here */}
             </TabsContent>
           </Tabs>
