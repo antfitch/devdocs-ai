@@ -67,9 +67,17 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   
   const handleTagToggle = (tag: string) => {
     setShowDocWhileFiltering(false);
+
+    const isCurrentlySelected = selectedTags.includes(tag);
+
     setSelectedTags((prev) =>
       prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
     );
+
+    // If a type tag was just deselected, collapse its section
+    if (isCurrentlySelected && typeFilterTags.includes(tag)) {
+      setOpenFilterTypes((prev) => prev.filter((t) => t !== tag));
+    }
   };
   
   const handleToggleFilterType = (tag: string) => {
@@ -404,12 +412,14 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                                 {filter.label}
                                 </Label>
                             </div>
-                            <CollapsibleTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-6 w-6">
-                                    <ChevronRight className="h-4 w-4 transition-transform duration-200 data-[state=open]:rotate-90" />
-                                    <span className="sr-only">Toggle</span>
-                                </Button>
-                            </CollapsibleTrigger>
+                            {selectedTags.includes(filter.tag) && (
+                              <CollapsibleTrigger asChild>
+                                  <Button variant="ghost" size="icon" className="h-6 w-6">
+                                      <ChevronRight className="h-4 w-4 transition-transform duration-200 data-[state=open]:rotate-90" />
+                                      <span className="sr-only">Toggle</span>
+                                  </Button>
+                              </CollapsibleTrigger>
+                            )}
                         </div>
                         <CollapsibleContent>
                           <div className="pl-6 mt-2 space-y-1">
