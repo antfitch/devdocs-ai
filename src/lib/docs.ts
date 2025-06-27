@@ -23,7 +23,7 @@ const addContentToTopics = (topics: any[]): DocItem[] => {
         if (line.startsWith('tags:')) {
           inTags = true;
         } else if (inTags && line.trim().startsWith('- ')) {
-          documentTags.push(line.trim().substring(2).trim().toLowerCase());
+          documentTags.push(line.trim().substring(2).trim());
         } else if (inTags && line.trim() !== '') {
           // If a non-empty line that is not a tag item is found, stop parsing tags
           inTags = false;
@@ -49,7 +49,7 @@ const addContentToTopics = (topics: any[]): DocItem[] => {
             currentHeading = { id, title };
             headings.push(currentHeading);
         } else if (tagsMatch && currentHeading) {
-            const tags = tagsMatch[1].split(',').map(tag => tag.trim().toLowerCase());
+            const tags = tagsMatch[1].split(',').map(tag => tag.trim());
             currentHeading.tags = tags;
         }
     }
