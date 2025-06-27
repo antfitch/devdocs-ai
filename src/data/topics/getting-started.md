@@ -4,6 +4,7 @@ tags:
   - setup
   - api-call
   - how-to
+  - get-started
 ---
 # Getting Started
 

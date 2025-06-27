@@ -4,6 +4,7 @@ tags:
   - npm
   - setup
   - how-to
+  - get-started
 ---
 # Installation
 

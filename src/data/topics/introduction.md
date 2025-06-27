@@ -5,6 +5,7 @@ tags:
   - features
   - welcome
   - concept
+  - get-started
 ---
 # Welcome to DevDocs AI
 

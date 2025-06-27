@@ -199,6 +199,10 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     }
   }
 
+  const handleReturnToFilters = () => {
+    setShowDocWhileFiltering(false);
+  };
+
   return (
     <SidebarProvider defaultOpen={true}>
       <Sidebar collapsible="icon">
@@ -441,18 +445,42 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
         <div className="flex items-center gap-2 mb-4">
           <SidebarTrigger />
           <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-            <span className="capitalize">{activeTab}</span>
-            {breadcrumbTypeLabel && (
-              <>
-                <ChevronRight className="h-4 w-4" />
-                <span>{breadcrumbTypeLabel}</span>
-              </>
+            {activeTab === 'filters' && showDocWhileFiltering ? (
+              <Button
+                variant="link"
+                className="p-0 h-auto capitalize text-muted-foreground hover:text-primary"
+                onClick={handleReturnToFilters}
+              >
+                {activeTab}
+              </Button>
+            ) : (
+              <span className="capitalize">{activeTab}</span>
             )}
-            {activeDoc && (activeTab !== 'filters' || showDocWhileFiltering) && (
+            
+            {breadcrumbTypeLabel ? (
               <>
                 <ChevronRight className="h-4 w-4" />
-                <span>{activeDoc.title}</span>
+                <Button
+                  variant="link"
+                  className="p-0 h-auto text-muted-foreground hover:text-primary"
+                  onClick={handleReturnToFilters}
+                >
+                  {breadcrumbTypeLabel}
+                </Button>
+                {activeDoc && (
+                  <>
+                    <ChevronRight className="h-4 w-4" />
+                    <span>{activeDoc.title}</span>
+                  </>
+                )}
               </>
+            ) : (
+              activeDoc && (activeTab !== 'filters' || showDocWhileFiltering) && (
+                <>
+                  <ChevronRight className="h-4 w-4" />
+                  <span>{activeDoc.title}</span>
+                </>
+              )
             )}
           </div>
         </div>
