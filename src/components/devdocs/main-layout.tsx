@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Book, Bot, ChevronRight, MessageSquare, Search } from 'lucide-react';
+import { Book, Bot, ChevronRight, MessageSquare, Search, Filter } from 'lucide-react';
 import {
   SidebarProvider,
   Sidebar,
@@ -99,6 +99,9 @@ export function MainLayout({ topics, prompts, allDocs }: MainLayoutProps) {
               <TabsTrigger value="prompts" className="flex-1 gap-2">
                 <MessageSquare className="h-4 w-4" /> Prompts
               </TabsTrigger>
+              <TabsTrigger value="filters" className="flex-1 gap-2">
+                <Filter className="h-4 w-4" /> Filters
+              </TabsTrigger>
             </TabsList>
             <TabsContent value="topics" className="m-0">
               <SidebarMenu className="p-2">
@@ -193,6 +196,9 @@ export function MainLayout({ topics, prompts, allDocs }: MainLayoutProps) {
                   </SidebarMenuItem>
                 ))}
               </SidebarMenu>
+            </TabsContent>
+            <TabsContent value="filters" className="m-0">
+              {/* Content for filters will go here */}
             </TabsContent>
           </Tabs>
         </SidebarContent>
