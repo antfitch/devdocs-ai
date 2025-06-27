@@ -15,16 +15,19 @@ import {
 } from '@/components/ui/sidebar';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { topics } from '@/data/topics';
-import { prompts } from '@/data/prompts';
 import type { DocItem } from '@/types';
 import { DocViewer } from './doc-viewer';
 import { SearchResults } from './search-results';
 import { AskMeAssistant } from './ask-me-assistant';
+import DynamicIcon from './dynamic-icon';
 
-const allDocs = [...topics, ...prompts];
+interface MainLayoutProps {
+  topics: DocItem[];
+  prompts: DocItem[];
+  allDocs: DocItem[];
+}
 
-export function MainLayout() {
+export function MainLayout({ topics, prompts, allDocs }: MainLayoutProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeDoc, setActiveDoc] = useState<DocItem | null>(topics[0]);
 
@@ -33,7 +36,7 @@ export function MainLayout() {
         doc.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
         doc.content.toLowerCase().includes(searchQuery.toLowerCase())
     ) : [],
-    [searchQuery]
+    [searchQuery, allDocs]
   );
 
   const handleSelectDoc = (doc: DocItem) => {
@@ -79,7 +82,7 @@ export function MainLayout() {
                       onClick={() => handleSelectDoc(doc)}
                       isActive={!isSearching && activeDoc?.id === doc.id}
                     >
-                      {doc.icon && <doc.icon />}
+                      {doc.icon && <DynamicIcon name={doc.icon} />}
                       <span>{doc.title}</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -94,7 +97,7 @@ export function MainLayout() {
                       onClick={() => handleSelectDoc(doc)}
                       isActive={!isSearching && activeDoc?.id === doc.id}
                     >
-                      {doc.icon && <doc.icon />}
+                      {doc.icon && <DynamicIcon name={doc.icon} />}
                       <span>{doc.title}</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

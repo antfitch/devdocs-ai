@@ -1,11 +1,10 @@
-import { HelpCircle, Bot, BrainCircuit } from 'lucide-react';
 import type { DocItem } from '@/types';
 
 export const prompts: DocItem[] = [
   {
     id: 'ask-a-question',
     title: 'Ask a Question',
-    icon: HelpCircle,
+    icon: 'HelpCircle',
     content: `
 # Ask a Question
 
@@ -21,7 +20,7 @@ For example, you could ask:
   {
     id: 'explain-code',
     title: 'Explain Code',
-    icon: Bot,
+    icon: 'Bot',
     content: `
 # Explain Code or Text
 
@@ -36,7 +35,7 @@ This is useful for:
   {
     id: 'generate-code',
     title: 'Generate Code',
-    icon: BrainCircuit,
+    icon: 'BrainCircuit',
     content: `
 # Generate Sample Code
 
