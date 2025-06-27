@@ -9,6 +9,7 @@ tags:
 To get started, you need to install the client library.
 
 ## npm
+tags: npm, package manager, client library
 
 You can install the library using npm:
 

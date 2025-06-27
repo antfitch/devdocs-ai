@@ -23,9 +23,8 @@ This endpoint allows you to submit a quantum circuit for computation.
 }
 ```
 
-The `circuit` parameter should be a string representation of your quantum circuit in QASM format. The `shots` parameter specifies how many times to run the circuit.
-
 ## GET /v1/jobs/{jobId}
+tags: GET, jobs, v1, status
 
 Retrieve the status of a previously submitted job.
 
@@ -35,6 +34,7 @@ Retrieve the status of a previously submitted job.
 - `jobId` (string): The unique identifier for the job.
 
 ## POST /v1/jobs/{jobId}/cancel
+tags: POST, jobs, v1, cancel
 
 Cancel a job that is currently running.
 
@@ -44,6 +44,7 @@ Cancel a job that is currently running.
 - `jobId` (string): The unique identifier for the job.
 
 ## GET /v1/jobs/{jobId}/results
+tags: GET, jobs, v1, results
 
 Fetch the results of a completed job.
 
@@ -65,12 +66,14 @@ Fetch the results of a completed job.
 ```
 
 ## GET /v1/backends
+tags: GET, backends, v1, list
 
 Get a list of all available quantum computer backends.
 
 **Method:** `GET`
 
 ## GET /v1/backends/{backendId}
+tags: GET, backends, v1, details
 
 Retrieve detailed information about a specific quantum backend, including its topology and gate set.
 
@@ -80,6 +83,7 @@ Retrieve detailed information about a specific quantum backend, including its to
 - `backendId` (string): The identifier for the backend.
 
 ## POST /v1/experiments
+tags: POST, experiments, v1, create
 
 Create a new experiment to group related jobs.
 
@@ -94,6 +98,7 @@ Create a new experiment to group related jobs.
 ```
 
 ## GET /v1/experiments/{experimentId}
+tags: GET, experiments, v1, details
 
 Get details for a specific experiment.
 
@@ -103,6 +108,7 @@ Get details for a specific experiment.
 - `experimentId` (string): The unique identifier for the experiment.
 
 ## PUT /v1/experiments/{experimentId}
+tags: PUT, experiments, v1, update
 
 Update the details of an existing experiment.
 
@@ -120,6 +126,7 @@ Update the details of an existing experiment.
 ```
 
 ## DELETE /v1/experiments/{experimentId}
+tags: DELETE, experiments, v1, remove
 
 Delete a specific experiment.
 
@@ -129,6 +136,7 @@ Delete a specific experiment.
 - `experimentId` (string): The unique identifier for the experiment.
 
 ## GET /v1/algorithms
+tags: GET, algorithms, v1, list
 
 List all supported quantum algorithms.
 
