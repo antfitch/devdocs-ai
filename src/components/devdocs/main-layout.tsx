@@ -32,6 +32,7 @@ import { DocViewer } from './doc-viewer';
 import { SearchResults } from './search-results';
 import { AskMeAssistant } from './ask-me-assistant';
 import DynamicIcon from './dynamic-icon';
+import { FilteredDocsViewer } from './filtered-docs-viewer';
 
 interface MainLayoutProps {
   topics: DocItem[];
@@ -65,29 +66,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     [searchQuery, allDocs]
   );
   
-  const displayedTopics = useMemo(() => {
-    if (selectedTags.length === 0) {
-      return topics;
-    }
-
-    const itemAndDescendantsMatchTags = (doc: DocItem, tags: string[]): boolean => {
-      // Check current item's tags
-      if (doc.tags?.some(tag => tags.includes(tag))) {
-        return true;
-      }
-      // Check current item's headings' tags
-      if (doc.headings?.some(h => h.tags?.some(tag => tags.includes(tag)))) {
-        return true;
-      }
-      // Recursively check subtopics
-      if (doc.subtopics?.some(subtopic => itemAndDescendantsMatchTags(subtopic, tags))) {
-        return true;
-      }
-      return false;
-    };
-
-    return topics.filter(topic => itemAndDescendantsMatchTags(topic, selectedTags));
-  }, [topics, selectedTags]);
+  const displayedTopics = topics;
 
   const handleSelectDoc = (doc: DocItem) => {
     setSearchQuery('');
@@ -99,6 +78,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     } else {
       setToggledTopicId(null);
     }
+    setSelectedTags([]);
   };
 
   const handleHeadingClick = (headingId: string) => {
@@ -112,6 +92,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   };
 
   const isSearching = searchQuery.length > 0;
+  const areFiltersActive = selectedTags.length > 0;
 
   return (
     <SidebarProvider defaultOpen={true}>
@@ -291,6 +272,12 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
           <SearchResults
             query={searchQuery}
             results={searchResults}
+            onSelect={handleSelectDoc}
+          />
+        ) : areFiltersActive ? (
+          <FilteredDocsViewer 
+            tags={selectedTags}
+            docs={allDocs}
             onSelect={handleSelectDoc}
           />
         ) : (
