@@ -81,7 +81,12 @@ export function FilteredDocsViewer({ tags, typeFilterTags, docs, onSelect }: Fil
                     filteredDocs.map((item) => (
                     <Card key={item.id}>
                         <CardHeader>
-                        <CardTitle className="text-lg">{item.title}</CardTitle>
+                          <CardTitle
+                            className="text-lg cursor-pointer hover:underline"
+                            onClick={() => onSelect(item)}
+                          >
+                            {item.title}
+                          </CardTitle>
                         </CardHeader>
                         <CardContent>
                             <p className="text-muted-foreground">
