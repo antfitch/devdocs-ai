@@ -47,6 +47,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   const [openItems, setOpenItems] = useState<string[]>(['getting-started']);
   const [toggledTopicId, setToggledTopicId] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [activeTab, setActiveTab] = useState('topics');
 
   const handleTagToggle = (tag: string) => {
     setSelectedTags((prev) =>
@@ -79,6 +80,11 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
       setToggledTopicId(null);
     }
     setSelectedTags([]);
+    if (prompts.some(p => p.id === doc.id)) {
+      setActiveTab('prompts');
+    } else {
+      setActiveTab('topics');
+    }
   };
 
   const handleHeadingClick = (headingId: string) => {
@@ -92,7 +98,6 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   };
 
   const isSearching = searchQuery.length > 0;
-  const areFiltersActive = selectedTags.length > 0;
 
   return (
     <SidebarProvider defaultOpen={true}>
@@ -113,7 +118,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
           </div>
         </SidebarHeader>
         <SidebarContent className="p-0">
-          <Tabs defaultValue="topics" className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="w-full rounded-none">
               <TooltipProvider>
                 <Tooltip>
@@ -163,6 +168,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                             onClick={() => handleSelectDoc(doc)}
                             isActive={
                               !isSearching &&
+                              activeTab !== 'filters' &&
                               (activeDoc?.id === doc.id ||
                                 doc.subtopics.some(
                                   (sub) => sub.id === activeDoc?.id
@@ -184,7 +190,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                                 <SidebarMenuButton
                                   onClick={() => handleSelectDoc(subDoc)}
                                   isActive={
-                                    !isSearching && activeDoc?.id === subDoc.id
+                                    !isSearching && activeTab !== 'filters' && activeDoc?.id === subDoc.id
                                   }
                                 >
                                   {subDoc.icon && (
@@ -201,7 +207,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                       <>
                         <SidebarMenuButton
                           onClick={() => handleSelectDoc(doc)}
-                          isActive={!isSearching && activeDoc?.id === doc.id}
+                          isActive={!isSearching && activeTab !== 'filters' && activeDoc?.id === doc.id}
                         >
                           {doc.icon && <DynamicIcon name={doc.icon} />}
                           <span>{doc.title}</span>
@@ -235,7 +241,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                   <SidebarMenuItem key={doc.id}>
                     <SidebarMenuButton
                       onClick={() => handleSelectDoc(doc)}
-                      isActive={!isSearching && activeDoc?.id === doc.id}
+                      isActive={!isSearching && activeTab !== 'filters' && activeDoc?.id === doc.id}
                     >
                       {doc.icon && <DynamicIcon name={doc.icon} />}
                       <span>{doc.title}</span>
@@ -274,7 +280,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
             results={searchResults}
             onSelect={handleSelectDoc}
           />
-        ) : areFiltersActive ? (
+        ) : activeTab === 'filters' ? (
           <FilteredDocsViewer 
             tags={selectedTags}
             docs={allDocs}
