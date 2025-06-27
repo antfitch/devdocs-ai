@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -51,6 +50,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState('topics');
   const [scrollToHeading, setScrollToHeading] = useState<string | null>(null);
+  const [showDocWhileFiltering, setShowDocWhileFiltering] = useState(false);
 
   const typeFilters = useMemo(() => [
     { label: 'User Guide', tag: 'how-to' },
@@ -61,6 +61,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   const typeFilterTags = useMemo(() => typeFilters.map((filter) => filter.tag), [typeFilters]);
   
   const handleTagToggle = (tag: string) => {
+    setShowDocWhileFiltering(false);
     setSelectedTags((prev) =>
       prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
     );
@@ -119,28 +120,20 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   const displayedTopics = topics;
 
   const handleSelectDoc = (doc: DocItem, headingId?: string) => {
+    setShowDocWhileFiltering(false);
     setSearchQuery('');
     setActiveDoc(doc);
     if (headingId) {
       setScrollToHeading(headingId);
-    } else {
-      // Scroll to top when a new doc is selected without a specific heading
-      const docViewerTop = document.getElementById('doc-viewer-top');
-      if (docViewerTop) docViewerTop.parentElement?.parentElement?.scrollTo(0, 0);
     }
-
     if (doc.id === toggledTopicId) {
       setToggledTopicId(null);
-    } else if (doc.headings && doc.headings.length > 0) {
+    } else if (doc.headings && doc.headings.length > 1) {
       setToggledTopicId(doc.id);
     } else {
       setToggledTopicId(null);
     }
-
-    if (activeTab === 'filters') {
-      setSelectedTags([]);
-    }
-
+    setSelectedTags([]);
     if (prompts.some(p => p.id === doc.id)) {
       setActiveTab('prompts');
     } else {
@@ -157,6 +150,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     } else {
         setToggledTopicId(null);
     }
+    setShowDocWhileFiltering(true);
   };
 
   const handleHeadingClick = (headingId: string) => {
@@ -164,30 +158,28 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   };
   
   useEffect(() => {
-    if (scrollToHeading && activeTab !== 'filters') {
-      const element = document.getElementById(scrollToHeading);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+    if (scrollToHeading) {
+      document.getElementById(scrollToHeading)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       setScrollToHeading(null);
     }
-  }, [scrollToHeading, activeDoc, activeTab]);
+  }, [scrollToHeading, activeDoc]);
 
   const handleToggle = (id: string) => {
     setOpenItems((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
     );
   };
-
-  const isSearching = searchQuery.length > 0;
   
-  const handleTabChange = (value: string) => {
+  const onTabChange = (value: string) => {
     if (value !== 'filters') {
       setSelectedTags([]);
       setToggledTopicId(null);
     }
+    setShowDocWhileFiltering(false);
     setActiveTab(value);
   }
+
+  const isSearching = searchQuery.length > 0;
 
   return (
     <SidebarProvider defaultOpen={true}>
@@ -208,7 +200,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
           </div>
         </SidebarHeader>
         <SidebarContent className="p-0">
-          <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+          <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
             <TabsList className="w-full rounded-none">
               <TooltipProvider>
                 <Tooltip>
@@ -367,7 +359,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                               {(docsByType.get(filter.tag) || []).map(doc => (
                                 <div key={doc.id} className="w-full">
                                   <Button
-                                    variant="ghost"
+                                    variant="link"
                                     className="p-0 h-auto w-full text-left justify-start font-normal text-muted-foreground hover:text-primary"
                                     onClick={() => handleFilterTopicClick(doc)}
                                   >
@@ -437,7 +429,9 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
             results={searchResults}
             onSelect={handleSelectDoc}
           />
-        ) : activeTab === 'filters' || (selectedTags.length > 0 && activeTab !== 'topics' && activeTab !== 'prompts') ? (
+        ) : showDocWhileFiltering ? (
+          <DocViewer doc={activeDoc} />
+        ) : activeTab === 'filters' || selectedTags.length > 0 ? (
           <FilteredDocsViewer 
             tags={selectedTags}
             typeFilterTags={typeFilterTags}
