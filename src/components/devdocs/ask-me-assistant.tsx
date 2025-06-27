@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Bot, Lightbulb, Code, Send, Loader2, X, HelpCircle } from 'lucide-react';
+import { Bot, Lightbulb, Code, Send, Loader2, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
@@ -109,8 +109,6 @@ export function AskMeAssistant() {
     }
   };
   
-  const clearSelection = () => setSelectedText('');
-
   if (!mounted) {
     return null;
   }
@@ -132,14 +130,6 @@ export function AskMeAssistant() {
             <Button size="sm" onClick={handleMakeCode} disabled={!selectedText || isLoading}>
                  <Code className="mr-2 h-4 w-4" /> Make Code
             </Button>
-            {selectedText && (
-                <div className="flex items-center gap-2 border-l pl-2">
-                    <p className="text-xs text-muted-foreground italic line-clamp-1 max-w-xs">"{selectedText}"</p>
-                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={clearSelection}>
-                        <X className="h-4 w-4"/>
-                    </Button>
-                </div>
-            )}
         </CardContent>
       </Card>
 
