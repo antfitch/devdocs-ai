@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -69,7 +70,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
 
     if (selectedTypeTags.length > 0) {
       const relevantDocs = allDocs.filter((doc) => {
-        const docTypeTags = doc.tags || [];
+        const docTypeTags = (doc.tags || []).map(t => t.toLowerCase());
         return selectedTypeTags.some((typeTag) =>
           docTypeTags.includes(typeTag)
         );
@@ -347,6 +348,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
         ) : activeTab === 'filters' || selectedTags.length > 0 ? (
           <FilteredDocsViewer 
             tags={selectedTags}
+            typeFilterTags={typeFilterTags}
             docs={allDocs}
             onSelect={handleSelectDoc}
           />

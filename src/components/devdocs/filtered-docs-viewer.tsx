@@ -8,17 +8,40 @@ import { Button } from '@/components/ui/button';
 
 interface FilteredDocsViewerProps {
   tags: string[];
+  typeFilterTags: string[];
   docs: DocItem[];
   onSelect: (doc: DocItem) => void;
 }
 
-export function FilteredDocsViewer({ tags, docs, onSelect }: FilteredDocsViewerProps) {
-  const filteredDocs = docs.filter(doc => {
-    const docTags = doc.tags || [];
-    const headingTags = doc.headings?.flatMap(h => h.tags || []) || [];
-    const allDocTags = [...docTags, ...headingTags].map(t => t.toLowerCase());
-    return tags.some(selectedTag => allDocTags.includes(selectedTag.toLowerCase()));
-  });
+export function FilteredDocsViewer({ tags, typeFilterTags, docs, onSelect }: FilteredDocsViewerProps) {
+  const selectedTypeTags = tags.filter(t => typeFilterTags.includes(t.toLowerCase())).map(t => t.toLowerCase());
+  const selectedRegularTags = tags.filter(t => !typeFilterTags.includes(t.toLowerCase())).map(t => t.toLowerCase());
+
+  let filteredDocs = docs;
+
+  if (selectedTypeTags.length > 0) {
+    filteredDocs = filteredDocs.filter(doc => {
+      const allDocTags = [
+        ...(doc.tags || []),
+        ...(doc.headings?.flatMap(h => h.tags || []) || [])
+      ].map(t => t.toLowerCase());
+      return selectedTypeTags.some(typeTag => allDocTags.includes(typeTag));
+    });
+  }
+
+  if (selectedRegularTags.length > 0) {
+    filteredDocs = filteredDocs.filter(doc => {
+      const allDocTags = [
+        ...(doc.tags || []),
+        ...(doc.headings?.flatMap(h => h.tags || []) || [])
+      ].map(t => t.toLowerCase());
+      return selectedRegularTags.some(regularTag => allDocTags.includes(regularTag));
+    });
+  }
+
+  if (tags.length === 0) {
+    filteredDocs = [];
+  }
 
   return (
     <Card className="h-full w-full overflow-hidden">
