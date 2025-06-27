@@ -56,6 +56,13 @@ export function MainLayout({ topics, prompts, allDocs }: MainLayoutProps) {
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
     );
   };
+  
+  const handleSelectHeading = (headingId: string) => {
+    document.getElementById(headingId)?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  };
 
   const isSearching = searchQuery.length > 0;
 
@@ -130,19 +137,61 @@ export function MainLayout({ topics, prompts, allDocs }: MainLayoutProps) {
                                   )}
                                   <span>{subDoc.title}</span>
                                 </SidebarMenuButton>
+                                {activeDoc?.id === subDoc.id &&
+                                  activeDoc.headings &&
+                                  activeDoc.headings.length > 0 && (
+                                    <SidebarMenuSub>
+                                      {activeDoc.headings.map((heading) => (
+                                        <SidebarMenuItem key={heading.id}>
+                                          <SidebarMenuButton
+                                            size="sm"
+                                            className="h-auto w-full justify-start py-1 font-normal text-muted-foreground"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              handleSelectHeading(heading.id);
+                                            }}
+                                          >
+                                            <span className="truncate">{heading.title}</span>
+                                          </SidebarMenuButton>
+                                        </SidebarMenuItem>
+                                      ))}
+                                    </SidebarMenuSub>
+                                  )}
                               </SidebarMenuItem>
                             ))}
                           </SidebarMenuSub>
                         </CollapsibleContent>
                       </Collapsible>
                     ) : (
-                      <SidebarMenuButton
-                        onClick={() => handleSelectDoc(doc)}
-                        isActive={!isSearching && activeDoc?.id === doc.id}
-                      >
-                        {doc.icon && <DynamicIcon name={doc.icon} />}
-                        <span>{doc.title}</span>
-                      </SidebarMenuButton>
+                      <>
+                        <SidebarMenuButton
+                          onClick={() => handleSelectDoc(doc)}
+                          isActive={!isSearching && activeDoc?.id === doc.id}
+                        >
+                          {doc.icon && <DynamicIcon name={doc.icon} />}
+                          <span>{doc.title}</span>
+                        </SidebarMenuButton>
+                        {activeDoc?.id === doc.id &&
+                          activeDoc.headings &&
+                          activeDoc.headings.length > 0 && (
+                          <SidebarMenuSub>
+                              {activeDoc.headings.map((heading) => (
+                                <SidebarMenuItem key={heading.id}>
+                                  <SidebarMenuButton
+                                    size="sm"
+                                    className="h-auto w-full justify-start py-1 font-normal text-muted-foreground"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleSelectHeading(heading.id);
+                                    }}
+                                  >
+                                    <span className="truncate">{heading.title}</span>
+                                  </SidebarMenuButton>
+                                </SidebarMenuItem>
+                              ))}
+                            </SidebarMenuSub>
+                          )}
+                      </>
                     )}
                   </SidebarMenuItem>
                 ))}
