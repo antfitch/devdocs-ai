@@ -33,6 +33,7 @@ import { SearchResults } from './search-results';
 import { AskMeAssistant } from './ask-me-assistant';
 import DynamicIcon from './dynamic-icon';
 import { FilteredDocsViewer } from './filtered-docs-viewer';
+import { Button } from '@/components/ui/button';
 
 interface MainLayoutProps {
   topics: DocItem[];
@@ -66,7 +67,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   
   const displayedTags = useMemo(() => {
     const selectedTypeTags = selectedTags.filter((tag) =>
-      typeFilterTags.includes(tag)
+      typeFilterTags.includes(tag.toLowerCase())
     );
 
     if (selectedTypeTags.length > 0) {
@@ -86,12 +87,21 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
       });
 
       return Array.from(tagsFromRelevantDocs)
-        .filter((tag) => !typeFilterTags.includes(tag))
+        .filter((tag) => !typeFilterTags.includes(tag.toLowerCase()))
         .sort();
     }
 
-    return allTags.filter((tag) => !typeFilterTags.includes(tag)).sort();
+    return allTags.filter((tag) => !typeFilterTags.includes(tag.toLowerCase())).sort();
   }, [selectedTags, allDocs, allTags, typeFilterTags]);
+
+  const docsByType = useMemo(() => {
+    const map = new Map<string, DocItem[]>();
+    typeFilterTags.forEach(typeTag => {
+        const docs = allDocs.filter(doc => (doc.tags || []).map(t => t.toLowerCase()).includes(typeTag));
+        map.set(typeTag, docs);
+    });
+    return map;
+  }, [allDocs, typeFilterTags]);
 
   const searchResults = useMemo(
     () =>
@@ -305,19 +315,37 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                   <h3 className="mb-2 text-sm font-medium text-muted-foreground">Type</h3>
                   <div className="space-y-2">
                     {typeFilters.map((filter) => (
-                      <div key={filter.tag} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`filter-type-${filter.tag}`}
-                          checked={selectedTags.includes(filter.tag)}
-                          onCheckedChange={() => handleTagToggle(filter.tag)}
-                        />
-                        <Label
-                          htmlFor={`filter-type-${filter.tag}`}
-                          className="font-normal cursor-pointer"
-                        >
-                          {filter.label}
-                        </Label>
-                      </div>
+                      <Collapsible key={filter.tag} open={selectedTags.includes(filter.tag)} >
+                        <div>
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`filter-type-${filter.tag}`}
+                              checked={selectedTags.includes(filter.tag)}
+                              onCheckedChange={() => handleTagToggle(filter.tag)}
+                            />
+                            <Label
+                              htmlFor={`filter-type-${filter.tag}`}
+                              className="font-normal cursor-pointer"
+                            >
+                              {filter.label}
+                            </Label>
+                          </div>
+                          <CollapsibleContent>
+                            <div className="pl-6 mt-2 space-y-1">
+                              {(docsByType.get(filter.tag) || []).map(doc => (
+                                <Button
+                                  key={doc.id}
+                                  variant="link"
+                                  className="p-0 h-auto w-full text-left justify-start font-normal text-muted-foreground hover:text-primary"
+                                  onClick={() => handleSelectDoc(doc)}
+                                >
+                                  {doc.title}
+                                </Button>
+                              ))}
+                            </div>
+                          </CollapsibleContent>
+                        </div>
+                      </Collapsible>
                     ))}
                   </div>
                 </div>
