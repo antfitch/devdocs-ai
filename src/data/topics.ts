@@ -20,6 +20,23 @@ export const topics: Topic[] = [
     ],
   },
   {
+    id: 'how-to-guides',
+    title: 'How-to Guides',
+    icon: 'Hammer',
+    subtopics: [
+      { id: 'how-to-run-circuit', title: 'Run a Quantum Circuit', icon: 'Play' },
+      { id: 'how-to-check-job-status', title: 'Check Job Status', icon: 'Activity' },
+      { id: 'how-to-retrieve-results', title: 'Retrieve Results', icon: 'DownloadCloud' },
+      { id: 'how-to-list-backends', title: 'List Available Backends', icon: 'Server' },
+      { id: 'how-to-create-bell-state', title: 'Create a Bell State', icon: 'GitMerge' },
+      { id: 'how-to-use-grovers-algorithm', title: 'Use Grover\'s Algorithm', icon: 'SearchCode' },
+      { id: 'how-to-handle-api-errors', title: 'Handle API Errors', icon: 'ShieldAlert' },
+      { id: 'how-to-batch-jobs', title: 'Batch Multiple Jobs', icon: 'BoxSelect' },
+      { id: 'how-to-cancel-job', title: 'Cancel a Running Job', icon: 'XCircle' },
+      { id: 'how-to-use-simulator', title: 'Use a Local Simulator', icon: 'Laptop' },
+    ]
+  },
+  {
     id: 'core-concepts',
     title: 'Core Concepts',
     icon: 'Zap',
