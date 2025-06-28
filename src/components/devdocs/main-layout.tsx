@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { Book, Bot, ChevronRight, MessageSquare, Search, Filter } from 'lucide-react';
+import { Book, Bot, ChevronRight, MessageSquare, Search, Filter, Library, Tag } from 'lucide-react';
 import {
   SidebarProvider,
   Sidebar,
@@ -391,7 +391,10 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                   </Label>
                 </div>
                 <div>
-                  <h3 className="mb-2 text-sm font-medium text-muted-foreground">Types</h3>
+                  <h3 className="mb-2 flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                    <Library className="h-4 w-4" />
+                    Types
+                  </h3>
                   <div className="space-y-1">
                     {typeFilters.map((filter) => (
                       <Collapsible 
@@ -467,7 +470,10 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                   </div>
                 </div>
                 <div>
-                  <h3 className="mb-2 text-sm font-medium text-muted-foreground">Subjects</h3>
+                  <h3 className="mb-2 flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                    <Tag className="h-4 w-4" />
+                    Subjects
+                  </h3>
                   <div className="space-y-2">
                     {displayedTags.map((tag) => (
                       <div key={tag} className="flex items-center space-x-2">
