@@ -5,15 +5,8 @@ import type { DocItem, DocItemHeading } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
-import { ChevronRight } from 'lucide-react';
-
-interface FilteredDocsViewerProps {
-  tags: string[];
-  typeFilterTags: string[];
-  docs: DocItem[];
-  onSelect: (doc: DocItem, headingId?: string) => void;
-  includeSections: boolean;
-}
+import { ChevronRight, BookOpen } from 'lucide-react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 const getSummary = (markdown: string): string => {
   // Remove frontmatter, headings, code blocks, and other common markdown constructs.
@@ -37,6 +30,71 @@ const getSummary = (markdown: string): string => {
   // Return the matched sentence, or the full line if no sentence-ending punctuation is found.
   return sentenceMatch ? sentenceMatch[0] : firstMeaningfulLine;
 }
+
+const getSectionContent = (docContent: string, headingTitle: string): string => {
+    const contentWithoutFrontmatter = docContent.replace(/^---[\s\S]*?---/, '').trim();
+    const lines = contentWithoutFrontmatter.split('\n');
+    let inSection = false;
+    const sectionLines: string[] = [];
+
+    for (const line of lines) {
+        const match = line.match(/^## (.*)/);
+        if (match && match[1].trim() === headingTitle.trim()) {
+            inSection = true;
+            continue;
+        }
+
+        if (inSection) {
+            if (line.match(/^## .*/)) {
+                break;
+            }
+            sectionLines.push(line);
+        }
+    }
+    return sectionLines.join('\n').replace(/^tags:.*$\n?/gm, '').trim();
+};
+
+const renderSimpleMarkdown = (text: string) => {
+    const html = text
+      .replace(/^### (.*$)/gim, '<h3 class="text-xl font-bold mt-4 mb-2">$1</h3>')
+      .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
+      .replace(/\*(.*)\*/gim, '<em>$1</em>')
+      .replace(/`([^`]+)`/gim, '<code class="bg-muted text-muted-foreground px-1 py-0.5 rounded-sm font-mono text-sm">$1</code>')
+      .replace(/> (.*$)/gim, '<blockquote class="mt-6 border-l-2 pl-6 italic">$1</blockquote>')
+      .replace(/\n/g, '<br />');
+
+    return { __html: html };
+  };
+
+const renderSectionContent = (content: string) => {
+    if (!content) {
+        return <p className="text-muted-foreground italic">No additional content in this section.</p>;
+    }
+    const contentParts = content.split(/(```[\s\S]*?```)/g);
+
+    return (
+        <div className="prose prose-slate max-w-none dark:prose-invert prose-p:my-2 prose-h3:mb-2 prose-h3:mt-4">
+            {contentParts.map((part, index) => {
+                if (part.startsWith('```')) {
+                    const lines = part.split('\n');
+                    const lang = lines.shift()?.substring(3) || '';
+                    lines.pop();
+                    const code = lines.join('\n');
+                    return (
+                        <div key={index} className="my-4 relative not-prose">
+                            <pre className="bg-gray-800 text-white p-4 pt-8 rounded-md overflow-x-auto">
+                                <code className={`font-mono language-${lang}`}>{code}</code>
+                            </pre>
+                            {lang && <div className="absolute top-2 right-2 text-xs text-gray-400 bg-gray-700 px-2 py-1 rounded">{lang}</div>}
+                        </div>
+                    );
+                }
+                if (part.trim() === '') return null;
+                return <div key={index} dangerouslySetInnerHTML={renderSimpleMarkdown(part)} />;
+            })}
+        </div>
+    );
+};
 
 
 export function FilteredDocsViewer({ tags, typeFilterTags, docs, onSelect, includeSections }: FilteredDocsViewerProps) {
@@ -85,21 +143,32 @@ export function FilteredDocsViewer({ tags, typeFilterTags, docs, onSelect, inclu
         </CardHeader>
         <CardContent>
             <ScrollArea className="h-[calc(100vh-200px)]">
-                <div className="space-y-4 pb-24">
+                <div className="pb-24 pr-4">
                 {filteredSections.length > 0 ? (
-                    filteredSections.map(({ doc, heading }) => (
-                    <Card key={`${doc.id}-${heading.id}`}>
-                        <CardHeader>
-                          <CardTitle
-                            className="text-lg cursor-pointer hover:underline"
-                            onClick={() => onSelect(doc, heading.id)}
-                          >
-                            {heading.title}
-                          </CardTitle>
-                          <CardDescription>In: {doc.title}</CardDescription>
-                        </CardHeader>
-                    </Card>
-                    ))
+                    <Accordion type="multiple" className="w-full space-y-2">
+                        {filteredSections.map(({ doc, heading }) => (
+                            <AccordionItem value={`${doc.id}-${heading.id}`} key={`${doc.id}-${heading.id}`} className="border rounded-md data-[state=closed]:bg-transparent data-[state=open]:bg-card transition-colors">
+                                <AccordionTrigger className="hover:no-underline p-4 text-left">
+                                    <div className="flex-1">
+                                        <p className="font-semibold text-base">{heading.title}</p>
+                                        <p className="text-sm text-muted-foreground">In: {doc.title}</p>
+                                    </div>
+                                </AccordionTrigger>
+                                <AccordionContent>
+                                    <div className="px-4 pb-4 pt-0 space-y-4">
+                                        <div className="border-t -mx-4" />
+                                        <div className="pt-2">
+                                          {renderSectionContent(getSectionContent(doc.content, heading.title))}
+                                        </div>
+                                        <Button variant="outline" size="sm" onClick={() => onSelect(doc, heading.id)}>
+                                            <BookOpen className="mr-2 h-4 w-4" />
+                                            View full topic
+                                        </Button>
+                                    </div>
+                                </AccordionContent>
+                            </AccordionItem>
+                        ))}
+                    </Accordion>
                 ) : (
                     <p className="text-center text-muted-foreground py-10">No sections found with the selected subjects.</p>
                 )}
