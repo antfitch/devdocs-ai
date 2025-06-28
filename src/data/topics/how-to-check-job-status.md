@@ -6,7 +6,7 @@ tags:
 
 For long-running jobs, you may want to submit them and check their status later instead of awaiting the result directly.
 
-## 1. Submitting the Job
+## 1. Submit the Job
 When you submit a job without awaiting the final result, the API immediately returns a job object with a unique ID.
 
 ```javascript
@@ -19,7 +19,7 @@ async function submit() {
 const jobId = await submit();
 ```
 
-## 2. Polling for Status
+## 2. Poll for Status
 You can then use the `jobId` to poll for the job's status periodically. This is useful for providing progress updates in a user interface.
 
 ```javascript
@@ -33,7 +33,7 @@ async function checkStatus(id) {
 setInterval(() => checkStatus(jobId), 10000);
 ```
 
-## 3. Handling Different Statuses
+## 3. Handle Different Statuses
 The job status can be `QUEUED`, `RUNNING`, `COMPLETED`, `FAILED`, or `CANCELLED`. Your application should handle these different states accordingly.
 
 ```javascript

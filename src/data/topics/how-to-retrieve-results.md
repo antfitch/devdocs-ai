@@ -18,7 +18,7 @@ if (status !== 'COMPLETED') {
 }
 ```
 
-## 2. Fetching the Results
+## 2. Fetch the Results
 Use the `client.getJobResults()` method with the `jobId` to get the measurement outcomes.
 
 ```javascript
@@ -35,7 +35,7 @@ async function fetchResults(id) {
 const jobResults = await fetchResults(jobId);
 ```
 
-## 3. Parsing the Output
+## 3. Parse the Output
 The results object contains the measurement outcomes as keys and the number of times that outcome was observed (counts) as values.
 
 ```javascript

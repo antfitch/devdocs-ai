@@ -6,7 +6,7 @@ tags:
 
 This guide provides a high-level overview of how you might structure a call to a pre-packaged Grover's algorithm function.
 
-## 1. Defining the Oracle
+## 1. Define the Oracle
 Grover's algorithm requires an "oracle" function that identifies the solution. For this example, we assume the API allows you to provide a "marked item" that it uses to build the oracle internally.
 
 ```javascript
@@ -15,7 +15,7 @@ const searchSpaceSize = 3; // 2^3 = 8 items
 const markedItem = '101';
 ```
 
-## 2. Constructing the Grover Job
+## 2. Construct the Grover Job
 The `client.runAlgorithm()` method abstracts away the circuit construction. You specify the algorithm name and its parameters.
 
 ```javascript
@@ -30,7 +30,7 @@ const groverJob = {
 };
 ```
 
-## 3. Running the Search
+## 3. Run the Search
 Executing the job will run Grover's algorithm and should return the marked item with high probability.
 
 ```javascript

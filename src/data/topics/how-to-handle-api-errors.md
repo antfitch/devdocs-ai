@@ -6,7 +6,7 @@ tags:
 
 Proper error handling is crucial for building robust applications. The API client will throw an error for failed requests.
 
-## 1. Using Try...Catch Blocks
+## 1. Use Try...Catch Blocks
 Always wrap your API calls in a `try...catch` block to gracefully handle any potential failures, such as network issues or invalid inputs.
 
 ```javascript
@@ -22,7 +22,7 @@ async function riskyOperation() {
 }
 ```
 
-## 2. Inspecting Error Codes
+## 2. Inspect Error Codes
 The error object returned by the client may include a `statusCode` and a `code` property from the API, which can help you handle different types of errors programmatically.
 
 ```javascript
@@ -39,7 +39,7 @@ try {
 }
 ```
 
-## 3. Implementing Retry Logic
+## 3. Implement Retry Logic
 For transient errors (like a 503 Service Unavailable), you might want to implement a simple retry mechanism with an exponential backoff.
 
 ```javascript
