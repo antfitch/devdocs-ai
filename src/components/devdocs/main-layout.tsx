@@ -392,123 +392,121 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
               </TabsContent>
               <TabsContent value="filters" className="m-0 h-full flex flex-col">
                 <h2 className="p-4 pb-2 text-base font-bold shrink-0">Filters</h2>
-                <div className="flex-1 overflow-y-auto">
-                  <div className="p-4 pt-0">
-                    <div className="space-y-4">
-                      <div className="flex items-center space-x-2">
-                        <Switch
-                          id="include-sections"
-                          checked={includeSections}
-                          onCheckedChange={setIncludeSections}
-                        />
-                        <Label htmlFor="include-sections">
-                          {includeSections ? 'Sections only' : 'Topics only'}
-                        </Label>
-                      </div>
-                      <Collapsible
-                        open={openFilterCategories.includes('types')}
-                        onOpenChange={() => handleToggleFilterCategory('types')}
-                      >
-                        <CollapsibleTrigger className="w-full flex items-center rounded-md p-1 -ml-1 mb-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
-                          <div className="flex flex-1 items-center gap-2 text-sm font-medium">
-                            <Library className="h-4 w-4" />
-                            <span className="text-base">Types</span>
-                          </div>
-                          <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
-                        </CollapsibleTrigger>
-                        <CollapsibleContent>
-                          <div className="space-y-1">
-                            {typeFilters.map((filter) => (
-                              <Collapsible 
-                                key={filter.tag}
-                                open={openFilterTypes.includes(filter.tag)}
-                                onOpenChange={() => handleToggleFilterType(filter.tag)}
-                              >
-                                <div className="flex items-center space-x-2">
-                                    <Checkbox
-                                      id={`filter-type-${filter.tag}`}
-                                      checked={selectedTags.includes(filter.tag)}
-                                      onCheckedChange={() => handleTagToggle(filter.tag)}
-                                    />
-                                    <CollapsibleTrigger 
-                                      className="flex h-6 flex-1 cursor-pointer items-center justify-between rounded-md px-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                                    >
-                                        <span className="text-sm font-normal">{filter.label}</span>
-                                        <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
-                                    </CollapsibleTrigger>
-                                </div>
-                                <CollapsibleContent>
-                                  <div className="pl-6 mt-2 space-y-1">
-                                    {(docsByType.get(filter.tag) || []).map(doc => (
-                                      <div key={doc.id} className="w-full">
-                                        <Button
-                                          variant="link"
-                                          className="p-0 h-auto w-full text-left justify-start font-normal text-muted-foreground hover:text-primary"
-                                          onClick={() => handleFilterTopicClick(doc, filter.tag)}
-                                        >
-                                          {doc.title}
-                                        </Button>
-                                        {toggledTopicId === doc.id && doc.headings && doc.headings.length > 0 && (
-                                          <SidebarMenuSub className="ml-0 my-1 pl-2">
-                                            <SidebarMenuItem key={`${doc.id}-overview`}>
+                <div className="flex-1 overflow-y-auto p-4 pt-0">
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        id="include-sections"
+                        checked={includeSections}
+                        onCheckedChange={setIncludeSections}
+                      />
+                      <Label htmlFor="include-sections">
+                        {includeSections ? 'Sections only' : 'Topics only'}
+                      </Label>
+                    </div>
+                    <Collapsible
+                      open={openFilterCategories.includes('types')}
+                      onOpenChange={() => handleToggleFilterCategory('types')}
+                    >
+                      <CollapsibleTrigger className="w-full flex items-center rounded-md p-1 -ml-1 mb-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+                        <div className="flex flex-1 items-center gap-2 text-sm font-medium">
+                          <Library className="h-4 w-4" />
+                          <span className="text-base">Types</span>
+                        </div>
+                        <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <div className="space-y-1">
+                          {typeFilters.map((filter) => (
+                            <Collapsible 
+                              key={filter.tag}
+                              open={openFilterTypes.includes(filter.tag)}
+                              onOpenChange={() => handleToggleFilterType(filter.tag)}
+                            >
+                              <div className="flex items-center space-x-2">
+                                <Checkbox
+                                  id={`filter-type-${filter.tag}`}
+                                  checked={selectedTags.includes(filter.tag)}
+                                  onCheckedChange={() => handleTagToggle(filter.tag)}
+                                />
+                                <CollapsibleTrigger 
+                                  className="flex h-6 flex-1 cursor-pointer items-center justify-between rounded-md px-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                                >
+                                  <span className="text-sm font-normal">{filter.label}</span>
+                                  <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
+                                </CollapsibleTrigger>
+                              </div>
+                              <CollapsibleContent>
+                                <div className="pl-9 mt-2 space-y-1">
+                                  {(docsByType.get(filter.tag) || []).map(doc => (
+                                    <div key={doc.id} className="w-full">
+                                      <Button
+                                        variant="link"
+                                        className="p-0 h-auto w-full text-left justify-start font-normal text-muted-foreground hover:text-primary"
+                                        onClick={() => handleFilterTopicClick(doc, filter.tag)}
+                                      >
+                                        {doc.title}
+                                      </Button>
+                                      {toggledTopicId === doc.id && doc.headings && doc.headings.length > 0 && (
+                                        <SidebarMenuSub className="my-1 pl-2">
+                                          <SidebarMenuItem key={`${doc.id}-overview`}>
+                                            <SidebarMenuSubButton asChild size="sm">
+                                              <button onClick={() => handleHeadingClick('doc-viewer-top')} className="w-full text-left justify-start">
+                                                <span>Overview</span>
+                                              </button>
+                                            </SidebarMenuSubButton>
+                                          </SidebarMenuItem>
+                                          {doc.headings.map((heading) => (
+                                            <SidebarMenuItem key={heading.id}>
                                               <SidebarMenuSubButton asChild size="sm">
-                                                <button onClick={() => handleHeadingClick('doc-viewer-top')} className="w-full text-left justify-start">
-                                                  <span>Overview</span>
+                                                <button onClick={() => handleHeadingClick(heading.id)} className="w-full text-left justify-start">
+                                                  <span>{heading.title}</span>
                                                 </button>
                                               </SidebarMenuSubButton>
                                             </SidebarMenuItem>
-                                            {doc.headings.map((heading) => (
-                                              <SidebarMenuItem key={heading.id}>
-                                                <SidebarMenuSubButton asChild size="sm">
-                                                  <button onClick={() => handleHeadingClick(heading.id)} className="w-full text-left justify-start">
-                                                    <span>{heading.title}</span>
-                                                  </button>
-                                                </SidebarMenuSubButton>
-                                              </SidebarMenuItem>
-                                            ))}
-                                          </SidebarMenuSub>
-                                        )}
-                                      </div>
-                                    ))}
-                                  </div>
-                                </CollapsibleContent>
-                              </Collapsible>
-                            ))}
-                          </div>
-                        </CollapsibleContent>
-                      </Collapsible>
-                      <Collapsible
-                        open={openFilterCategories.includes('subjects')}
-                        onOpenChange={() => handleToggleFilterCategory('subjects')}
-                      >
-                         <CollapsibleTrigger className="w-full flex items-center rounded-md p-1 -ml-1 mb-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
-                          <div className="flex flex-1 items-center gap-2 text-sm font-medium">
-                            <Tag className="h-4 w-4" />
-                            <span className="text-base">Subjects</span>
-                          </div>
-                          <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
-                        </CollapsibleTrigger>
-                        <CollapsibleContent>
-                          <div className="space-y-2">
-                            {displayedTags.map((tag) => (
-                              <div key={tag} className="flex items-center space-x-2">
-                                <Checkbox
-                                  id={`filter-tag-${tag}`}
-                                  checked={selectedTags.includes(tag)}
-                                  onCheckedChange={() => handleTagToggle(tag)}
-                                />
-                                <Label
-                                  htmlFor={`filter-tag-${tag}`}
-                                  className="font-normal capitalize"
-                                >
-                                  {tag.replace(/-/g, ' ')}
-                                </Label>
-                              </div>
-                            ))}
-                          </div>
-                        </CollapsibleContent>
-                      </Collapsible>
-                    </div>
+                                          ))}
+                                        </SidebarMenuSub>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </CollapsibleContent>
+                            </Collapsible>
+                          ))}
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
+                    <Collapsible
+                      open={openFilterCategories.includes('subjects')}
+                      onOpenChange={() => handleToggleFilterCategory('subjects')}
+                    >
+                       <CollapsibleTrigger className="w-full flex items-center rounded-md p-1 -ml-1 mb-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+                        <div className="flex flex-1 items-center gap-2 text-sm font-medium">
+                          <Tag className="h-4 w-4" />
+                          <span className="text-base">Subjects</span>
+                        </div>
+                        <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <div className="space-y-2">
+                          {displayedTags.map((tag) => (
+                            <div key={tag} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={`filter-tag-${tag}`}
+                                checked={selectedTags.includes(tag)}
+                                onCheckedChange={() => handleTagToggle(tag)}
+                              />
+                              <Label
+                                htmlFor={`filter-tag-${tag}`}
+                                className="font-normal capitalize"
+                              >
+                                {tag.replace(/-/g, ' ')}
+                              </Label>
+                            </div>
+                          ))}
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
                   </div>
                 </div>
               </TabsContent>
