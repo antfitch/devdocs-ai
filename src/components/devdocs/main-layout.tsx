@@ -403,31 +403,15 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                         open={openFilterTypes.includes(filter.tag)}
                         onOpenChange={() => handleToggleFilterType(filter.tag)}
                       >
-                        <div className="flex items-center justify-between pr-2">
-                            <div className="flex items-center space-x-2">
-                                <Checkbox
-                                id={`filter-type-${filter.tag}`}
-                                checked={selectedTags.includes(filter.tag)}
-                                onCheckedChange={() => handleTagToggle(filter.tag)}
-                                />
-                                <Label
-                                  className="font-normal cursor-pointer"
-                                  onClick={() => {
-                                    handleToggleFilterType(filter.tag);
-                                  }}
-                                >
-                                  {filter.label}
-                                </Label>
-                            </div>
-                            <CollapsibleTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-6 w-6"
-                                >
-                                    <ChevronRight className="h-4 w-4 transition-transform duration-200 data-[state=open]:rotate-90" />
-                                    <span className="sr-only">Toggle</span>
-                                </Button>
+                        <div className="flex items-center space-x-2">
+                            <Checkbox
+                            id={`filter-type-${filter.tag}`}
+                            checked={selectedTags.includes(filter.tag)}
+                            onCheckedChange={() => handleTagToggle(filter.tag)}
+                            />
+                            <CollapsibleTrigger className="flex h-6 flex-1 cursor-pointer items-center justify-between rounded-md px-2 hover:bg-accent">
+                                <span className="text-sm font-normal">{filter.label}</span>
+                                <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
                             </CollapsibleTrigger>
                         </div>
                         <CollapsibleContent>
