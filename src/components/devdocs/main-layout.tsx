@@ -295,112 +295,108 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                 </Tooltip>
               </TooltipProvider>
             </TabsList>
-            <TabsContent value="topics" className="m-0 flex-1 flex flex-col min-h-0">
+            <TabsContent value="topics" className="m-0 flex-1 overflow-y-auto">
               <h2 className="p-4 pb-2 text-base font-bold shrink-0 sticky top-0 bg-sidebar z-10">Topics</h2>
-              <div className="flex-1 overflow-y-auto">
-                <SidebarMenu className="p-2 pt-0">
-                  {displayedTopics.map((doc) => (
-                    <SidebarMenuItem key={doc.id}>
-                      {doc.subtopics && doc.subtopics.length > 0 ? (
-                        <Collapsible
-                          open={openItems.includes(doc.id)}
-                          onOpenChange={() => handleToggle(doc.id)}
-                        >
-                          <CollapsibleTrigger asChild>
-                            <SidebarMenuButton
-                              onClick={() => handleSelectDoc(doc)}
-                              isActive={
-                                !isSearching &&
-                                activeTab !== 'filters' &&
-                                (activeDoc?.id === doc.id ||
-                                  doc.subtopics.some(
-                                    (sub) => sub.id === activeDoc?.id
-                                  ))
-                              }
-                              className="w-full justify-between"
-                            >
-                              <div className="flex items-center gap-2">
-                                {doc.icon && <DynamicIcon name={doc.icon} />}
-                                <span>{doc.title}</span>
-                              </div>
-                              <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
-                            </SidebarMenuButton>
-                          </CollapsibleTrigger>
-                          <CollapsibleContent>
-                            <SidebarMenuSub>
-                              {doc.subtopics.map((subDoc) => (
-                                <SidebarMenuItem key={subDoc.id}>
-                                  <SidebarMenuButton
-                                    onClick={() => handleSelectDoc(subDoc)}
-                                    isActive={
-                                      !isSearching && activeTab !== 'filters' && activeDoc?.id === subDoc.id
-                                    }
-                                  >
-                                    {subDoc.icon && (
-                                      <DynamicIcon name={subDoc.icon} />
-                                    )}
-                                    <span>{subDoc.title}</span>
-                                  </SidebarMenuButton>
-                                </SidebarMenuItem>
-                              ))}
-                            </SidebarMenuSub>
-                          </CollapsibleContent>
-                        </Collapsible>
-                      ) : (
-                        <>
+              <SidebarMenu className="p-2 pt-0">
+                {displayedTopics.map((doc) => (
+                  <SidebarMenuItem key={doc.id}>
+                    {doc.subtopics && doc.subtopics.length > 0 ? (
+                      <Collapsible
+                        open={openItems.includes(doc.id)}
+                        onOpenChange={() => handleToggle(doc.id)}
+                      >
+                        <CollapsibleTrigger asChild>
                           <SidebarMenuButton
                             onClick={() => handleSelectDoc(doc)}
-                            isActive={!isSearching && activeTab !== 'filters' && activeDoc?.id === doc.id}
+                            isActive={
+                              !isSearching &&
+                              activeTab !== 'filters' &&
+                              (activeDoc?.id === doc.id ||
+                                doc.subtopics.some(
+                                  (sub) => sub.id === activeDoc?.id
+                                ))
+                            }
+                            className="w-full justify-between"
                           >
                             <div className="flex items-center gap-2">
                               {doc.icon && <DynamicIcon name={doc.icon} />}
                               <span>{doc.title}</span>
                             </div>
+                            <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
                           </SidebarMenuButton>
-                          {toggledTopicId === doc.id && doc.headings && doc.headings.length > 1 && (
-                              <SidebarMenuSub>
-                                {doc.headings.map((heading) => (
-                                  <SidebarMenuItem key={heading.id}>
-                                    <SidebarMenuSubButton
-                                      asChild
-                                      size="sm"
-                                    >
-                                      <button onClick={() => handleHeadingClick(heading.id)} className="w-full text-left justify-start">
-                                        <span>{heading.title}</span>
-                                      </button>
-                                    </SidebarMenuSubButton>
-                                  </SidebarMenuItem>
-                                ))}
-                              </SidebarMenuSub>
-                            )}
-                        </>
-                      )}
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              </div>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <SidebarMenuSub>
+                            {doc.subtopics.map((subDoc) => (
+                              <SidebarMenuItem key={subDoc.id}>
+                                <SidebarMenuButton
+                                  onClick={() => handleSelectDoc(subDoc)}
+                                  isActive={
+                                    !isSearching && activeTab !== 'filters' && activeDoc?.id === subDoc.id
+                                  }
+                                >
+                                  {subDoc.icon && (
+                                    <DynamicIcon name={subDoc.icon} />
+                                  )}
+                                  <span>{subDoc.title}</span>
+                                </SidebarMenuButton>
+                              </SidebarMenuItem>
+                            ))}
+                          </SidebarMenuSub>
+                        </CollapsibleContent>
+                      </Collapsible>
+                    ) : (
+                      <>
+                        <SidebarMenuButton
+                          onClick={() => handleSelectDoc(doc)}
+                          isActive={!isSearching && activeTab !== 'filters' && activeDoc?.id === doc.id}
+                        >
+                          <div className="flex items-center gap-2">
+                            {doc.icon && <DynamicIcon name={doc.icon} />}
+                            <span>{doc.title}</span>
+                          </div>
+                        </SidebarMenuButton>
+                        {toggledTopicId === doc.id && doc.headings && doc.headings.length > 1 && (
+                            <SidebarMenuSub>
+                              {doc.headings.map((heading) => (
+                                <SidebarMenuItem key={heading.id}>
+                                  <SidebarMenuSubButton
+                                    asChild
+                                    size="sm"
+                                  >
+                                    <button onClick={() => handleHeadingClick(heading.id)} className="w-full text-left justify-start">
+                                      <span>{heading.title}</span>
+                                    </button>
+                                  </SidebarMenuSubButton>
+                                </SidebarMenuItem>
+                              ))}
+                            </SidebarMenuSub>
+                          )}
+                      </>
+                    )}
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
             </TabsContent>
-            <TabsContent value="prompts" className="m-0 flex-1 flex flex-col min-h-0">
+            <TabsContent value="prompts" className="m-0 flex-1 overflow-y-auto">
               <h2 className="p-4 pb-2 text-base font-bold shrink-0 sticky top-0 bg-sidebar z-10">Prompts</h2>
-              <div className="flex-1 overflow-y-auto">
-                <SidebarMenu className="p-2 pt-0">
-                  {prompts.map((doc) => (
-                    <SidebarMenuItem key={doc.id}>
-                      <SidebarMenuButton
-                        onClick={() => handleSelectDoc(doc)}
-                        isActive={!isSearching && activeTab !== 'filters' && activeDoc?.id === doc.id}
-                      >
-                        {doc.icon && <DynamicIcon name={doc.icon} />}
-                        <span>{doc.title}</span>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              </div>
+              <SidebarMenu className="p-2 pt-0">
+                {prompts.map((doc) => (
+                  <SidebarMenuItem key={doc.id}>
+                    <SidebarMenuButton
+                      onClick={() => handleSelectDoc(doc)}
+                      isActive={!isSearching && activeTab !== 'filters' && activeDoc?.id === doc.id}
+                    >
+                      {doc.icon && <DynamicIcon name={doc.icon} />}
+                      <span>{doc.title}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
             </TabsContent>
-            <TabsContent value="filters" className="m-0 flex-1 flex flex-col min-h-0">
+            <TabsContent value="filters" className="m-0 flex-1 overflow-y-auto">
               <h2 className="p-4 pb-2 text-base font-bold shrink-0 sticky top-0 bg-sidebar z-10">Filters</h2>
-              <div className="flex-1 overflow-y-auto p-4 pt-0">
+              <div className="p-4 pt-0">
                 <div className="space-y-4">
                   <div className="flex items-center space-x-2">
                     <Switch
