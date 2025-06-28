@@ -411,9 +411,17 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                                 onCheckedChange={() => handleTagToggle(filter.tag)}
                                 />
                                 <Label
-                                className="font-normal"
+                                  className={cn(
+                                    "font-normal",
+                                    selectedTags.includes(filter.tag) && "cursor-pointer"
+                                  )}
+                                  onClick={() => {
+                                    if (selectedTags.includes(filter.tag)) {
+                                      handleToggleFilterType(filter.tag);
+                                    }
+                                  }}
                                 >
-                                {filter.label}
+                                  {filter.label}
                                 </Label>
                             </div>
                             <CollapsibleTrigger asChild disabled={!selectedTags.includes(filter.tag)}>
