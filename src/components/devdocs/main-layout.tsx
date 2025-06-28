@@ -286,8 +286,8 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                 </Tooltip>
               </TooltipProvider>
             </TabsList>
-            <div className="flex-1 min-h-0">
-              <TabsContent value="topics" className="m-0 h-full overflow-y-auto">
+            <div className="flex-1 overflow-y-auto">
+              <TabsContent value="topics" className="m-0">
                 <h2 className="p-4 pb-2 text-base font-bold shrink-0 sticky top-0 bg-sidebar z-10">Topics</h2>
                 <SidebarMenu className="p-2 pt-0">
                   {displayedTopics.map((doc) => (
@@ -370,7 +370,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                   ))}
                 </SidebarMenu>
               </TabsContent>
-              <TabsContent value="prompts" className="m-0 h-full overflow-y-auto">
+              <TabsContent value="prompts" className="m-0">
                 <h2 className="p-4 pb-2 text-base font-bold shrink-0 sticky top-0 bg-sidebar z-10">Prompts</h2>
                 <SidebarMenu className="p-2 pt-0">
                   {prompts.map((doc) => (
@@ -386,7 +386,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                   ))}
                 </SidebarMenu>
               </TabsContent>
-              <TabsContent value="filters" className="m-0 h-full overflow-y-auto">
+              <TabsContent value="filters" className="m-0">
                 <h2 className="p-4 pb-2 text-base font-bold shrink-0 sticky top-0 bg-sidebar z-10">Filters</h2>
                 <div className="p-4 pt-0">
                   <div className="space-y-4">
