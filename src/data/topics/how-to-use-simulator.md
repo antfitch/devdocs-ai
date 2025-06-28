@@ -2,11 +2,13 @@
 tags:
   - how-to
 ---
-# How to Use a Local Simulator
+# How to Use a Simulator
 
 Simulators are essential tools for debugging quantum circuits without needing to wait for access to a real quantum computer.
 
-## 1. Choose the Simulator Backend
+## Choose the Simulator Backend
+tags: simulator, backend, choose
+
 Our API provides access to several high-performance simulators. You can find them by listing the backends and filtering for `type: 'SIMULATOR'`.
 
 ```javascript
@@ -18,7 +20,9 @@ if (!simulator) {
 }
 ```
 
-## 2. Run a Circuit Locally
+## Run a Circuit on a Simulator
+tags: simulator, circuit, run
+
 To use a simulator, simply specify its name in the `backend` property of your job configuration. The rest of the process is identical to running on real hardware.
 
 ```javascript
@@ -34,7 +38,9 @@ const results = await client.compute(jobConfig);
 console.log('Simulation results:', results.counts);
 ```
 
-## 3. Understand the Advantages
+## Understand the Advantages
+tags: simulator, advantages, fidelity
+
 Simulators provide several key benefits:
 - **Speed:** Results are often returned much faster.
 - **Cost:** Running on simulators is typically free or much cheaper.

@@ -6,7 +6,9 @@ tags:
 
 Once a job has completed, you can fetch its results using the job ID.
 
-## 1. Ensure Job Completion
+## Ensure Job Completion
+tags: results, jobs, completion
+
 Before attempting to retrieve results, you should confirm that the job's status is `COMPLETED`. Trying to fetch results for a job in any other state will result in an error.
 
 ```javascript
@@ -18,7 +20,9 @@ if (status !== 'COMPLETED') {
 }
 ```
 
-## 2. Fetch the Results
+## Fetch the Results
+tags: results, jobs, fetch
+
 Use the `client.getJobResults()` method with the `jobId` to get the measurement outcomes.
 
 ```javascript
@@ -35,7 +39,9 @@ async function fetchResults(id) {
 const jobResults = await fetchResults(jobId);
 ```
 
-## 3. Parse the Output
+## Parse the Output
+tags: results, jobs, parsing
+
 The results object contains the measurement outcomes as keys and the number of times that outcome was observed (counts) as values.
 
 ```javascript

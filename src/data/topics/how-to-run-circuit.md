@@ -6,7 +6,9 @@ tags:
 
 This guide demonstrates the basic workflow for defining a quantum circuit and submitting it to a backend for execution.
 
-## 1. Define Your Circuit
+## Define Your Circuit
+tags: circuit, define, run
+
 First, you need to define your quantum circuit. Our client library uses a simple, string-based representation for circuits. This example creates a circuit with one Hadamard gate and one CNOT gate.
 
 ```javascript
@@ -16,7 +18,9 @@ const myCircuit = `
 `;
 ```
 
-## 2. Configure the Job
+## Configure the Job
+tags: circuit, jobs, configuration
+
 Next, create a job configuration object. This specifies the circuit to run, the backend to use, and the number of "shots" (how many times to run the circuit).
 
 ```javascript
@@ -27,7 +31,9 @@ const jobConfig = {
 };
 ```
 
-## 3. Submit and Await Results
+## Submit and Await Results
+tags: circuit, submit, results
+
 Finally, submit the job to the API. The `client.compute()` method returns a promise that resolves with the job results once the computation is complete.
 
 ```javascript

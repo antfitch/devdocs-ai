@@ -6,7 +6,9 @@ tags:
 
 A Bell state is a specific state of two entangled qubits. This guide shows how to create one.
 
-## 1. Define the Circuit for Entanglement
+## Define the Circuit for Entanglement
+tags: bell-state, circuit, entanglement
+
 The simplest Bell state, |Φ+⟩, is created by applying a Hadamard gate to the first qubit and then a CNOT gate with the first qubit as control and the second as target.
 
 ```javascript
@@ -17,7 +19,9 @@ const bellStateCircuit = `
 `;
 ```
 
-## 2. Execute the Bell State Circuit
+## Execute the Bell State Circuit
+tags: bell-state, execute, circuit
+
 Submit this circuit to a backend. Since this is a foundational experiment, a simulator is often sufficient and faster.
 
 ```javascript
@@ -31,7 +35,9 @@ const results = await client.compute(jobConfig);
 console.log('Bell state circuit results:', results);
 ```
 
-## 3. Verify the Entangled State
+## Verify the Entangled State
+tags: bell-state, entanglement, verification
+
 When you measure the qubits, you should observe the states `00` and `11` with roughly equal probability (around 50% each), and never `01` or `10`. This confirms the entanglement.
 
 ```javascript
