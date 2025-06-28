@@ -1,8 +1,5 @@
 ---
 tags:
-  - getting-started
-  - setup
-  - api-call
   - how-to
   - get-started
 ---

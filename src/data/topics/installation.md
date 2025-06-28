@@ -1,9 +1,6 @@
 ---
 tags:
   - installation
-  - npm
-  - setup
-  - how-to
   - get-started
 ---
 # Installation
@@ -11,7 +8,7 @@ tags:
 To get started, you need to install the client library.
 
 ## npm
-tags: npm, package manager, client library
+tags: npm
 
 You can install the library using npm:
 

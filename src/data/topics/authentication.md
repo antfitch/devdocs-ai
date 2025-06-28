@@ -1,8 +1,6 @@
 ---
 tags:
   - authentication
-  - api-key
-  - security
   - how-to
 ---
 # Authentication
@@ -10,7 +8,7 @@ tags:
 Authenticating with the Quantum API is straightforward.
 
 ## API Key
-tags: api key, security, client
+tags: api key
 
 You need an API key to make requests. You can find your API key in your account dashboard.
 

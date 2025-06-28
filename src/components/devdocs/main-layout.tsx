@@ -70,13 +70,14 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     setShowDocWhileFiltering(false);
 
     const isCurrentlySelected = selectedTags.includes(tag);
+    const isTypeTag = typeFilterTags.includes(tag);
 
     setSelectedTags((prev) =>
       prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
     );
 
     // If a type tag was just deselected, collapse its section
-    if (isCurrentlySelected && typeFilterTags.includes(tag)) {
+    if (isCurrentlySelected && isTypeTag) {
       setOpenFilterTypes((prev) => prev.filter((t) => t !== tag));
     }
   };
@@ -386,7 +387,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                     checked={includeSections}
                     onCheckedChange={setIncludeSections}
                   />
-                  <Label htmlFor="include-sections" className="cursor-pointer">
+                  <Label>
                     {includeSections ? 'Sections only' : 'Topics only'}
                   </Label>
                 </div>
@@ -410,8 +411,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                                 onCheckedChange={() => handleTagToggle(filter.tag)}
                                 />
                                 <Label
-                                htmlFor={`filter-type-${filter.tag}`}
-                                className="font-normal cursor-pointer"
+                                className="font-normal"
                                 >
                                 {filter.label}
                                 </Label>
@@ -483,8 +483,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                           onCheckedChange={() => handleTagToggle(tag)}
                         />
                         <Label
-                          htmlFor={`filter-${tag}`}
-                          className="font-normal capitalize cursor-pointer"
+                          className="font-normal capitalize"
                         >
                           {tag.replace(/-/g, ' ')}
                         </Label>

@@ -1,9 +1,5 @@
 ---
 tags:
-  - introduction
-  - overview
-  - features
-  - welcome
   - concept
   - get-started
 ---
@@ -12,7 +8,6 @@ tags:
 This is an interactive documentation experience powered by AI. You can browse topics, search across multiple documentation sources, and use the AI assistant to ask questions, explain concepts, or generate code.
 
 ## Key Features
-tags: features, search, ai assistant
 
 - **Unified Documentation:** Access all your documentation in one place.
 - **Vector Search:** Find what you need quickly with our powerful search.

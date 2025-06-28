@@ -1,8 +1,7 @@
 ---
 tags:
-  - api-reference
+  - api
   - endpoints
-  - quantum-computing
   - reference
 ---
 # API Reference
@@ -10,6 +9,7 @@ tags:
 This section provides a detailed reference for all available API endpoints.
 
 ## POST /v1/compute
+tags: POST, compute, v1
 
 This endpoint allows you to submit a quantum circuit for computation.
 
@@ -24,7 +24,7 @@ This endpoint allows you to submit a quantum circuit for computation.
 ```
 
 ## GET /v1/jobs/{jobId}
-tags: GET, jobs, v1, status
+tags: GET, jobs, v1
 
 Retrieve the status of a previously submitted job.
 
@@ -66,7 +66,7 @@ Fetch the results of a completed job.
 ```
 
 ## GET /v1/backends
-tags: GET, backends, v1, list
+tags: GET, backends, v1
 
 Get a list of all available quantum computer backends.
 
@@ -83,7 +83,7 @@ Retrieve detailed information about a specific quantum backend, including its to
 - `backendId` (string): The identifier for the backend.
 
 ## POST /v1/experiments
-tags: POST, experiments, v1, create
+tags: POST, experiments, v1, jobs
 
 Create a new experiment to group related jobs.
 
@@ -98,7 +98,7 @@ Create a new experiment to group related jobs.
 ```
 
 ## GET /v1/experiments/{experimentId}
-tags: GET, experiments, v1, details
+tags: GET, experiments, v1
 
 Get details for a specific experiment.
 
@@ -108,7 +108,7 @@ Get details for a specific experiment.
 - `experimentId` (string): The unique identifier for the experiment.
 
 ## PUT /v1/experiments/{experimentId}
-tags: PUT, experiments, v1, update
+tags: PUT, experiments, v1
 
 Update the details of an existing experiment.
 
@@ -136,7 +136,7 @@ Delete a specific experiment.
 - `experimentId` (string): The unique identifier for the experiment.
 
 ## GET /v1/algorithms
-tags: GET, algorithms, v1, list
+tags: GET, algorithms, v1
 
 List all supported quantum algorithms.
 
