@@ -286,7 +286,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                 </Tooltip>
               </TooltipProvider>
             </TabsList>
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto min-h-0">
               <TabsContent value="topics" className="m-0">
                 <h2 className="p-4 pb-2 text-base font-bold">Topics</h2>
                 <SidebarMenu className="p-2 pt-0">
@@ -430,7 +430,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                                 </CollapsibleTrigger>
                             </div>
                             <CollapsibleContent>
-                              <div className="pl-8 mt-2 space-y-1">
+                              <div className="pl-6 mt-2 space-y-1">
                                 {(docsByType.get(filter.tag) || []).map(doc => (
                                   <div key={doc.id} className="w-full">
                                     <Button
