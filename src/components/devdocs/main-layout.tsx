@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -288,10 +287,9 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
               </TooltipProvider>
             </TabsList>
             <div className="flex-1 min-h-0">
-              <TabsContent value="topics" className="m-0 h-full flex flex-col">
-                <h2 className="p-4 pb-2 text-base font-bold shrink-0">Topics</h2>
-                <div className="overflow-y-auto">
-                  <SidebarMenu className="p-2 pt-0">
+              <TabsContent value="topics" className="m-0 h-full overflow-y-auto">
+                <h2 className="p-4 pb-2 text-base font-bold">Topics</h2>
+                <SidebarMenu className="p-2 pt-0">
                     {displayedTopics.map((doc) => (
                       <SidebarMenuItem key={doc.id}>
                         {doc.subtopics && doc.subtopics.length > 0 ? (
@@ -371,12 +369,10 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                       </SidebarMenuItem>
                     ))}
                   </SidebarMenu>
-                </div>
               </TabsContent>
-              <TabsContent value="prompts" className="m-0 h-full flex flex-col">
-                <h2 className="p-4 pb-2 text-base font-bold shrink-0">Prompts</h2>
-                <div className="overflow-y-auto">
-                  <SidebarMenu className="p-2 pt-0">
+              <TabsContent value="prompts" className="m-0 h-full overflow-y-auto">
+                <h2 className="p-4 pb-2 text-base font-bold">Prompts</h2>
+                <SidebarMenu className="p-2 pt-0">
                     {prompts.map((doc) => (
                       <SidebarMenuItem key={doc.id}>
                         <SidebarMenuButton
@@ -389,11 +385,10 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                       </SidebarMenuItem>
                     ))}
                   </SidebarMenu>
-                </div>
               </TabsContent>
-              <TabsContent value="filters" className="m-0 h-full flex flex-col">
-                <h2 className="p-4 pb-2 text-base font-bold shrink-0">Filters</h2>
-                <div className="overflow-y-auto p-4 pt-0">
+              <TabsContent value="filters" className="m-0 h-full overflow-y-auto">
+                <h2 className="p-4 pb-2 text-base font-bold">Filters</h2>
+                <div className="p-4 pt-0">
                   <div className="space-y-4">
                     <div className="flex items-center space-x-2">
                       <Switch
@@ -438,7 +433,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                                   </CollapsibleTrigger>
                               </div>
                               <CollapsibleContent>
-                                <div className="pl-6 mt-2 space-y-1">
+                                <div className="pl-8 mt-2 space-y-1">
                                   {(docsByType.get(filter.tag) || []).map(doc => (
                                     <div key={doc.id} className="w-full">
                                       <Button
