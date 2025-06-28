@@ -384,7 +384,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                   </Label>
                 </div>
                 <div>
-                  <h3 className="mb-2 flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                  <h3 className="mb-2 flex items-center gap-2 text-sm font-medium">
                     <Library className="h-4 w-4" />
                     Types
                   </h3>
@@ -407,7 +407,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                             </CollapsibleTrigger>
                         </div>
                         <CollapsibleContent>
-                          <div className="pl-6 mt-2 space-y-1">
+                          <div className="pl-8 mt-2 space-y-1">
                             {(docsByType.get(filter.tag) || []).map(doc => (
                               <div key={doc.id} className="w-full">
                                 <Button
@@ -446,7 +446,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                   </div>
                 </div>
                 <div>
-                  <h3 className="mb-2 flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                  <h3 className="mb-2 flex items-center gap-2 text-sm font-medium">
                     <Tag className="h-4 w-4" />
                     Subjects
                   </h3>
@@ -458,11 +458,12 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                           checked={selectedTags.includes(tag)}
                           onCheckedChange={() => handleTagToggle(tag)}
                         />
-                        <Label
-                          className="font-normal capitalize"
+                        <label
+                          htmlFor={`filter-${tag}`}
+                          className="font-normal capitalize cursor-pointer"
                         >
                           {tag.replace(/-/g, ' ')}
-                        </Label>
+                        </label>
                       </div>
                     ))}
                   </div>
