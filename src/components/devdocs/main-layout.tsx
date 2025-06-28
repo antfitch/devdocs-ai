@@ -253,7 +253,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <TabsTrigger value="topics" className="flex-1">
-                      <Book className="h-4 w-4" />
+                      <Book className="h-4 w-4" strokeWidth={activeTab === 'topics' ? 2.5 : 1.5} />
                     </TabsTrigger>
                   </TooltipTrigger>
                   <TooltipContent side="bottom">
@@ -263,7 +263,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <TabsTrigger value="prompts" className="flex-1">
-                      <MessageSquare className="h-4 w-4" />
+                      <MessageSquare className="h-4 w-4" strokeWidth={activeTab === 'prompts' ? 2.5 : 1.5} />
                     </TabsTrigger>
                   </TooltipTrigger>
                   <TooltipContent side="bottom">
@@ -273,7 +273,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <TabsTrigger value="filters" className="flex-1">
-                      <Filter className="h-4 w-4" />
+                      <Filter className="h-4 w-4" strokeWidth={activeTab === 'filters' ? 2.5 : 1.5} />
                     </TabsTrigger>
                   </TooltipTrigger>
                   <TooltipContent side="bottom">
@@ -409,15 +409,17 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                         <Collapsible 
                           key={filter.tag}
                           open={openFilterTypes.includes(filter.tag)}
-                          onOpenChange={() => handleToggleFilterType(filter.tag)}
                         >
                           <div className="flex items-center space-x-2">
                               <Checkbox
-                              id={`filter-type-${filter.tag}`}
-                              checked={selectedTags.includes(filter.tag)}
-                              onCheckedChange={() => handleTagToggle(filter.tag)}
+                                id={`filter-type-${filter.tag}`}
+                                checked={selectedTags.includes(filter.tag)}
+                                onCheckedChange={() => handleTagToggle(filter.tag)}
                               />
-                              <CollapsibleTrigger className="flex h-6 flex-1 cursor-pointer items-center justify-between rounded-md px-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+                              <CollapsibleTrigger 
+                                className="flex h-6 flex-1 cursor-pointer items-center justify-between rounded-md px-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                                onClick={() => handleToggleFilterType(filter.tag)}
+                              >
                                   <span className="text-sm font-normal">{filter.label}</span>
                                   <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
                               </CollapsibleTrigger>
@@ -434,7 +436,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                                     {doc.title}
                                   </Button>
                                   {toggledTopicId === doc.id && doc.headings && doc.headings.length > 0 && (
-                                    <SidebarMenuSub>
+                                    <SidebarMenuSub className="ml-0 my-1 pl-2">
                                       <SidebarMenuItem key={`${doc.id}-overview`}>
                                         <SidebarMenuSubButton asChild size="sm">
                                           <button onClick={() => handleHeadingClick('doc-viewer-top')} className="w-full text-left justify-start">
@@ -478,12 +480,12 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                       {displayedTags.map((tag) => (
                         <div key={tag} className="flex items-center space-x-2">
                           <Checkbox
-                            id={`filter-${tag}`}
+                            id={`filter-tag-${tag}`}
                             checked={selectedTags.includes(tag)}
                             onCheckedChange={() => handleTagToggle(tag)}
                           />
                           <label
-                            htmlFor={`filter-${tag}`}
+                            htmlFor={`filter-tag-${tag}`}
                             className="font-normal capitalize"
                           >
                             {tag.replace(/-/g, ' ')}
