@@ -411,27 +411,19 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                                 onCheckedChange={() => handleTagToggle(filter.tag)}
                                 />
                                 <Label
-                                  className={cn(
-                                    "font-normal",
-                                    selectedTags.includes(filter.tag) && "cursor-pointer"
-                                  )}
+                                  className="font-normal cursor-pointer"
                                   onClick={() => {
-                                    if (selectedTags.includes(filter.tag)) {
-                                      handleToggleFilterType(filter.tag);
-                                    }
+                                    handleToggleFilterType(filter.tag);
                                   }}
                                 >
                                   {filter.label}
                                 </Label>
                             </div>
-                            <CollapsibleTrigger asChild disabled={!selectedTags.includes(filter.tag)}>
+                            <CollapsibleTrigger asChild>
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className={cn(
-                                    "h-6 w-6",
-                                    !selectedTags.includes(filter.tag) && "invisible"
-                                  )}
+                                  className="h-6 w-6"
                                 >
                                     <ChevronRight className="h-4 w-4 transition-transform duration-200 data-[state=open]:rotate-90" />
                                     <span className="sr-only">Toggle</span>
