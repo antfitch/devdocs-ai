@@ -15,6 +15,7 @@ import {
   SidebarMenuButton,
   SidebarMenuSub,
   SidebarMenuSubButton,
+  SidebarTitle,
 } from '@/components/ui/sidebar';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -140,7 +141,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     if (askMeSelectedText) {
       if (selectedAction === 'Explain selected text') {
         handleFetchExplanation(askMeSelectedText);
-      } else if (selectedAction === 'Generate code from text') {
+      } else if (selectedAction === 'Generate code sample') {
         handleFetchCode(askMeSelectedText);
       }
     }
@@ -157,7 +158,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   };
 
   const handleMakeCodeClick = () => {
-    setSelectedAction('Generate code from text');
+    setSelectedAction('Generate code sample');
     setInlineExplanation('');
     setInlineCode('');
     if (askMeSelectedText) {
@@ -477,13 +478,14 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   return (
     <SidebarProvider defaultOpen={true}>
       <Sidebar collapsible="icon">
-        <SidebarHeader className="p-4">
+        <SidebarHeader className="p-4 overflow-hidden">
           <div className="flex items-center gap-2">
             <Bot className="h-8 w-8 text-primary" />
-            <h1 className="text-2xl font-bold">DevDocs AI</h1>
+            <h1 className="text-2xl font-bold truncate">DevDocs AI</h1>
           </div>
         </SidebarHeader>
         <SidebarContent className="p-0">
+          <SidebarTitle className="sr-only">DevDocs AI Navigation</SidebarTitle>
           <Tabs
             value={activeTab}
             onValueChange={onTabChange}

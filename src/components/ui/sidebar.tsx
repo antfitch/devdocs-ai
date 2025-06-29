@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
-import { Sheet, SheetContent } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   Tooltip,
@@ -298,6 +298,7 @@ const Sidebar = React.forwardRef<
             }
             side={side}
           >
+            <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
             <div className="flex h-full w-full flex-col">{children}</div>
           </SheetContent>
         </Sheet>
@@ -423,6 +424,22 @@ const SidebarHeader = React.forwardRef<
   )
 })
 SidebarHeader.displayName = "SidebarHeader"
+
+const SidebarTitle = React.forwardRef<
+  HTMLHeadingElement,
+  React.HTMLAttributes<HTMLHeadingElement>
+>(({ className, ...props }, ref) => (
+  <h2
+    ref={ref}
+    data-sidebar="title"
+    className={cn(
+      "text-lg font-semibold tracking-tight",
+      className
+    )}
+    {...props}
+  />
+))
+SidebarTitle.displayName = "SidebarTitle"
 
 const SidebarFooter = React.forwardRef<
   HTMLDivElement,
@@ -817,6 +834,7 @@ export {
   SidebarProvider,
   SidebarRail,
   SidebarSeparator,
+  SidebarTitle,
   SidebarTrigger,
   useSidebar,
 }

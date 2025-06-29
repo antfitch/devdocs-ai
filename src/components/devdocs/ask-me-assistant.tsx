@@ -66,7 +66,7 @@ export function AskMeAssistant({
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handleMakeCodeClick} disabled={isLoading}>
               <Code className="mr-2" />
-              <span>Generate code from text</span>
+              <span>Generate code sample</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -98,7 +98,7 @@ export function AskMeAssistant({
           </div>
         )}
 
-        {selectedAction === 'Generate code from text' && (
+        {selectedAction === 'Generate code sample' && (
             <div className="space-y-2 pt-4 border-t">
                 <p className="text-sm text-muted-foreground">The AI will generate a code sample based on some text you've highlighted in the main window.</p>
                 <div className="p-2 bg-muted rounded-md text-sm text-muted-foreground max-h-28 overflow-y-auto">
@@ -128,14 +128,14 @@ export function AskMeAssistant({
           </div>
         ) : null}
 
-        {(isLoading && selectedAction === 'Generate code from text') || inlineCode ? (
+        {(isLoading && selectedAction === 'Generate code sample') || inlineCode ? (
           <div className="pt-4 mt-4 border-t">
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">Generated Code</CardTitle>
               </CardHeader>
               <CardContent>
-                {isLoading && selectedAction === 'Generate code from text' ? (
+                {isLoading && selectedAction === 'Generate code sample' ? (
                   <div className="flex items-center justify-center p-4">
                     <Loader2 className="h-6 w-6 animate-spin text-primary" />
                   </div>
