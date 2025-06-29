@@ -763,7 +763,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
           </Tabs>
         </SidebarContent>
       </Sidebar>
-      <SidebarInset className="p-4 max-h-screen flex flex-col">
+      <SidebarInset className="p-4 max-h-screen flex flex-col min-w-0">
         <div className="flex items-center gap-2 mb-4">
           <SidebarTrigger />
           <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">

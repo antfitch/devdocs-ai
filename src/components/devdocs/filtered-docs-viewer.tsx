@@ -63,13 +63,22 @@ const getSectionContent = (docContent: string, headingTitle: string): string => 
 };
 
 const renderSimpleMarkdown = (text: string) => {
-    const html = text
-      .replace(/^### (.*$)/gim, '<h3 class="text-xl font-bold mt-4 mb-2">$1</h3>')
-      .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
-      .replace(/\*(.*)\*/gim, '<em>$1</em>')
-      .replace(/`([^`]+)`/gim, '<code class="bg-muted text-muted-foreground px-1 py-0.5 rounded-sm font-mono text-sm">$1</code>')
-      .replace(/> (.*$)/gim, '<blockquote class="mt-6 border-l-2 pl-6 italic">$1</blockquote>')
-      .replace(/\n/g, '<br />');
+    const segments = text.split(/(`[^`]+`)/g);
+
+    const html = segments.map(segment => {
+        if (segment.startsWith('`') && segment.endsWith('`')) {
+            const codeContent = segment.slice(1, -1);
+            return `<code class="bg-muted text-muted-foreground px-1 py-0.5 rounded-sm font-mono text-sm">${codeContent}</code>`;
+        } else {
+            if (!segment) return '';
+            return segment
+                .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/gim, '<em>$1</em>')
+                .replace(/^### (.*$)/gim, '<h3 class="text-xl font-bold mt-4 mb-2">$1</h3>')
+                .replace(/> (.*$)/gim, '<blockquote class="mt-6 border-l-2 pl-6 italic">$1</blockquote>')
+                .replace(/\n/g, '<br />');
+        }
+    }).join('');
 
     return { __html: html };
   };
@@ -89,7 +98,7 @@ const renderSectionContent = (content: string) => {
                     lines.pop();
                     const code = lines.join('\n');
                     return (
-                        <div key={index} className="my-4 relative not-prose">
+                        <div key={index} className="my-4 relative">
                             <pre className="bg-gray-800 text-white p-4 pt-8 rounded-md overflow-x-auto">
                                 <code className={`font-mono language-${lang}`}>{code}</code>
                             </pre>

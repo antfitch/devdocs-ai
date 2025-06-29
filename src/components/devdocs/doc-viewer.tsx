@@ -19,18 +19,31 @@ export function DocViewer({ doc }: DocViewerProps) {
   }
 
   const renderSimpleMarkdown = (text: string) => {
-    const html = text
-      .replace(/^# (.*$)/gim, '<h1 class="text-4xl font-extrabold mt-8 mb-4 tracking-tight">$1</h1>')
-      .replace(/^## (.*$)/gim, (match, p1) => {
-        const id = p1.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
-        return `<h2 id="${id}" class="text-2xl font-bold mt-6 mb-3 border-b pb-2">${p1}</h2>`;
-      })
-      .replace(/^### (.*$)/gim, '<h3 class="text-xl font-bold mt-4 mb-2">$1</h3>')
-      .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
-      .replace(/\*(.*)\*/gim, '<em>$1</em>')
-      .replace(/`([^`]+)`/gim, '<code class="bg-muted text-muted-foreground px-1 py-0.5 rounded-sm font-mono text-sm">$1</code>')
-      .replace(/> (.*$)/gim, '<blockquote class="mt-6 border-l-2 pl-6 italic">$1</blockquote>')
-      .replace(/\n/g, '<br />');
+    // Split the text by code blocks, keeping the code blocks as part of the array
+    const segments = text.split(/(`[^`]+`)/g);
+
+    const html = segments.map(segment => {
+        if (segment.startsWith('`') && segment.endsWith('`')) {
+            // This is a code block, extract content and wrap in <code>
+            const codeContent = segment.slice(1, -1);
+            return `<code class="bg-muted text-muted-foreground px-1 py-0.5 rounded-sm font-mono text-sm">${codeContent}</code>`;
+        } else {
+            // This is regular text, apply other markdown rules
+            if (!segment) return '';
+            return segment
+                .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/gim, '<em>$1</em>')
+                .replace(/^# (.*$)/gim, '<h1 class="text-4xl font-extrabold mt-8 mb-4 tracking-tight">$1</h1>')
+                .replace(/^## (.*$)/gim, (match, p1) => {
+                    const id = p1.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+                    return `<h2 id="${id}" class="text-2xl font-bold mt-6 mb-3 border-b pb-2">${p1}</h2>`;
+                })
+                .replace(/^### (.*$)/gim, '<h3 class="text-xl font-bold mt-4 mb-2">$1</h3>')
+                .replace(/> (.*$)/gim, '<blockquote class="mt-6 border-l-2 pl-6 italic">$1</blockquote>')
+                .replace(/\n/g, '<br />')
+                .replace(/(<\/h[1-3]>)<br \/>/gi, '$1');
+        }
+    }).join('');
 
     return { __html: html };
   };
@@ -38,10 +51,7 @@ export function DocViewer({ doc }: DocViewerProps) {
   const contentWithoutFrontmatter = doc.content.replace(/^---[\s\S]*?---/, '').trim();
   const contentForRendering = contentWithoutFrontmatter
     // Remove tags lines used for metadata
-    .replace(/^tags:.*$\n?/gm, '')
-    // Normalize newlines after headings to a single newline to remove extra vertical space.
-    .replace(/(^# .*$)\n+/gm, '$1\n')
-    .replace(/(^##.*$)\n+/gm, '$1\n');
+    .replace(/^tags:.*$\n?/gm, '');
   const contentParts = contentForRendering.split(/(```[\s\S]*?```)/g);
 
   return (
