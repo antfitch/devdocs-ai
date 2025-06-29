@@ -14,3 +14,10 @@ export interface DocItemHeading {
   title: string;
   tags?: string[];
 }
+
+export interface QaItem {
+  id: number;
+  question: string;
+  answer: string | null;
+  isLoading: boolean;
+}

@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { Book, Bot, ChevronRight, MessageSquare, Search, Filter, Library, Tag } from 'lucide-react';
+import { Bot, ChevronRight, MessageSquare, Search, Filter, Library, Tag, BookCopy } from 'lucide-react';
 import {
   SidebarProvider,
   Sidebar,
@@ -28,14 +28,18 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import type { DocItem } from '@/types';
+import type { DocItem, QaItem } from '@/types';
 import { DocViewer } from './doc-viewer';
 import { SearchResults } from './search-results';
 import { AskMeAssistant } from './ask-me-assistant';
 import DynamicIcon from './dynamic-icon';
 import { FilteredDocsViewer } from './filtered-docs-viewer';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
+import { answerQuestions } from '@/ai/flows/answer-questions';
+import { explainText } from '@/ai/flows/explain-text';
+import { generateCode } from '@/ai/flows/generate-code';
+import { AskAiResultViewer } from './ask-ai-result-viewer';
 
 interface MainLayoutProps {
   topics: DocItem[];
@@ -44,10 +48,16 @@ interface MainLayoutProps {
   allTags: string[];
 }
 
+// Mock function for vector search
+const performVectorSearch = (query: string): string => {
+    console.log(`Performing vector search for: ${query}`);
+    return "Relevant documentation snippets based on vector search would be placed here.";
+}
+
+
 export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeDoc, setActiveDoc] = useState<DocItem | null>(topics[0]);
-  const [openItems, setOpenItems] = useState<string[]>(['getting-started']);
   const [toggledTopicId, setToggledTopicId] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState('filters');
@@ -56,17 +66,260 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   const [activeFilterTypeTag, setActiveFilterTypeTag] = useState<string | null>(null);
   const [includeSections, setIncludeSections] = useState(false);
   const [openFilterTypes, setOpenFilterTypes] = useState<string[]>([]);
-  const [openFilterCategories, setOpenFilterCategories] = useState<string[]>(['types', 'subjects']);
+  const [openFilterCategories, setOpenFilterCategories] = useState<string[]>(['types', 'subjects', 'keywords']);
   const [viewingDocsForType, setViewingDocsForType] = useState<string | null>(null);
+  const [openKeywordGroups, setOpenKeywordGroups] = useState<string[]>([]);
+
+  // State for AskMeAssistant
+  const [askMeSelectedText, setAskMeSelectedText] = useState('');
+  const [askQuery, setAskQuery] = useState('');
+  const [isAskMeLoading, setIsAskMeLoading] = useState(false);
+  const [selectedAction, setSelectedAction] = useState('Select an action');
+  const [inlineExplanation, setInlineExplanation] = useState('');
+  const [inlineCode, setInlineCode] = useState('');
+  const { toast } = useToast();
+
+  const [qaHistory, setQaHistory] = useState<QaItem[]>([]);
+
+  useEffect(() => {
+    const handleMouseUp = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+
+      // Prevent clearing selection when interacting with the sidebar
+      if (target.closest('[data-sidebar="sidebar"]')) {
+        return;
+      }
+      
+      const text = window.getSelection()?.toString().trim() || '';
+      setAskMeSelectedText(text);
+    };
+
+    document.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [setAskMeSelectedText]);
+
+  const handleFetchExplanation = async (text: string) => {
+    if (!text) {
+      setInlineExplanation('');
+      return;
+    }
+    setIsAskMeLoading(true);
+    setInlineExplanation('');
+    try {
+      const result = await explainText({ text });
+      setInlineExplanation(result.explanation);
+    } catch (error) {
+      console.error(error);
+      toast({ variant: 'destructive', title: 'Error', description: 'Could not get explanation.' });
+    } finally {
+      setIsAskMeLoading(false);
+    }
+  };
+
+  const handleFetchCode = async (text: string) => {
+    if (!text) {
+      setInlineCode('');
+      return;
+    }
+    setIsAskMeLoading(true);
+    setInlineCode('');
+    try {
+      const result = await generateCode({ text });
+      setInlineCode(result.code);
+    } catch (error) {
+      console.error(error);
+      toast({ variant: 'destructive', title: 'Error', description: 'Could not generate code.' });
+    } finally {
+      setIsAskMeLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (askMeSelectedText) {
+      if (selectedAction === 'Explain selected text') {
+        handleFetchExplanation(askMeSelectedText);
+      } else if (selectedAction === 'Generate code from text') {
+        handleFetchCode(askMeSelectedText);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [askMeSelectedText, selectedAction]);
+  
+  const handleExplainClick = () => {
+    setSelectedAction('Explain selected text');
+    setInlineExplanation('');
+    setInlineCode('');
+    if (askMeSelectedText) {
+      handleFetchExplanation(askMeSelectedText);
+    }
+  };
+
+  const handleMakeCodeClick = () => {
+    setSelectedAction('Generate code from text');
+    setInlineExplanation('');
+    setInlineCode('');
+    if (askMeSelectedText) {
+      handleFetchCode(askMeSelectedText);
+    }
+  };
+  
+  const handleAsk = async () => {
+    if (!askQuery) return;
+    
+    const newId = Date.now();
+    const currentQuery = askQuery;
+    const newQaItem: QaItem = { id: newId, question: currentQuery, answer: null, isLoading: true };
+
+    setIsAskMeLoading(true);
+    setQaHistory(prev => [...prev, newQaItem]);
+    setAskQuery('');
+
+    try {
+      const relevantDocs = performVectorSearch(currentQuery);
+      const result = await answerQuestions({ question: currentQuery, relevantDocs });
+      
+      setQaHistory(prev => prev.map(item => 
+        item.id === newId ? { ...item, answer: result.answer, isLoading: false } : item
+      ));
+    } catch (error) {
+      console.error(error);
+      const errorMessage = 'Sorry, I encountered an error while trying to answer your question.';
+      toast({ variant: 'destructive', title: 'Error', description: 'Could not get an answer.' });
+      
+      setQaHistory(prev => prev.map(item => 
+        item.id === newId ? { ...item, answer: errorMessage, isLoading: false } : item
+      ));
+    } finally {
+      setIsAskMeLoading(false);
+    }
+  };
+
+  const handleClearQaHistory = () => {
+    setQaHistory([]);
+  };
+
+  const handleAskClick = () => {
+    setSelectedAction('Ask a question');
+    setInlineExplanation('');
+    setInlineCode('');
+  };
+
 
   const typeFilters = useMemo(() => [
     { label: 'Get Started', tag: 'get-started' },
     { label: 'How to', tag: 'how-to' },
     { label: 'Reference', tag: 'reference' },
     { label: 'Concept', tag: 'concept' },
+    { label: 'Other', tag: 'other' },
   ], []);
 
   const typeFilterTags = useMemo(() => typeFilters.map((filter) => filter.tag), [typeFilters]);
+
+  const hasSelectedType = useMemo(() => 
+    selectedTags.some((tag) => typeFilterTags.includes(tag.toLowerCase()))
+  , [selectedTags, typeFilterTags]);
+
+  const singleFilterTypeLabel = useMemo(() => {
+    if (activeTab !== 'filters' || showDocWhileFiltering) return null;
+
+    let typeTag: string | null = null;
+
+    if (viewingDocsForType) {
+        typeTag = viewingDocsForType;
+    } else {
+        const selectedTypeTags = selectedTags.filter((tag) =>
+            typeFilterTags.includes(tag.toLowerCase())
+        );
+        if (selectedTypeTags.length === 1) {
+            typeTag = selectedTypeTags[0];
+        }
+    }
+
+    if (typeTag) {
+        const filter = typeFilters.find(f => f.tag === typeTag);
+        return filter ? filter.label : null;
+    }
+    
+    return null;
+  }, [activeTab, showDocWhileFiltering, viewingDocsForType, selectedTags, typeFilterTags, typeFilters]);
+
+  const subjectTagsList = useMemo(() => [
+    'api', 'authentication', 'backends', 'batching', 'bell-state', 'circuits', 
+    'decoherence', 'entanglement', 'errors', 'experiments', 'grovers-algorithm', 
+    'jobs', 'quantum-algorithms', 'quantum-circuits', 'quantum-gates', 
+    'quantum-measurement', 'qubits', 'shors-algorithm', 'superposition'
+  ].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' })), []);
+
+  const getRelevantTags = useMemo(() => {
+    const selectedTypeTags = selectedTags.filter((tag) =>
+      typeFilterTags.includes(tag.toLowerCase())
+    );
+
+    if (selectedTypeTags.length > 0) {
+      const relevantDocs = allDocs.filter((doc) => {
+        const docTypeTags = (doc.tags || []).map(t => t.toLowerCase());
+        return selectedTypeTags.some((typeTag) =>
+          docTypeTags.includes(typeTag)
+        );
+      });
+
+      const tagsFromRelevantDocs = new Set<string>();
+      relevantDocs.forEach((doc) => {
+        (doc.tags || []).forEach((tag) => tagsFromRelevantDocs.add(tag));
+        (doc.headings || []).forEach((heading) => {
+          (heading.tags || []).forEach((tag) => tagsFromRelevantDocs.add(tag));
+        });
+      });
+
+      return Array.from(tagsFromRelevantDocs);
+    }
+
+    return allTags;
+  }, [selectedTags, allDocs, allTags, typeFilterTags]);
+
+  const displayedSubjects = useMemo(() => {
+    return getRelevantTags.filter((tag) => subjectTagsList.includes(tag.toLowerCase())).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+  }, [getRelevantTags, subjectTagsList]);
+
+  const displayedKeywords = useMemo(() => {
+    return getRelevantTags.filter((tag) => !typeFilterTags.includes(tag.toLowerCase()) && !subjectTagsList.includes(tag.toLowerCase())).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+  }, [getRelevantTags, typeFilterTags, subjectTagsList]);
+
+  const keywordGroups = useMemo(() => {
+    const groups: Record<string, string[]> = {};
+    const alphabet = 'abcdefghijklmnopqrstuvwxyz';
+    const groupSize = 3;
+
+    for (let i = 0; i < alphabet.length; i += groupSize) {
+        const groupLetters = alphabet.slice(i, i + groupSize);
+        const groupKey = groupLetters.split('').join('-');
+        groups[groupKey] = [];
+    }
+    
+    displayedKeywords.forEach(keyword => {
+        const firstLetter = keyword.toLowerCase()[0];
+        if (alphabet.includes(firstLetter)) {
+            const groupIndex = Math.floor(alphabet.indexOf(firstLetter) / groupSize);
+            const groupStart = groupIndex * groupSize;
+            const groupLetters = alphabet.slice(groupStart, groupStart + groupSize);
+            const groupKey = groupLetters.split('').join('-');
+            if (groups[groupKey]) {
+                groups[groupKey].push(keyword);
+            }
+        }
+    });
+
+    const orderedGroups: {key: string, keywords: string[]}[] = [];
+    Object.keys(groups).forEach(key => {
+        if (groups[key].length > 0) {
+            orderedGroups.push({key, keywords: groups[key]});
+        }
+    });
+
+    return orderedGroups;
+  }, [displayedKeywords]);
   
   const handleTagToggle = (tag: string) => {
     setShowDocWhileFiltering(false);
@@ -91,43 +344,32 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     );
   };
 
-  const displayedTags = useMemo(() => {
-    const selectedTypeTags = selectedTags.filter((tag) =>
-      typeFilterTags.includes(tag.toLowerCase())
+  const handleToggleKeywordGroup = (groupKey: string) => {
+    setOpenKeywordGroups((prev) =>
+      prev.includes(groupKey)
+        ? prev.filter((g) => g !== groupKey)
+        : [...prev, groupKey]
     );
-
-    if (selectedTypeTags.length > 0) {
-      const relevantDocs = allDocs.filter((doc) => {
-        const docTypeTags = (doc.tags || []).map(t => t.toLowerCase());
-        return selectedTypeTags.some((typeTag) =>
-          docTypeTags.includes(typeTag)
-        );
-      });
-
-      const tagsFromRelevantDocs = new Set<string>();
-      relevantDocs.forEach((doc) => {
-        (doc.tags || []).forEach((tag) => tagsFromRelevantDocs.add(tag));
-        (doc.headings || []).forEach((heading) => {
-          (heading.tags || []).forEach((tag) => tagsFromRelevantDocs.add(tag));
-        });
-      });
-
-      return Array.from(tagsFromRelevantDocs)
-        .filter((tag) => !typeFilterTags.includes(tag.toLowerCase()))
-        .sort();
-    }
-
-    return allTags.filter((tag) => !typeFilterTags.includes(tag.toLowerCase())).sort();
-  }, [selectedTags, allDocs, allTags, typeFilterTags]);
-
+  };
+  
   const docsByType = useMemo(() => {
     const map = new Map<string, DocItem[]>();
-    typeFilterTags.forEach(typeTag => {
-        const docs = allDocs.filter(doc => (doc.tags || []).map(t => t.toLowerCase()).includes(typeTag));
-        map.set(typeTag, docs);
+    const allTopicDocs = allDocs.filter(doc => !prompts.some(p => p.id === doc.id) && doc.content.trim() !== '' && doc.title !== 'How-to Guides');
+    const primaryTypeTags = typeFilterTags.filter(t => t !== 'other');
+
+    primaryTypeTags.forEach(typeTag => {
+      const docs = allTopicDocs.filter(doc => (doc.tags || []).map(t => t.toLowerCase()).includes(typeTag));
+      map.set(typeTag, docs);
     });
+
+    const otherDocs = allTopicDocs.filter(doc => {
+      const docTags = (doc.tags || []).map(t => t.toLowerCase());
+      return !primaryTypeTags.some(typeTag => docTags.includes(typeTag));
+    });
+    map.set('other', otherDocs);
+    
     return map;
-  }, [allDocs, typeFilterTags]);
+  }, [allDocs, typeFilterTags, prompts]);
 
   const searchResults = useMemo(
     () =>
@@ -141,8 +383,6 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     [searchQuery, allDocs]
   );
   
-  const displayedTopics = topics;
-
   const handleSelectDoc = (doc: DocItem, headingId?: string) => {
     if (activeTab === 'filters' || viewingDocsForType) {
       setShowDocWhileFiltering(true);
@@ -152,7 +392,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
       if (prompts.some(p => p.id === doc.id)) {
         setActiveTab('prompts');
       } else {
-        setActiveTab('topics');
+        setActiveTab('search');
       }
     }
     
@@ -198,12 +438,6 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
       setScrollToHeading(null);
     }
   }, [scrollToHeading, activeDoc]);
-
-  const handleToggle = (id: string) => {
-    setOpenItems((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    );
-  };
   
   const onTabChange = (value: string) => {
     if (value !== 'filters') {
@@ -245,15 +479,6 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
             <Bot className="h-8 w-8 text-primary" />
             <h1 className="text-2xl font-bold">DevDocs AI</h1>
           </div>
-          <div className="relative mt-4">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="SearchMe..."
-              className="pl-9"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
         </SidebarHeader>
         <SidebarContent className="p-0">
           <Tabs
@@ -285,117 +510,131 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                 </Tooltip>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <TabsTrigger value="topics" className="flex-1">
-                      <Book className="h-4 w-4" strokeWidth={activeTab === 'topics' ? 2.5 : 1.5} />
+                    <TabsTrigger value="ask" className="flex-1">
+                      <Bot className="h-4 w-4" strokeWidth={activeTab === 'ask' ? 2.5 : 1.5} />
                     </TabsTrigger>
                   </TooltipTrigger>
                   <TooltipContent side="bottom">
-                    <p>Topics</p>
+                    <p>Ask AI</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TabsTrigger value="search" className="flex-1">
+                      <Search className="h-4 w-4" strokeWidth={activeTab === 'search' ? 2.5 : 1.5} />
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">
+                    <p>Search</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             </TabsList>
             <TabsContent value="filters" className="m-0 flex-1 overflow-y-auto">
-              <div className="flex flex-col h-full">
-                <h2 className="p-4 pb-2 text-base font-bold shrink-0 sticky top-0 bg-sidebar z-10">Filters</h2>
-                <div className="overflow-y-auto p-4 pt-0">
-                  <div className="space-y-4">
-                    <div className="flex items-center space-x-2">
-                      <Switch
-                        id="include-sections"
-                        checked={includeSections}
-                        onCheckedChange={setIncludeSections}
-                      />
-                      <Label htmlFor="include-sections">
-                        {includeSections ? 'Sections only' : 'Topics only'}
-                      </Label>
-                    </div>
-                    <Collapsible
-                      open={openFilterCategories.includes('types')}
-                      onOpenChange={() => handleToggleFilterCategory('types')}
-                    >
-                      <CollapsibleTrigger className="w-full flex items-center rounded-md p-1 -ml-1 mb-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
-                        <div className="flex flex-1 items-center gap-2 text-sm font-medium">
-                          <Library className="h-4 w-4" />
-                          <span className="text-base">Types</span>
-                        </div>
-                        <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
-                      </CollapsibleTrigger>
-                      <CollapsibleContent>
-                        <div className="space-y-1">
-                          {typeFilters.map((filter) => (
-                            <Collapsible 
-                              key={filter.tag}
-                              open={openFilterTypes.includes(filter.tag)}
-                              onOpenChange={() => handleToggleFilterType(filter.tag)}
-                            >
-                              <div className="flex items-center space-x-2">
-                                <Checkbox
-                                  id={`filter-type-${filter.tag}`}
-                                  checked={selectedTags.includes(filter.tag)}
-                                  onCheckedChange={() => handleTagToggle(filter.tag)}
-                                />
-                                <CollapsibleTrigger 
-                                  className="flex h-6 flex-1 cursor-pointer items-center justify-between rounded-md px-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                                >
-                                  <span className="text-sm font-normal">{filter.label}</span>
-                                  <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
-                                </CollapsibleTrigger>
-                              </div>
-                              <CollapsibleContent>
-                                <div className="pl-9 mt-2 space-y-1">
-                                  {(docsByType.get(filter.tag) || []).map(doc => (
-                                    <div key={doc.id} className="w-full">
-                                      <Button
-                                        variant="link"
-                                        className="p-0 h-auto w-full text-left justify-start font-normal text-muted-foreground hover:text-primary"
-                                        onClick={() => handleFilterTopicClick(doc, filter.tag)}
-                                      >
-                                        {doc.title}
-                                      </Button>
-                                      {toggledTopicId === doc.id && doc.headings && doc.headings.length > 0 && (
-                                        <SidebarMenuSub className="my-1 pl-2">
-                                          <SidebarMenuItem key={`${doc.id}-overview`}>
+              <div className="sticky top-0 bg-sidebar z-10 p-4 pb-2">
+                <h2 className="text-base font-bold">Filters</h2>
+              </div>
+              <div className="p-4 pt-2 space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="include-sections"
+                      checked={includeSections}
+                      onCheckedChange={setIncludeSections}
+                    />
+                    <Label htmlFor="include-sections">
+                      {includeSections ? 'Sections only' : 'Topics only'}
+                    </Label>
+                  </div>
+                  <Collapsible
+                    open={openFilterCategories.includes('types')}
+                    onOpenChange={() => handleToggleFilterCategory('types')}
+                  >
+                    <CollapsibleTrigger className="w-full flex items-center rounded-md p-1 -ml-1 mb-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+                      <div className="flex flex-1 items-center gap-2">
+                        <Library className="h-4 w-4" />
+                        <span className="font-semibold text-sm">Types</span>
+                      </div>
+                      <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="space-y-1">
+                        {typeFilters
+                          .filter((filter) => (docsByType.get(filter.tag) || []).length > 0)
+                          .map((filter) => (
+                          <Collapsible 
+                            key={filter.tag}
+                            open={openFilterTypes.includes(filter.tag)}
+                            onOpenChange={() => handleToggleFilterType(filter.tag)}
+                          >
+                            <div className="flex items-center space-x-2">
+                              <Checkbox
+                                id={`filter-type-${filter.tag}`}
+                                checked={selectedTags.includes(filter.tag)}
+                                onCheckedChange={() => handleTagToggle(filter.tag)}
+                              />
+                              <CollapsibleTrigger 
+                                className="flex h-6 flex-1 cursor-pointer items-center justify-between rounded-md px-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                              >
+                                <span className="text-sm font-normal">{filter.label}</span>
+                                <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
+                              </CollapsibleTrigger>
+                            </div>
+                            <CollapsibleContent>
+                              <div className="pl-9 mt-2 space-y-1">
+                                {(docsByType.get(filter.tag) || []).map(doc => (
+                                  <div key={doc.id} className="w-full">
+                                    <Button
+                                      variant="link"
+                                      className="p-0 h-auto w-full text-left justify-start font-normal text-muted-foreground hover:text-primary"
+                                      onClick={() => handleFilterTopicClick(doc, filter.tag)}
+                                    >
+                                      {doc.title}
+                                    </Button>
+                                    {toggledTopicId === doc.id && doc.headings && doc.headings.length > 0 && (
+                                      <SidebarMenuSub className="my-1 pl-2">
+                                        <SidebarMenuItem key={`${doc.id}-overview`}>
+                                          <SidebarMenuSubButton asChild size="sm">
+                                            <button onClick={() => handleHeadingClick('doc-viewer-top')} className="w-full text-left justify-start">
+                                              <span>Overview</span>
+                                            </button>
+                                          </SidebarMenuSubButton>
+                                        </SidebarMenuItem>
+                                        {doc.headings.map((heading) => (
+                                          <SidebarMenuItem key={heading.id}>
                                             <SidebarMenuSubButton asChild size="sm">
-                                              <button onClick={() => handleHeadingClick('doc-viewer-top')} className="w-full text-left justify-start">
-                                                <span>Overview</span>
+                                              <button onClick={() => handleHeadingClick(heading.id)} className="w-full text-left justify-start">
+                                                <span>{heading.title}</span>
                                               </button>
                                             </SidebarMenuSubButton>
                                           </SidebarMenuItem>
-                                          {doc.headings.map((heading) => (
-                                            <SidebarMenuItem key={heading.id}>
-                                              <SidebarMenuSubButton asChild size="sm">
-                                                <button onClick={() => handleHeadingClick(heading.id)} className="w-full text-left justify-start">
-                                                  <span>{heading.title}</span>
-                                                </button>
-                                              </SidebarMenuSubButton>
-                                            </SidebarMenuItem>
-                                          ))}
-                                        </SidebarMenuSub>
-                                      )}
-                                    </div>
-                                  ))}
-                                </div>
-                              </CollapsibleContent>
-                            </Collapsible>
-                          ))}
-                        </div>
-                      </CollapsibleContent>
-                    </Collapsible>
-                    <Collapsible
-                      open={openFilterCategories.includes('subjects')}
-                      onOpenChange={() => handleToggleFilterCategory('subjects')}
-                    >
-                       <CollapsibleTrigger className="w-full flex items-center rounded-md p-1 -ml-1 mb-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
-                        <div className="flex flex-1 items-center gap-2 text-sm font-medium">
-                          <Tag className="h-4 w-4" />
-                          <span className="text-base">Subjects</span>
-                        </div>
-                        <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
-                      </CollapsibleTrigger>
-                      <CollapsibleContent>
-                        <div className="space-y-2">
-                          {displayedTags.map((tag) => (
+                                        ))}
+                                      </SidebarMenuSub>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            </CollapsibleContent>
+                          </Collapsible>
+                        ))}
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                  <Collapsible
+                    open={openFilterCategories.includes('subjects')}
+                    onOpenChange={() => handleToggleFilterCategory('subjects')}
+                    disabled={hasSelectedType && displayedSubjects.length === 0}
+                  >
+                      <CollapsibleTrigger className="w-full flex items-center rounded-md p-1 -ml-1 mb-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground disabled:opacity-50 disabled:cursor-not-allowed">
+                      <div className="flex flex-1 items-center gap-2">
+                        <BookCopy className="h-4 w-4" />
+                        <span className="font-semibold text-sm">Subjects</span>
+                      </div>
+                      <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="space-y-2">
+                        {displayedSubjects.length > 0 ? (
+                          displayedSubjects.map((tag) => (
                             <div key={tag} className="flex items-center space-x-2">
                               <Checkbox
                                 id={`filter-tag-${tag}`}
@@ -409,118 +648,115 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                                 {tag.replace(/-/g, ' ')}
                               </Label>
                             </div>
-                          ))}
-                        </div>
-                      </CollapsibleContent>
-                    </Collapsible>
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-            <TabsContent value="prompts" className="m-0 flex-1 overflow-y-auto">
-              <div className="flex flex-col h-full">
-                <h2 className="p-4 pb-2 text-base font-bold shrink-0 sticky top-0 bg-sidebar z-10">Prompts</h2>
-                <div className="overflow-y-auto">
-                  <SidebarMenu className="p-2 pt-0">
-                    {prompts.map((doc) => (
-                      <SidebarMenuItem key={doc.id}>
-                        <SidebarMenuButton
-                          onClick={() => handleSelectDoc(doc)}
-                          isActive={!isSearching && activeTab !== 'filters' && activeDoc?.id === doc.id}
-                        >
-                          {doc.icon && <DynamicIcon name={doc.icon} />}
-                          <span>{doc.title}</span>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    ))}
-                  </SidebarMenu>
-                </div>
-              </div>
-            </TabsContent>
-            <TabsContent value="topics" className="m-0 flex-1 overflow-y-auto">
-              <div className="flex flex-col h-full">
-                <h2 className="p-4 pb-2 text-base font-bold shrink-0 sticky top-0 bg-sidebar z-10">Topics</h2>
-                <div className="overflow-y-auto">
-                  <SidebarMenu className="p-2 pt-0">
-                    {displayedTopics.map((doc) => (
-                      <SidebarMenuItem key={doc.id}>
-                        {doc.subtopics && doc.subtopics.length > 0 ? (
+                          ))
+                        ) : (
+                          <p className="px-2 text-sm text-muted-foreground">
+                            {hasSelectedType ? 'No subjects for the selected type.' : 'No subjects available.'}
+                          </p>
+                        )}
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                  <Collapsible
+                    open={openFilterCategories.includes('keywords')}
+                    onOpenChange={() => handleToggleFilterCategory('keywords')}
+                  >
+                      <CollapsibleTrigger className="w-full flex items-center rounded-md p-1 -ml-1 mb-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+                      <div className="flex flex-1 items-center gap-2">
+                        <Tag className="h-4 w-4" />
+                        <span className="font-semibold text-sm">Keywords</span>
+                      </div>
+                      <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="space-y-1 pt-2">
+                        {keywordGroups.map(({ key: groupKey, keywords }) => (
                           <Collapsible
-                            open={openItems.includes(doc.id)}
-                            onOpenChange={() => handleToggle(doc.id)}
+                            key={groupKey}
+                            open={openKeywordGroups.includes(groupKey)}
+                            onOpenChange={() => handleToggleKeywordGroup(groupKey)}
                           >
-                            <CollapsibleTrigger asChild>
-                              <SidebarMenuButton
-                                onClick={() => handleSelectDoc(doc)}
-                                isActive={
-                                  !isSearching &&
-                                  activeTab !== 'filters' &&
-                                  (activeDoc?.id === doc.id ||
-                                    doc.subtopics.some(
-                                      (sub) => sub.id === activeDoc?.id
-                                    ))
-                                }
-                                className="w-full justify-between"
-                              >
-                                <div className="flex items-center gap-2">
-                                  {doc.icon && <DynamicIcon name={doc.icon} />}
-                                  <span>{doc.title}</span>
-                                </div>
-                                <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
-                              </SidebarMenuButton>
+                            <CollapsibleTrigger className="flex w-full cursor-pointer items-center rounded-md hover:bg-sidebar-accent hover:text-sidebar-accent-foreground p-1">
+                              <span className="text-sm font-normal capitalize flex-1 text-left pl-2">{groupKey.replace(/-/g, ', ')}</span>
+                              <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90 mr-1.5" />
                             </CollapsibleTrigger>
                             <CollapsibleContent>
-                              <SidebarMenuSub>
-                                {doc.subtopics.map((subDoc) => (
-                                  <SidebarMenuItem key={subDoc.id}>
-                                    <SidebarMenuButton
-                                      onClick={() => handleSelectDoc(subDoc)}
-                                      isActive={
-                                        !isSearching && activeTab !== 'filters' && activeDoc?.id === subDoc.id
-                                      }
+                              <div className="pl-8 pt-2 space-y-2">
+                                {keywords.map((tag) => (
+                                  <div key={tag} className="flex items-center space-x-2">
+                                    <Checkbox
+                                      id={`filter-tag-${tag}`}
+                                      checked={selectedTags.includes(tag)}
+                                      onCheckedChange={() => handleTagToggle(tag)}
+                                    />
+                                    <Label
+                                      htmlFor={`filter-tag-${tag}`}
+                                      className="font-normal capitalize"
                                     >
-                                      {subDoc.icon && (
-                                        <DynamicIcon name={subDoc.icon} />
-                                      )}
-                                      <span>{subDoc.title}</span>
-                                    </SidebarMenuButton>
-                                  </SidebarMenuItem>
+                                      {tag.replace(/-/g, ' ')}
+                                    </Label>
+                                  </div>
                                 ))}
-                              </SidebarMenuSub>
+                              </div>
                             </CollapsibleContent>
                           </Collapsible>
-                        ) : (
-                          <>
-                            <SidebarMenuButton
-                              onClick={() => handleSelectDoc(doc)}
-                              isActive={!isSearching && activeTab !== 'filters' && activeDoc?.id === doc.id}
-                            >
-                              <div className="flex items-center gap-2">
-                                {doc.icon && <DynamicIcon name={doc.icon} />}
-                                <span>{doc.title}</span>
-                              </div>
-                            </SidebarMenuButton>
-                            {toggledTopicId === doc.id && doc.headings && doc.headings.length > 1 && (
-                                <SidebarMenuSub>
-                                  {doc.headings.map((heading) => (
-                                    <SidebarMenuItem key={heading.id}>
-                                      <SidebarMenuSubButton
-                                        asChild
-                                        size="sm"
-                                      >
-                                        <button onClick={() => handleHeadingClick(heading.id)} className="w-full text-left justify-start">
-                                          <span>{heading.title}</span>
-                                        </button>
-                                      </SidebarMenuSubButton>
-                                    </SidebarMenuItem>
-                                  ))}
-                                </SidebarMenuSub>
-                              )}
-                          </>
-                        )}
-                      </SidebarMenuItem>
-                    ))}
-                  </SidebarMenu>
+                        ))}
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                </div>
+            </TabsContent>
+            <TabsContent value="prompts" className="m-0 flex-1 overflow-y-auto">
+              <div className="sticky top-0 bg-sidebar z-10 p-4 pb-2">
+                <h2 className="text-base font-bold">Prompts</h2>
+              </div>
+              <SidebarMenu className="p-2 pt-0">
+                {prompts.map((doc) => (
+                  <SidebarMenuItem key={doc.id}>
+                    <SidebarMenuButton
+                      onClick={() => handleSelectDoc(doc)}
+                      isActive={!isSearching && activeTab === 'prompts' && activeDoc?.id === doc.id}
+                    >
+                      {doc.icon && <DynamicIcon name={doc.icon} />}
+                      <span>{doc.title}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </TabsContent>
+            <TabsContent value="ask" className="m-0 flex-1 overflow-y-auto">
+              <div className="sticky top-0 bg-sidebar z-10 p-4 pb-2">
+                <h2 className="text-base font-bold">Ask AI</h2>
+              </div>
+              <div className="p-4 pt-2">
+                <AskMeAssistant
+                  selectedText={askMeSelectedText}
+                  askQuery={askQuery}
+                  setAskQuery={setAskQuery}
+                  isLoading={isAskMeLoading}
+                  selectedAction={selectedAction}
+                  inlineExplanation={inlineExplanation}
+                  inlineCode={inlineCode}
+                  onAsk={handleAsk}
+                  handleAskClick={handleAskClick}
+                  handleExplainClick={handleExplainClick}
+                  handleMakeCodeClick={handleMakeCodeClick}
+                />
+              </div>
+            </TabsContent>
+            <TabsContent value="search" className="m-0 flex-1 overflow-y-auto">
+              <div className="sticky top-0 bg-sidebar z-10 p-4 pb-2">
+                <h2 className="text-base font-bold">Search</h2>
+              </div>
+              <div className="p-4 pt-2">
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="SearchMe..."
+                    className="pl-9"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
                 </div>
               </div>
             </TabsContent>
@@ -543,30 +779,35 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
               <span className="capitalize">{activeTab}</span>
             )}
             
-            {breadcrumbTypeLabel ? (
-              <>
-                <ChevronRight className="h-4 w-4" />
-                <Button
-                  variant="link"
-                  className="p-0 h-auto text-muted-foreground hover:text-primary"
-                  onClick={() => handleTypeBreadcrumbClick(breadcrumbTypeTag!)}
-                >
-                  {breadcrumbTypeLabel}
-                </Button>
-                {activeDoc && showDocWhileFiltering && (
-                  <>
+            {breadcrumbTypeLabel && (!activeDoc || !showDocWhileFiltering) ? (
+                <>
                     <ChevronRight className="h-4 w-4" />
-                    <span>{activeDoc.title}</span>
-                  </>
-                )}
-              </>
+                    <Button
+                      variant="link"
+                      className="p-0 h-auto text-muted-foreground hover:text-primary"
+                      onClick={() => handleTypeBreadcrumbClick(breadcrumbTypeTag!)}
+                    >
+                      {breadcrumbTypeLabel}
+                    </Button>
+                    {activeDoc && showDocWhileFiltering && (
+                      <>
+                        <ChevronRight className="h-4 w-4" />
+                        <span>{activeDoc.title}</span>
+                      </>
+                    )}
+                </>
+            ) : singleFilterTypeLabel ? (
+                <>
+                    <ChevronRight className="h-4 w-4" />
+                    <span>{singleFilterTypeLabel}</span>
+                </>
             ) : (
-              activeDoc && (activeTab !== 'filters' || showDocWhileFiltering) && (
+              activeDoc && (activeTab !== 'filters' || showDocWhileFiltering) ? (
                 <>
                   <ChevronRight className="h-4 w-4" />
                   <span>{activeDoc.title}</span>
                 </>
-              )
+              ) : null
             )}
           </div>
         </div>
@@ -578,9 +819,14 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                 results={searchResults}
                 onSelect={handleSelectDoc}
               />
+            ) : activeTab === 'ask' && qaHistory.length > 0 ? (
+              <AskAiResultViewer
+                history={qaHistory}
+                onClear={handleClearQaHistory}
+              />
             ) : showDocWhileFiltering ? (
               <DocViewer doc={activeDoc} />
-            ) : viewingDocsForType || activeTab === 'filters' || selectedTags.length > 0 ? (
+            ) : viewingDocsForType || selectedTags.length > 0 ? (
               <FilteredDocsViewer 
                 tags={viewingDocsForType ? [viewingDocsForType] : selectedTags}
                 typeFilterTags={typeFilterTags}
@@ -592,7 +838,6 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
               <DocViewer doc={activeDoc} />
             )}
         </div>
-        <AskMeAssistant />
       </SidebarInset>
     </SidebarProvider>
   );

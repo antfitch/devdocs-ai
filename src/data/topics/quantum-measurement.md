@@ -1,6 +1,5 @@
 ---
 tags:
-  - concept
   - quantum-measurement
   - quantum
 ---

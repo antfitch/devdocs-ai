@@ -1,185 +1,154 @@
+
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Bot, Lightbulb, Code, Send, Loader2, HelpCircle } from 'lucide-react';
+import { Lightbulb, Code, Send, Loader2, HelpCircle, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/hooks/use-toast';
-import { answerQuestions } from '@/ai/flows/answer-questions';
-import { explainText } from '@/ai/flows/explain-text';
-import { generateCode } from '@/ai/flows/generate-code';
-import { ScrollArea } from '../ui/scroll-area';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 
-// Mock function for vector search
-const performVectorSearch = (query: string): string => {
-    console.log(`Performing vector search for: ${query}`);
-    return "Relevant documentation snippets based on vector search would be placed here.";
+interface AskMeAssistantProps {
+  selectedText: string;
+  askQuery: string;
+  setAskQuery: (query: string) => void;
+  isLoading: boolean;
+  selectedAction: string;
+  inlineExplanation: string;
+  inlineCode: string;
+  onAsk: () => void;
+  handleAskClick: () => void;
+  handleExplainClick: () => void;
+  handleMakeCodeClick: () => void;
 }
 
-export function AskMeAssistant() {
-  const [mounted, setMounted] = useState(false);
-  const [selectedText, setSelectedText] = useState('');
-  const [isAskOpen, setIsAskOpen] = useState(false);
-  const [isResultOpen, setIsResultOpen] = useState(false);
-  const [resultContent, setResultContent] = useState({ title: '', content: '' });
-  const [askQuery, setAskQuery] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-
-    const handleMouseUp = () => {
-      const text = window.getSelection()?.toString().trim() || '';
-      // Only update if the selection is not inside the assistant itself
-      const selection = window.getSelection();
-      if (selection && selection.anchorNode) {
-          let parent = selection.anchorNode.parentElement;
-          while(parent) {
-              if(parent.id === 'ask-me-assistant') return;
-              parent = parent.parentElement;
-          }
-      }
-      setSelectedText(text);
-    };
-    
-    document.addEventListener('mouseup', handleMouseUp);
-    return () => {
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [mounted]);
-
-  const handleExplain = async () => {
-    if (!selectedText) return;
-    setIsLoading(true);
-    setResultContent({ title: 'Explanation', content: '' });
-    setIsResultOpen(true);
-    try {
-      const result = await explainText({ text: selectedText });
-      setResultContent({ title: 'Explanation', content: result.explanation });
-    } catch (error) {
-      console.error(error);
-      toast({ variant: 'destructive', title: 'Error', description: 'Could not get explanation.' });
-      setIsResultOpen(false);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleMakeCode = async () => {
-    if (!selectedText) return;
-    setIsLoading(true);
-    setResultContent({ title: 'Generated Code', content: '' });
-    setIsResultOpen(true);
-    try {
-      const result = await generateCode({ text: selectedText });
-      setResultContent({ title: 'Generated Code', content: result.code });
-    } catch (error) {
-      console.error(error);
-      toast({ variant: 'destructive', title: 'Error', description: 'Could not generate code.' });
-      setIsResultOpen(false);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  const handleAsk = async () => {
-    if (!askQuery) return;
-    setIsLoading(true);
-    setIsAskOpen(false);
-    setResultContent({ title: 'Answer', content: '' });
-    setIsResultOpen(true);
-    try {
-      const relevantDocs = performVectorSearch(askQuery);
-      const result = await answerQuestions({ question: askQuery, relevantDocs });
-      setResultContent({ title: 'Answer', content: result.answer });
-    } catch (error) {
-      console.error(error);
-      toast({ variant: 'destructive', title: 'Error', description: 'Could not get an answer.' });
-      setIsResultOpen(false);
-    } finally {
-      setIsLoading(false);
-      setAskQuery('');
-    }
-  };
-  
-  if (!mounted) {
-    return null;
-  }
+export function AskMeAssistant({
+  selectedText,
+  askQuery,
+  setAskQuery,
+  isLoading,
+  selectedAction,
+  inlineExplanation,
+  inlineCode,
+  onAsk,
+  handleAskClick,
+  handleExplainClick,
+  handleMakeCodeClick,
+}: AskMeAssistantProps) {
 
   return (
     <>
-      <Card id="ask-me-assistant" className="fixed bottom-4 right-4 z-50 shadow-2xl">
-        <CardContent className="p-2 flex items-center gap-2">
-            <div className="flex items-center gap-1">
-                <Bot className="h-5 w-5 text-primary" />
-                <span className="text-sm font-medium">AskMe</span>
-            </div>
-            <Button size="sm" onClick={() => setIsAskOpen(true)}>
-                <HelpCircle className="mr-2 h-4 w-4" /> Ask
+      <div id="ask-me-assistant" className="space-y-4">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button className="w-full justify-between">
+              <span>{selectedAction}</span>
+              <ChevronDown />
             </Button>
-            <Button size="sm" onClick={handleExplain} disabled={!selectedText || isLoading}>
-                 <Lightbulb className="mr-2 h-4 w-4" /> Explain
-            </Button>
-            <Button size="sm" onClick={handleMakeCode} disabled={!selectedText || isLoading}>
-                 <Code className="mr-2 h-4 w-4" /> Make Code
-            </Button>
-        </CardContent>
-      </Card>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)]">
+            <DropdownMenuLabel>AI Actions</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleAskClick} disabled={isLoading}>
+              <HelpCircle className="mr-2" />
+              <span>Ask a question</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleExplainClick} disabled={isLoading}>
+              <Lightbulb className="mr-2" />
+              <span>Explain selected text</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleMakeCodeClick} disabled={isLoading}>
+              <Code className="mr-2" />
+              <span>Generate code from text</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
-      <Dialog open={isAskOpen} onOpenChange={setIsAskOpen}>
-        <DialogContent>
-            <DialogHeader>
-                <DialogTitle>Ask a question</DialogTitle>
-                <DialogDescription>
-                    The AI will search the documentation to find an answer for you.
-                </DialogDescription>
-            </DialogHeader>
-            <Textarea 
+        {selectedAction === 'Ask a question' && (
+          <div className="pt-4 mt-4 border-t space-y-4">
+            <p className="text-sm text-muted-foreground">The AI will search the documentation to find an answer for you.</p>
+            <Textarea
                 placeholder="e.g., How do I authenticate with the API?"
                 value={askQuery}
                 onChange={(e) => setAskQuery(e.target.value)}
+                rows={5}
             />
-            <DialogFooter>
-                <Button onClick={handleAsk} disabled={isLoading || !askQuery}>
-                    {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
-                    Submit
-                </Button>
-            </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      
-      <Dialog open={isResultOpen} onOpenChange={setIsResultOpen}>
-          <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                  <DialogTitle>{resultContent.title}</DialogTitle>
-              </DialogHeader>
-              <ScrollArea className="max-h-[60vh] pr-4">
-                {isLoading ? (
-                    <div className="flex items-center justify-center h-40">
-                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    </div>
+            <Button onClick={onAsk} disabled={isLoading || !askQuery} className="w-full">
+                {isLoading && selectedAction === 'Ask a question' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
+                Submit
+            </Button>
+          </div>
+        )}
+
+        {selectedAction === 'Explain selected text' && (
+          <div className="space-y-2 pt-4 border-t">
+            <p className="text-sm text-muted-foreground">The AI will explain some text you've highlighted in the main window.</p>
+            <div className="p-2 bg-muted rounded-md text-sm text-muted-foreground max-h-28 overflow-y-auto">
+              <p className="italic">
+                {selectedText ? `"${selectedText}"` : '""'}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {selectedAction === 'Generate code from text' && (
+            <div className="space-y-2 pt-4 border-t">
+                <p className="text-sm text-muted-foreground">The AI will generate a code sample based on some text you've highlighted in the main window.</p>
+                <div className="p-2 bg-muted rounded-md text-sm text-muted-foreground max-h-28 overflow-y-auto">
+                <p className="italic">
+                    {selectedText ? `"${selectedText}"` : '""'}
+                </p>
+                </div>
+            </div>
+        )}
+
+        {(isLoading && (selectedAction === 'Explain selected text')) || inlineExplanation ? (
+          <div className="pt-4 mt-4 border-t">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Explanation</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isLoading && selectedAction === 'Explain selected text' ? (
+                  <div className="flex items-center justify-center p-4">
+                    <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                  </div>
                 ) : (
-                    resultContent.title === 'Generated Code' ? (
-                        <pre className="bg-gray-800 text-white p-4 rounded-md overflow-x-auto">
-                            <code className="font-mono whitespace-pre-wrap">{resultContent.content}</code>
-                        </pre>
-                    ) : (
-                        <p className="whitespace-pre-wrap">{resultContent.content}</p>
-                    )
+                  <p className="text-sm whitespace-pre-wrap">{inlineExplanation}</p>
                 )}
-              </ScrollArea>
-              <DialogFooter>
-                  <Button onClick={() => setIsResultOpen(false)}>Close</Button>
-              </DialogFooter>
-          </DialogContent>
-      </Dialog>
+              </CardContent>
+            </Card>
+          </div>
+        ) : null}
+
+        {(isLoading && selectedAction === 'Generate code from text') || inlineCode ? (
+          <div className="pt-4 mt-4 border-t">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Generated Code</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isLoading && selectedAction === 'Generate code from text' ? (
+                  <div className="flex items-center justify-center p-4">
+                    <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                  </div>
+                ) : (
+                  <pre className="bg-gray-800 text-white p-4 rounded-md overflow-x-auto">
+                    <code className="font-mono text-sm whitespace-pre">{inlineCode}</code>
+                  </pre>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        ) : null}
+      </div>
     </>
   );
 }

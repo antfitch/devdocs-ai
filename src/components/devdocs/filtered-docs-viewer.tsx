@@ -8,6 +8,14 @@ import { Button } from '@/components/ui/button';
 import { ChevronRight, BookOpen } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
+interface FilteredDocsViewerProps {
+    tags: string[];
+    typeFilterTags: string[];
+    docs: DocItem[];
+    onSelect: (doc: DocItem, headingId?: string) => void;
+    includeSections: boolean;
+}
+
 const getSummary = (markdown: string): string => {
   // Remove frontmatter, headings, code blocks, and other common markdown constructs.
   const content = markdown
@@ -151,6 +159,7 @@ export function FilteredDocsViewer({ tags, typeFilterTags, docs, onSelect, inclu
                                 <AccordionTrigger className="hover:no-underline p-4 text-left">
                                     <div className="flex-1">
                                         <p className="font-semibold text-base">{heading.title}</p>
+
                                         <p className="text-sm text-muted-foreground">In: {doc.title}</p>
                                     </div>
                                 </AccordionTrigger>
@@ -206,52 +215,60 @@ export function FilteredDocsViewer({ tags, typeFilterTags, docs, onSelect, inclu
           </CardHeader>
           <CardContent>
               <ScrollArea className="h-[calc(100vh-200px)]">
-                  <div className="space-y-4 pb-24">
+                  <div className="space-y-2 pb-24 pr-4">
                   {filteredDocs.length > 0 ? (
-                      filteredDocs.map((item) => (
-                      <Card key={item.id}>
-                          <CardHeader>
-                            <CardTitle
-                              className="text-lg cursor-pointer hover:underline"
-                              onClick={() => onSelect(item)}
-                            >
-                              {item.title}
-                            </CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                              <p className="text-muted-foreground">
-                                  {getSummary(item.content)}
-                              </p>
-                              <div className="mt-4 pt-4 border-t">
-                                  <h4 className="text-sm font-medium mb-2">Relevant Sections</h4>
-                                  <ul className="space-y-1">
-                                      <li>
-                                          <Button
-                                              variant="link"
-                                              className="p-0 h-auto text-muted-foreground hover:text-primary justify-start text-left font-normal"
-                                              onClick={() => onSelect(item)}
-                                          >
-                                              <ChevronRight className="h-4 w-4 mr-1" />
-                                              Overview
-                                          </Button>
-                                      </li>
-                                      {item.headings?.map((heading) => (
-                                          <li key={heading.id}>
-                                              <Button
-                                                  variant="link"
-                                                  className="p-0 h-auto text-muted-foreground hover:text-primary justify-start text-left font-normal"
-                                                  onClick={() => onSelect(item, heading.id)}
-                                              >
-                                                  <ChevronRight className="h-4 w-4 mr-1" />
-                                                  {heading.title}
-                                              </Button>
-                                          </li>
-                                      ))}
-                                  </ul>
-                              </div>
-                          </CardContent>
-                      </Card>
-                      ))
+                      <Accordion type="multiple" className="w-full space-y-2">
+                        {filteredDocs.map((item) => {
+                            const docTypeTags = (item.tags || []).filter(t => typeFilterTags.includes(t.toLowerCase()));
+                            const docTypeLabels = docTypeTags.map(tag => tag.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()));
+                            const docTypeLabel = docTypeLabels.length > 0 ? docTypeLabels.join(', ') : 'Topic';
+                            
+                            return (
+                                <AccordionItem value={item.id} key={item.id} className="border rounded-md data-[state=closed]:bg-transparent data-[state=open]:bg-card transition-colors">
+                                    <AccordionTrigger className="hover:no-underline p-4 text-left">
+                                        <div className="flex-1">
+                                            <p className="font-semibold text-base">{item.title}</p>
+                                            <p className="text-sm text-muted-foreground">Type: {docTypeLabel}</p>
+                                        </div>
+                                    </AccordionTrigger>
+                                    <AccordionContent>
+                                        <div className="px-4 pb-4 pt-0 space-y-4">
+                                            <div className="border-t -mx-4" />
+                                            <div className="pt-2">
+                                                <p className="text-muted-foreground mb-4">{getSummary(item.content)}</p>
+                                                
+                                                <h4 className="text-sm font-semibold mb-2">Relevant Sections</h4>
+                                                <ul className="space-y-1">
+                                                    <li>
+                                                        <Button
+                                                            variant="link"
+                                                            className="p-0 h-auto text-muted-foreground hover:text-primary justify-start text-left font-normal"
+                                                            onClick={() => onSelect(item)}
+                                                        >
+                                                            <ChevronRight className="h-4 w-4 mr-1" />
+                                                            Overview
+                                                        </Button>
+                                                    </li>
+                                                    {item.headings?.map((heading) => (
+                                                        <li key={heading.id}>
+                                                            <Button
+                                                                variant="link"
+                                                                className="p-0 h-auto text-muted-foreground hover:text-primary justify-start text-left font-normal"
+                                                                onClick={() => onSelect(item, heading.id)}
+                                                            >
+                                                                <ChevronRight className="h-4 w-4 mr-1" />
+                                                                {heading.title}
+                                                            </Button>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+                            );
+                        })}
+                        </Accordion>
                   ) : (
                       <p className="text-center text-muted-foreground py-10">No documents found with the selected tags.</p>
                   )}
