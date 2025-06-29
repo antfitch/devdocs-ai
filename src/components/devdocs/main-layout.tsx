@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { Bot, ChevronRight, MessageSquare, Search, Filter, Library, Tag, BookCopy } from 'lucide-react';
+import { Bot, ChevronRight, MessageSquare, Search, Library, Tag, BookCopy, View } from 'lucide-react';
 import {
   SidebarProvider,
   Sidebar,
@@ -27,7 +27,7 @@ import {
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { DocItem, QaItem } from '@/types';
 import { DocViewer } from './doc-viewer';
 import { SearchResults } from './search-results';
@@ -60,13 +60,13 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   const [activeDoc, setActiveDoc] = useState<DocItem | null>(topics[0]);
   const [toggledTopicId, setToggledTopicId] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [activeTab, setActiveTab] = useState('filters');
+  const [activeTab, setActiveTab] = useState('docs');
   const [scrollToHeading, setScrollToHeading] = useState<string | null>(null);
   const [showDocWhileFiltering, setShowDocWhileFiltering] = useState(false);
   const [activeFilterTypeTag, setActiveFilterTypeTag] = useState<string | null>(null);
-  const [includeSections, setIncludeSections] = useState(false);
+  const [filterMode, setFilterMode] = useState<'topics' | 'sections' | 'samples'>('topics');
   const [openFilterTypes, setOpenFilterTypes] = useState<string[]>([]);
-  const [openFilterCategories, setOpenFilterCategories] = useState<string[]>(['types', 'subjects', 'keywords']);
+  const [openFilterCategories, setOpenFilterCategories] = useState<string[]>(['view-mode', 'types', 'subjects', 'keywords']);
   const [viewingDocsForType, setViewingDocsForType] = useState<string | null>(null);
   const [openKeywordGroups, setOpenKeywordGroups] = useState<string[]>([]);
 
@@ -222,7 +222,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   , [selectedTags, typeFilterTags]);
 
   const singleFilterTypeLabel = useMemo(() => {
-    if (activeTab !== 'filters' || showDocWhileFiltering) return null;
+    if (activeTab !== 'docs' || showDocWhileFiltering) return null;
 
     let typeTag: string | null = null;
 
@@ -384,7 +384,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   );
   
   const handleSelectDoc = (doc: DocItem, headingId?: string) => {
-    if (activeTab === 'filters' || viewingDocsForType) {
+    if (activeTab === 'docs' || viewingDocsForType) {
       setShowDocWhileFiltering(true);
     } else {
       setShowDocWhileFiltering(false);
@@ -404,7 +404,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
       setScrollToHeading(headingId);
     }
 
-    if (activeTab !== 'filters') {
+    if (activeTab !== 'docs') {
       if (doc.id === toggledTopicId) {
         setToggledTopicId(null);
       } else if (doc.headings && doc.headings.length > 1) {
@@ -440,7 +440,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   }, [scrollToHeading, activeDoc]);
   
   const onTabChange = (value: string) => {
-    if (value !== 'filters') {
+    if (value !== 'docs') {
       setSelectedTags([]);
       setToggledTopicId(null);
     }
@@ -453,7 +453,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   const isSearching = searchQuery.length > 0;
 
   let breadcrumbTypeTag: string | undefined;
-  if (activeTab === 'filters' && activeDoc && showDocWhileFiltering) {
+  if (activeTab === 'docs' && activeDoc && showDocWhileFiltering) {
     breadcrumbTypeTag = activeFilterTypeTag || activeDoc.tags?.find(t => typeFilterTags.includes(t.toLowerCase()));
   }
   const breadcrumbTypeLabel = breadcrumbTypeTag ? typeFilters.find(f => f.tag === breadcrumbTypeTag)?.label : null;
@@ -470,6 +470,9 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     setShowDocWhileFiltering(false);
     setActiveDoc(null);
   };
+
+  const includeSections = !viewingDocsForType && (filterMode === 'sections' || filterMode === 'samples');
+  const samplesOnly = !viewingDocsForType && filterMode === 'samples';
 
   return (
     <SidebarProvider defaultOpen={true}>
@@ -490,12 +493,12 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <TabsTrigger value="filters" className="flex-1">
-                      <Filter className="h-4 w-4" strokeWidth={activeTab === 'filters' ? 2.5 : 1.5} />
+                    <TabsTrigger value="docs" className="flex-1">
+                      <Library className="h-4 w-4" strokeWidth={activeTab === 'docs' ? 2.5 : 1.5} />
                     </TabsTrigger>
                   </TooltipTrigger>
                   <TooltipContent side="bottom">
-                    <p>Filters</p>
+                    <p>Docs</p>
                   </TooltipContent>
                 </Tooltip>
                 <Tooltip>
@@ -530,21 +533,41 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                 </Tooltip>
               </TooltipProvider>
             </TabsList>
-            <TabsContent value="filters" className="m-0 flex-1 overflow-y-auto">
+            <TabsContent value="docs" className="m-0 flex-1 overflow-y-auto">
               <div className="sticky top-0 bg-sidebar z-10 p-4 pb-2">
-                <h2 className="text-base font-bold">Filters</h2>
+                <h2 className="text-base font-bold">Docs</h2>
               </div>
               <div className="p-4 pt-2 space-y-4">
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="include-sections"
-                      checked={includeSections}
-                      onCheckedChange={setIncludeSections}
-                    />
-                    <Label htmlFor="include-sections">
-                      {includeSections ? 'Sections only' : 'Topics only'}
-                    </Label>
-                  </div>
+                  <Collapsible
+                    open={openFilterCategories.includes('view-mode')}
+                    onOpenChange={() => handleToggleFilterCategory('view-mode')}
+                  >
+                    <CollapsibleTrigger className="w-full flex items-center rounded-md p-1 -ml-1 mb-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+                      <div className="flex flex-1 items-center gap-2">
+                        <View className="h-4 w-4" />
+                        <span className="font-semibold text-sm">View mode</span>
+                      </div>
+                      <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="pb-2">
+                        <Select
+                          value={filterMode}
+                          onValueChange={(value) => setFilterMode(value as 'topics' | 'sections' | 'samples')}
+                          id="filter-mode"
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="topics">Topics only</SelectItem>
+                            <SelectItem value="sections">Sections only</SelectItem>
+                            <SelectItem value="samples">Samples only</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
                   <Collapsible
                     open={openFilterCategories.includes('types')}
                     onOpenChange={() => handleToggleFilterCategory('types')}
@@ -767,7 +790,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
         <div className="flex items-center gap-2 mb-4">
           <SidebarTrigger />
           <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-            {activeTab === 'filters' && (showDocWhileFiltering || viewingDocsForType) ? (
+            {activeTab === 'docs' && (showDocWhileFiltering || viewingDocsForType) ? (
               <Button
                 variant="link"
                 className="p-0 h-auto capitalize text-muted-foreground hover:text-primary"
@@ -802,7 +825,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                     <span>{singleFilterTypeLabel}</span>
                 </>
             ) : (
-              activeDoc && (activeTab !== 'filters' || showDocWhileFiltering) ? (
+              activeDoc && (activeTab !== 'docs' || showDocWhileFiltering) ? (
                 <>
                   <ChevronRight className="h-4 w-4" />
                   <span>{activeDoc.title}</span>
@@ -832,7 +855,8 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                 typeFilterTags={typeFilterTags}
                 docs={allDocs}
                 onSelect={handleSelectDoc}
-                includeSections={viewingDocsForType ? false : includeSections}
+                includeSections={includeSections}
+                samplesOnly={samplesOnly}
               />
             ) : (
               <DocViewer doc={activeDoc} />

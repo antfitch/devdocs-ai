@@ -8,7 +8,7 @@ tags:
 Authenticating with the Quantum API is straightforward.
 
 ## API Key
-tags: api key
+tags: api key, sample
 
 You need an API key to make requests. You can find your API key in your account dashboard.
 

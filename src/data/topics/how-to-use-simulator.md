@@ -7,7 +7,7 @@ tags:
 Simulators are essential tools for debugging quantum circuits without needing to wait for access to a real quantum computer.
 
 ## Choose the Simulator Backend
-tags: simulator, backend, choose
+tags: simulator, backend, choose, sample
 
 Our API provides access to several high-performance simulators. You can find them by listing the backends and filtering for `type: 'SIMULATOR'`.
 
@@ -21,7 +21,7 @@ if (!simulator) {
 ```
 
 ## Run a Circuit on a Simulator
-tags: simulator, circuit, run
+tags: simulator, circuit, run, sample
 
 To use a simulator, simply specify its name in the `backend` property of your job configuration. The rest of the process is identical to running on real hardware.
 
@@ -39,7 +39,7 @@ console.log('Simulation results:', results.counts);
 ```
 
 ## Understand the Advantages
-tags: simulator, advantages, fidelity
+tags: simulator, advantages, fidelity, sample
 
 Simulators provide several key benefits:
 - **Speed:** Results are often returned much faster.

@@ -7,7 +7,7 @@ tags:
 Once a job has completed, you can fetch its results using the job ID.
 
 ## Ensure Job Completion
-tags: results, jobs, completion
+tags: results, jobs, completion, sample
 
 Before attempting to retrieve results, you should confirm that the job's status is `COMPLETED`. Trying to fetch results for a job in any other state will result in an error.
 
@@ -21,7 +21,7 @@ if (status !== 'COMPLETED') {
 ```
 
 ## Fetch the Results
-tags: results, jobs, fetch
+tags: results, jobs, fetch, sample
 
 Use the `client.getJobResults()` method with the `jobId` to get the measurement outcomes.
 
@@ -40,7 +40,7 @@ const jobResults = await fetchResults(jobId);
 ```
 
 ## Parse the Output
-tags: results, jobs, parsing
+tags: results, jobs, parsing, sample
 
 The results object contains the measurement outcomes as keys and the number of times that outcome was observed (counts) as values.
 
@@ -49,7 +49,9 @@ if (jobResults) {
   console.log('Measurement outcomes:');
   for (const [outcome, count] of Object.entries(jobResults.counts)) {
     const percentage = (count / jobResults.shots) * 100;
-    console.log(`- State ${outcome}: ${count} times (${percentage.toFixed(2)}%)`);
+    console.log(
+      `- State ${outcome}: ${count} times (${percentage.toFixed(2)}%)`
+    );
   }
 }
 ```

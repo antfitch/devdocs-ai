@@ -9,7 +9,7 @@ tags:
 This section provides a detailed reference for all available API endpoints.
 
 ## POST /v1/compute
-tags: POST, compute, v1
+tags: POST, compute, v1, sample
 
 This endpoint allows you to submit a quantum circuit for computation.
 
@@ -44,7 +44,7 @@ Cancel a job that is currently running.
 - `jobId` (string): The unique identifier for the job.
 
 ## GET /v1/jobs/{jobId}/results
-tags: GET, jobs, v1, results
+tags: GET, jobs, v1, results, sample
 
 Fetch the results of a completed job.
 
@@ -83,7 +83,7 @@ Retrieve detailed information about a specific quantum backend, including its to
 - `backendId` (string): The identifier for the backend.
 
 ## POST /v1/experiments
-tags: POST, experiments, v1, jobs
+tags: POST, experiments, v1, jobs, sample
 
 Create a new experiment to group related jobs.
 
@@ -108,7 +108,7 @@ Get details for a specific experiment.
 - `experimentId` (string): The unique identifier for the experiment.
 
 ## PUT /v1/experiments/{experimentId}
-tags: PUT, experiments, v1
+tags: PUT, experiments, v1, sample
 
 Update the details of an existing experiment.
 

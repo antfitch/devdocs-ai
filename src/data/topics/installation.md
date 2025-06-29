@@ -8,7 +8,7 @@ tags:
 To get started, you need to install the client library.
 
 ## npm
-tags: npm
+tags: npm, sample
 
 You can install the library using npm:
 

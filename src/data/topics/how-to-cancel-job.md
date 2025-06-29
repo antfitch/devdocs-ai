@@ -7,7 +7,7 @@ tags:
 If you have a job that is queued or running, you can request to cancel it.
 
 ## Identify the Job to Cancel
-tags: jobs, cancel, identify
+tags: jobs, cancel, identify, sample
 
 First, you need the ID of the job you wish to cancel. You would typically get this ID when you first submit the job.
 
@@ -20,7 +20,7 @@ console.log(`Job ${jobIdToCancel} is currently ${job.status}.`);
 ```
 
 ## Send the Cancel Request
-tags: jobs, cancel, request
+tags: jobs, cancel, request, sample
 
 Use the `client.cancelJob()` method with the job ID. The API will attempt to stop the job from running. Cancellation is not always instantaneous or guaranteed.
 
@@ -40,7 +40,7 @@ await cancel(jobIdToCancel);
 ```
 
 ## Verify Cancellation
-tags: jobs, cancel, status, verification
+tags: jobs, cancel, status, verification, sample
 
 After requesting cancellation, you can check the job's status. It should eventually transition to `CANCELLED`.
 

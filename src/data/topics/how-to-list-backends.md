@@ -7,7 +7,7 @@ tags:
 You can programmatically query the API to see which quantum computers and simulators are available to run your jobs.
 
 ## Query for All Backends
-tags: backends, list, query
+tags: backends, list, query, sample
 
 The `client.listBackends()` method returns an array of all available backend devices.
 
@@ -25,7 +25,7 @@ const allBackends = await getBackends();
 ```
 
 ## Filter for Simulators
-tags: backends, simulators, filter
+tags: backends, simulators, filter, sample
 
 Each backend object includes a `type` property, which can be `QUANTUM_COMPUTER` or `SIMULATOR`. You can filter this list to find what you need.
 
@@ -36,13 +36,15 @@ simulators.forEach(sim => console.log(`- ${sim.name}`));
 ```
 
 ## Select a Backend for a Job
-tags: backends, jobs, selection
+tags: backends, jobs, selection, sample
 
 When submitting a job, you can use the name of a backend from the list you retrieved. This allows for dynamic selection based on criteria like the number of qubits required.
 
 ```javascript
 const myCircuitQubits = 5;
-const suitableBackend = allBackends.find(b => b.qubits >= myCircuitQubits && b.status === 'ONLINE');
+const suitableBackend = allBackends.find(
+  (b) => b.qubits >= myCircuitQubits && b.status === 'ONLINE'
+);
 
 if (suitableBackend) {
   const jobConfig = {

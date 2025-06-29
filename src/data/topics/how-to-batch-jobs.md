@@ -7,7 +7,7 @@ tags:
 Submitting multiple jobs in a single request (batching) can be more efficient than sending them one by one.
 
 ## Prepare Multiple Circuits
-tags: circuits, batching, preparation
+tags: circuits, batching, preparation, sample
 
 First, prepare an array of job configuration objects. Each object represents a single job you want to run.
 
@@ -15,12 +15,16 @@ First, prepare an array of job configuration objects. Each object represents a s
 const circuits = [
   { circuit: 'H q[0];', backend: 'local_simulator', shots: 100 },
   { circuit: 'X q[0];', backend: 'local_simulator', shots: 100 },
-  { circuit: 'H q[0]; CX q[0], q[1];', backend: 'quantum_computer_alpha', shots: 1024 },
+  {
+    circuit: 'H q[0]; CX q[0], q[1];',
+    backend: 'quantum_computer_alpha',
+    shots: 1024,
+  },
 ];
 ```
 
 ## Submit a Batch Request
-tags: batching, submit, request
+tags: batching, submit, request, sample
 
 Use the `client.submitBatch()` method, passing the array of job configurations. This method returns an array of job objects, each with its own ID.
 
@@ -42,13 +46,15 @@ const jobs = await submitBatch(circuits);
 ```
 
 ## Handle Batch Responses
-tags: batching, responses, results
+tags: batching, responses, results, sample
 
 After submitting, you can manage each job individually using its unique ID, just as you would with a single job submission. For example, you can retrieve all their results.
 
 ```javascript
 async function getAllResults(jobList) {
-  const resultsPromises = jobList.map(job => client.getJobResults(job.id));
+  const resultsPromises = jobList.map(
+    job => client.getJobResults(job.id)
+  );
   const allResults = await Promise.all(resultsPromises);
   
   allResults.forEach((result, index) => {

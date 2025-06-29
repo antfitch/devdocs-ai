@@ -7,7 +7,7 @@ tags:
 This guide provides a high-level overview of how you might structure a call to a pre-packaged Grover's algorithm function.
 
 ## Define the Oracle
-tags: grovers-algorithm, oracle, search
+tags: grovers-algorithm, oracle, search, sample
 
 Grover's algorithm requires an "oracle" function that identifies the solution. For this example, we assume the API allows you to provide a "marked item" that it uses to build the oracle internally.
 
@@ -18,7 +18,7 @@ const markedItem = '101';
 ```
 
 ## Construct the Grover Job
-tags: grovers-algorithm, jobs, construct
+tags: grovers-algorithm, jobs, construct, sample
 
 The `client.runAlgorithm()` method abstracts away the circuit construction. You specify the algorithm name and its parameters.
 
@@ -35,7 +35,7 @@ const groverJob = {
 ```
 
 ## Run the Search
-tags: grovers-algorithm, search, run
+tags: grovers-algorithm, search, run, sample
 
 Executing the job will run Grover's algorithm and should return the marked item with high probability.
 
@@ -44,7 +44,9 @@ async function findItem() {
   try {
     const result = await client.runAlgorithm(groverJob);
     // The result with the highest count should be our marked item
-    const foundItem = Object.keys(result.counts).reduce((a, b) => result.counts[a] > result.counts[b] ? a : b);
+    const foundItem = Object.keys(result.counts).reduce((a, b) =>
+      result.counts[a] > result.counts[b] ? a : b
+    );
 
     console.log(`Grover's algorithm found: ${foundItem}`);
     console.log(`Is it correct? ${foundItem === markedItem}`);

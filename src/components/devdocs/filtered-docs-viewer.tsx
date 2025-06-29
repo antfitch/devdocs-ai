@@ -14,6 +14,7 @@ interface FilteredDocsViewerProps {
     docs: DocItem[];
     onSelect: (doc: DocItem, headingId?: string) => void;
     includeSections: boolean;
+    samplesOnly: boolean;
 }
 
 const getSummary = (markdown: string): string => {
@@ -63,7 +64,7 @@ const getSectionContent = (docContent: string, headingTitle: string): string => 
 };
 
 const renderSimpleMarkdown = (text: string) => {
-    const segments = text.split(/(`[^`]+`)/g);
+    const segments = text.split(/(`[^`]+?`)/g);
 
     const html = segments.map(segment => {
         if (segment.startsWith('`') && segment.endsWith('`')) {
@@ -99,8 +100,8 @@ const renderSectionContent = (content: string) => {
                     const code = lines.join('\n');
                     return (
                         <div key={index} className="my-4 relative">
-                            <pre className="bg-gray-800 text-white p-4 pt-8 rounded-md overflow-x-auto">
-                                <code className={`font-mono language-${lang}`}>{code}</code>
+                            <pre className={`bg-gray-800 text-white p-4 pt-8 rounded-md overflow-x-auto font-mono language-${lang}`}>
+                                {code}
                             </pre>
                             {lang && <div className="absolute top-2 right-2 text-xs text-gray-400 bg-gray-700 px-2 py-1 rounded">{lang}</div>}
                         </div>
@@ -114,7 +115,7 @@ const renderSectionContent = (content: string) => {
 };
 
 
-export function FilteredDocsViewer({ tags, typeFilterTags, docs, onSelect, includeSections }: FilteredDocsViewerProps) {
+export function FilteredDocsViewer({ tags, typeFilterTags, docs, onSelect, includeSections, samplesOnly }: FilteredDocsViewerProps) {
   const selectedTypeTags = tags.filter(t => typeFilterTags.includes(t.toLowerCase())).map(t => t.toLowerCase());
   const selectedRegularTags = tags.filter(t => !typeFilterTags.includes(t.toLowerCase())).map(t => t.toLowerCase());
 
@@ -145,18 +146,25 @@ export function FilteredDocsViewer({ tags, typeFilterTags, docs, onSelect, inclu
       (doc.headings || []).map(heading => ({ doc, heading }))
     );
 
-    const filteredSections = selectedRegularTags.length > 0 
+    let filteredSections = selectedRegularTags.length > 0 
       ? allSections.filter(({ heading }) => {
           const headingTags = (heading.tags || []).map(t => t.toLowerCase());
           return selectedRegularTags.some(subjectTag => headingTags.includes(subjectTag));
         })
       : allSections;
 
+    if (samplesOnly) {
+      filteredSections = filteredSections.filter(({ heading }) => {
+        const headingTags = (heading.tags || []).map(t => t.toLowerCase());
+        return headingTags.includes('sample');
+      });
+    }
+
     return (
       <Card className="h-full w-full overflow-hidden">
         <CardHeader>
-            <CardTitle>Filtered Section Results</CardTitle>
-            <CardDescription>Showing sections with tags: {tags.map(t => t.replace(/-/g, ' ')).join(', ')}</CardDescription>
+            <CardTitle>{samplesOnly ? "Filtered Sample Results" : "Filtered Section Results"}</CardTitle>
+            <CardDescription>Showing {samplesOnly ? "samples" : "sections"} with tags: {tags.map(t => t.replace(/-/g, ' ')).join(', ')}</CardDescription>
         </CardHeader>
         <CardContent>
             <ScrollArea className="h-[calc(100vh-200px)]">
@@ -188,7 +196,11 @@ export function FilteredDocsViewer({ tags, typeFilterTags, docs, onSelect, inclu
                         ))}
                     </Accordion>
                 ) : (
-                    <p className="text-center text-muted-foreground py-10">No sections found with the selected subjects.</p>
+                    <p className="text-center text-muted-foreground py-10">{
+                      samplesOnly
+                        ? "No samples found with the selected criteria."
+                        : "No sections found with the selected subjects."
+                    }</p>
                 )}
                 </div>
             </ScrollArea>

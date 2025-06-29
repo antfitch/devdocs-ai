@@ -67,8 +67,8 @@ export function DocViewer({ doc }: DocViewerProps) {
                         const code = lines.join('\n');
                         return (
                             <div key={index} className="my-4 relative">
-                                <pre className="bg-gray-800 text-white p-4 pt-8 rounded-md overflow-x-auto">
-                                    <code className={`font-mono language-${lang}`}>{code}</code>
+                                <pre className={`bg-gray-800 text-white p-4 pt-8 rounded-md overflow-x-auto font-mono language-${lang}`}>
+                                    {code}
                                 </pre>
                                 {lang && <div className="absolute top-2 right-2 text-xs text-gray-400 bg-gray-700 px-2 py-1 rounded">{lang}</div>}
                             </div>
