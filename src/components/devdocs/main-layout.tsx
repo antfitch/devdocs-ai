@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { Bot, ChevronRight, MessageSquare, Search, Library, Tag, BookCopy, View } from 'lucide-react';
+import { Bot, ChevronRight, MessageSquare, Search, Library, Tag, BookCopy, View, Play } from 'lucide-react';
 import {
   SidebarProvider,
   Sidebar,
@@ -15,7 +15,6 @@ import {
   SidebarMenuButton,
   SidebarMenuSub,
   SidebarMenuSubButton,
-  SidebarTitle,
 } from '@/components/ui/sidebar';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -41,6 +40,7 @@ import { answerQuestions } from '@/ai/flows/answer-questions';
 import { explainText } from '@/ai/flows/explain-text';
 import { generateCode } from '@/ai/flows/generate-code';
 import { AskAiResultViewer } from './ask-ai-result-viewer';
+import { cn } from '@/lib/utils';
 
 interface MainLayoutProps {
   topics: DocItem[];
@@ -60,6 +60,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   const [searchQuery, setSearchQuery] = useState('');
   const [activeDoc, setActiveDoc] = useState<DocItem | null>(topics[0]);
   const [toggledTopicId, setToggledTopicId] = useState<string | null>(null);
+  const [toggledPromptId, setToggledPromptId] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState('docs');
   const [scrollToHeading, setScrollToHeading] = useState<string | null>(null);
@@ -75,7 +76,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   const [askMeSelectedText, setAskMeSelectedText] = useState('');
   const [askQuery, setAskQuery] = useState('');
   const [isAskMeLoading, setIsAskMeLoading] = useState(false);
-  const [selectedAction, setSelectedAction] = useState('Select an action');
+  const [selectedAction, setSelectedAction] = useState('Ask a question');
   const [inlineExplanation, setInlineExplanation] = useState('');
   const [inlineCode, setInlineCode] = useState('');
   const { toast } = useToast();
@@ -166,20 +167,23 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     }
   };
   
-  const handleAsk = async () => {
-    if (!askQuery) return;
-    
+  const handleAskQuestion = async (query: string) => {
+    if (!query) return;
+
     const newId = Date.now();
-    const currentQuery = askQuery;
-    const newQaItem: QaItem = { id: newId, question: currentQuery, answer: null, isLoading: true };
+    const newQaItem: QaItem = { id: newId, question: query, answer: null, isLoading: true };
 
     setIsAskMeLoading(true);
     setQaHistory(prev => [...prev, newQaItem]);
-    setAskQuery('');
+    
+    // Clear askQuery only if it was the source of the query.
+    if (query === askQuery) {
+        setAskQuery('');
+    }
 
     try {
-      const relevantDocs = performVectorSearch(currentQuery);
-      const result = await answerQuestions({ question: currentQuery, relevantDocs });
+      const relevantDocs = performVectorSearch(query);
+      const result = await answerQuestions({ question: query, relevantDocs });
       
       setQaHistory(prev => prev.map(item => 
         item.id === newId ? { ...item, answer: result.answer, isLoading: false } : item
@@ -197,6 +201,14 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     }
   };
 
+  const handleAsk = () => {
+    handleAskQuestion(askQuery);
+  };
+  
+  const handleRunPrompt = (promptText: string) => {
+      handleAskQuestion(promptText);
+  };
+
   const handleClearQaHistory = () => {
     setQaHistory([]);
   };
@@ -205,6 +217,10 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     setSelectedAction('Ask a question');
     setInlineExplanation('');
     setInlineCode('');
+  };
+
+  const handleTogglePrompt = (promptId: string) => {
+    setToggledPromptId(prevId => (prevId === promptId ? null : promptId));
   };
 
 
@@ -445,6 +461,9 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
       setSelectedTags([]);
       setToggledTopicId(null);
     }
+    if (value !== 'ask' && value !== 'prompts') {
+        setQaHistory([]);
+    }
     setShowDocWhileFiltering(false);
     setActiveTab(value);
     setActiveFilterTypeTag(null);
@@ -472,6 +491,51 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     setActiveDoc(null);
   };
 
+  const renderPromptContent = (content: string) => {
+    const renderSimpleMarkdown = (text: string) => {
+      const segments = text.split(/(`[^`]+`)/g);
+      const html = segments.map(segment => {
+          if (segment.startsWith('`') && segment.endsWith('`')) {
+              const codeContent = segment.slice(1, -1);
+              return `<code class="bg-sidebar-accent text-sidebar-accent-foreground px-1 py-0.5 rounded-sm font-mono text-xs">${codeContent}</code>`;
+          } else {
+              if (!segment) return '';
+              return segment
+                  .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+                  .replace(/\*(.*?)\*/gim, '<em>$1</em>')
+                  .replace(/^# (.*$)/gim, '<h3 class="text-base font-bold mt-4 mb-2">$1</h3>')
+                  .replace(/^## (.*$)/gim, '<h4 class="text-sm font-bold mt-3 mb-1">$1</h4>')
+                  .replace(/> (.*$)/gim, '<blockquote class="mt-2 border-l-2 pl-2 italic text-muted-foreground">$1</blockquote>')
+                  .replace(/\n/g, '<br />')
+                  .replace(/(<\/h[1-4]>)<br \/>/gi, '$1');
+          }
+      }).join('');
+      return { __html: html };
+    }
+
+    const contentWithoutFrontmatter = content.replace(/^---[\s\S]*?---/, '').trim();
+    const contentParts = contentWithoutFrontmatter.split(/(```[\s\S]*?```)/g);
+
+    return contentParts.map((part, index) => {
+      if (part.startsWith('```')) {
+          const lines = part.split('\n');
+          const lang = lines.shift()?.substring(3) || '';
+          lines.pop();
+          const code = lines.join('\n');
+          return (
+              <div key={index} className="my-2 relative">
+                  <pre className={`bg-gray-800 text-white p-2 rounded-md overflow-x-auto font-mono text-xs`}>
+                      {code}
+                  </pre>
+                  {lang && <div className="absolute top-1 right-1 text-[10px] text-gray-400 bg-gray-700 px-1.5 py-0.5 rounded">{lang}</div>}
+              </div>
+          );
+      }
+      if (part.trim() === '') return null;
+      return <div key={index} dangerouslySetInnerHTML={renderSimpleMarkdown(part)} />;
+    });
+  };
+
   const includeSections = !viewingDocsForType && (filterMode === 'sections' || filterMode === 'samples');
   const samplesOnly = !viewingDocsForType && filterMode === 'samples';
 
@@ -485,7 +549,6 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
           </div>
         </SidebarHeader>
         <SidebarContent className="p-0">
-          <SidebarTitle className="sr-only">DevDocs AI Navigation</SidebarTitle>
           <Tabs
             value={activeTab}
             onValueChange={onTabChange}
@@ -537,7 +600,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
             </TabsList>
             <TabsContent value="docs" className="m-0 flex-1 overflow-y-auto">
               <div className="sticky top-0 bg-sidebar z-10 p-4 pb-2">
-                <h2 className="text-base font-bold">Docs</h2>
+                <h3 className="text-base font-bold">Docs</h3>
               </div>
               <div className="p-4 pt-2 space-y-4">
                   <Collapsible
@@ -733,25 +796,46 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
             </TabsContent>
             <TabsContent value="prompts" className="m-0 flex-1 overflow-y-auto">
               <div className="sticky top-0 bg-sidebar z-10 p-4 pb-2">
-                <h2 className="text-base font-bold">Prompts</h2>
+                <h3 className="text-base font-bold">Prompts</h3>
               </div>
               <SidebarMenu className="p-2 pt-0">
                 {prompts.map((doc) => (
                   <SidebarMenuItem key={doc.id}>
-                    <SidebarMenuButton
-                      onClick={() => handleSelectDoc(doc)}
-                      isActive={!isSearching && activeTab === 'prompts' && activeDoc?.id === doc.id}
+                    <Collapsible
+                      open={toggledPromptId === doc.id}
+                      onOpenChange={() => handleTogglePrompt(doc.id)}
                     >
-                      {doc.icon && <DynamicIcon name={doc.icon} />}
-                      <span>{doc.title}</span>
-                    </SidebarMenuButton>
+                      <CollapsibleTrigger
+                        className={cn(
+                          'flex w-full items-center justify-between gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring transition hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 h-8',
+                          'data-[state=open]:bg-sidebar-accent data-[state=open]:font-medium data-[state=open]:text-sidebar-accent-foreground'
+                        )}
+                      >
+                        <div className="flex items-center gap-2 truncate">
+                          {doc.icon && <DynamicIcon name={doc.icon} />}
+                          <span>{doc.title}</span>
+                        </div>
+                        <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="py-2 pl-8 pr-4 text-sm">
+                        <div className="prose prose-sm prose-slate dark:prose-invert max-w-none prose-p:my-2 prose-headings:my-3">
+                          {renderPromptContent(doc.content)}
+                        </div>
+                        <div className="mt-4">
+                          <Button size="sm" variant="outline" onClick={() => handleRunPrompt(doc.content)} disabled={isAskMeLoading}>
+                            <Play className="mr-2 h-3 w-3" />
+                            Run Prompt
+                          </Button>
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
                   </SidebarMenuItem>
                 ))}
               </SidebarMenu>
             </TabsContent>
             <TabsContent value="ask" className="m-0 flex-1 overflow-y-auto">
               <div className="sticky top-0 bg-sidebar z-10 p-4 pb-2">
-                <h2 className="text-base font-bold">Ask AI</h2>
+                <h3 className="text-base font-bold">Ask AI</h3>
               </div>
               <div className="p-4 pt-2">
                 <AskMeAssistant
@@ -771,7 +855,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
             </TabsContent>
             <TabsContent value="search" className="m-0 flex-1 overflow-y-auto">
               <div className="sticky top-0 bg-sidebar z-10 p-4 pb-2">
-                <h2 className="text-base font-bold">Search</h2>
+                <h3 className="text-base font-bold">Search</h3>
               </div>
               <div className="p-4 pt-2">
                 <div className="relative">
@@ -844,14 +928,16 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                 results={searchResults}
                 onSelect={handleSelectDoc}
               />
-            ) : activeTab === 'ask' && qaHistory.length > 0 ? (
+            ) : (activeTab === 'ask' || (activeTab === 'prompts' && qaHistory.length > 0)) ? (
               <AskAiResultViewer
                 history={qaHistory}
                 onClear={handleClearQaHistory}
+                onAskQuestion={handleAskQuestion}
+                isLoading={isAskMeLoading}
               />
             ) : showDocWhileFiltering ? (
               <DocViewer doc={activeDoc} />
-            ) : viewingDocsForType || selectedTags.length > 0 ? (
+            ) : viewingDocsForType || (selectedTags.length > 0 && activeTab === 'docs') ? (
               <FilteredDocsViewer 
                 tags={viewingDocsForType ? [viewingDocsForType] : selectedTags}
                 typeFilterTags={typeFilterTags}

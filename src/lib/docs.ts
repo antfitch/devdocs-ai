@@ -1,14 +1,15 @@
 import fs from 'fs';
 import path from 'path';
 import { topics as topicMetadata } from '@/data/topics';
-import { prompts } from '@/data/prompts';
+import { promptsMetadata } from '@/data/prompts';
 import type { DocItem } from '@/types';
 
 const topicsDirectory = path.join(process.cwd(), 'src/data/topics');
+const promptsDirectory = path.join(process.cwd(), 'src/data/prompts');
 
-const addContentToTopics = (topics: any[]): DocItem[] => {
-  return topics.map((topic) => {
-    const fullPath = path.join(topicsDirectory, `${topic.id}.md`);
+const addContentToDocs = (docs: any[], directory: string): DocItem[] => {
+  return docs.map((doc) => {
+    const fullPath = path.join(directory, `${doc.id}.md`);
     const content = fs.existsSync(fullPath)
       ? fs.readFileSync(fullPath, 'utf8')
       : '';
@@ -54,27 +55,32 @@ const addContentToTopics = (topics: any[]): DocItem[] => {
         }
     }
 
-    const topicWithContent: DocItem = {
-      ...topic,
+    const docWithContent: DocItem = {
+      ...doc,
       content,
       tags: documentTags,
       headings: headings,
     };
 
-    if (topic.subtopics) {
-      topicWithContent.subtopics = addContentToTopics(topic.subtopics);
+    if (doc.subtopics) {
+      docWithContent.subtopics = addContentToDocs(doc.subtopics, directory);
     }
 
-    return topicWithContent;
+    return docWithContent;
   });
 };
 
 export function getTopicsWithContent(): DocItem[] {
-  return addContentToTopics(topicMetadata as any[]);
+  return addContentToDocs(topicMetadata as any[], topicsDirectory);
+}
+
+export function getPromptsWithContent(): DocItem[] {
+  return addContentToDocs(promptsMetadata as any[], promptsDirectory);
 }
 
 export function getAllDocsWithContent(): DocItem[] {
   const topics = getTopicsWithContent();
+  const prompts = getPromptsWithContent();
   const allDocs: DocItem[] = [];
 
   const flattenTopics = (items: DocItem[]) => {

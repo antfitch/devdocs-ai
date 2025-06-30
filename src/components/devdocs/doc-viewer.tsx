@@ -19,16 +19,17 @@ export function DocViewer({ doc }: DocViewerProps) {
   }
 
   const renderSimpleMarkdown = (text: string) => {
-    // Split the text by code blocks, keeping the code blocks as part of the array
-    const segments = text.split(/(`[^`]+`)/g);
+    // This function handles rendering of non-code-block text.
+    // It first splits by inline code to handle that separately.
+    const segments = text.split(/(`[^`]+?`)/g);
 
     const html = segments.map(segment => {
         if (segment.startsWith('`') && segment.endsWith('`')) {
-            // This is a code block, extract content and wrap in <code>
+            // It's an inline code segment
             const codeContent = segment.slice(1, -1);
             return `<code class="bg-muted text-muted-foreground px-1 py-0.5 rounded-sm font-mono text-sm">${codeContent}</code>`;
         } else {
-            // This is regular text, apply other markdown rules
+            // It's a regular text segment, apply other rules
             if (!segment) return '';
             return segment
                 .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
@@ -52,6 +53,8 @@ export function DocViewer({ doc }: DocViewerProps) {
   const contentForRendering = contentWithoutFrontmatter
     // Remove tags lines used for metadata
     .replace(/^tags:.*$\n?/gm, '');
+
+  // Split the content by full code blocks first
   const contentParts = contentForRendering.split(/(```[\s\S]*?```)/g);
 
   return (
@@ -61,6 +64,7 @@ export function DocViewer({ doc }: DocViewerProps) {
                 <div id="doc-viewer-top" />
                 {contentParts.map((part, index) => {
                     if (part.startsWith('```')) {
+                        // This part is a code block
                         const lines = part.split('\n');
                         const lang = lines.shift()?.substring(3) || '';
                         lines.pop();
@@ -74,6 +78,8 @@ export function DocViewer({ doc }: DocViewerProps) {
                             </div>
                         );
                     }
+                    // This part is not a code block, so render it with simple markdown rules
+                    if (part.trim() === '') return null;
                     return <div key={index} dangerouslySetInnerHTML={renderSimpleMarkdown(part)} />;
                 })}
             </div>

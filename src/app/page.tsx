@@ -1,11 +1,11 @@
 import { MainLayout } from '@/components/devdocs/main-layout';
 import { Toaster } from "@/components/ui/toaster";
-import { getTopicsWithContent, getAllDocsWithContent } from '@/lib/docs';
-import { prompts } from '@/data/prompts';
+import { getTopicsWithContent, getAllDocsWithContent, getPromptsWithContent } from '@/lib/docs';
 
 export default function Home() {
   const topics = getTopicsWithContent();
   const allDocs = getAllDocsWithContent();
+  const prompts = getPromptsWithContent();
 
   const allTags = Array.from(
     new Set(

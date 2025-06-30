@@ -64,13 +64,17 @@ const getSectionContent = (docContent: string, headingTitle: string): string => 
 };
 
 const renderSimpleMarkdown = (text: string) => {
+    // This function handles rendering of non-code-block text.
+    // It first splits by inline code to handle that separately.
     const segments = text.split(/(`[^`]+?`)/g);
 
     const html = segments.map(segment => {
         if (segment.startsWith('`') && segment.endsWith('`')) {
+            // It's an inline code segment
             const codeContent = segment.slice(1, -1);
             return `<code class="bg-muted text-muted-foreground px-1 py-0.5 rounded-sm font-mono text-sm">${codeContent}</code>`;
         } else {
+            // It's a regular text segment, apply other rules
             if (!segment) return '';
             return segment
                 .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
@@ -88,12 +92,14 @@ const renderSectionContent = (content: string) => {
     if (!content) {
         return <p className="text-muted-foreground italic">No additional content in this section.</p>;
     }
+    // Split the content by full code blocks first
     const contentParts = content.split(/(```[\s\S]*?```)/g);
 
     return (
         <div className="prose prose-slate max-w-none dark:prose-invert prose-p:my-2 prose-h3:mb-2 prose-h3:mt-4">
             {contentParts.map((part, index) => {
                 if (part.startsWith('```')) {
+                    // This part is a code block
                     const lines = part.split('\n');
                     const lang = lines.shift()?.substring(3) || '';
                     lines.pop();
@@ -107,6 +113,7 @@ const renderSectionContent = (content: string) => {
                         </div>
                     );
                 }
+                // This part is not a code block, so render it with simple markdown rules
                 if (part.trim() === '') return null;
                 return <div key={index} dangerouslySetInnerHTML={renderSimpleMarkdown(part)} />;
             })}
