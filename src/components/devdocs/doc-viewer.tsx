@@ -2,12 +2,17 @@
 import type { DocItem } from '@/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '../ui/button';
+import { RefreshCw, Loader2 } from 'lucide-react';
 
 interface DocViewerProps {
   doc: DocItem | null;
+  onRegenerateCode: (docId: string, originalCode: string, docContent: string) => void;
+  regeneratedCode: Record<string, string>;
+  isRegenerating: Record<string, boolean>;
 }
 
-export function DocViewer({ doc }: DocViewerProps) {
+export function DocViewer({ doc, onRegenerateCode, regeneratedCode, isRegenerating }: DocViewerProps) {
   if (!doc) {
     return (
       <Card className="h-full flex items-center justify-center">
@@ -68,13 +73,29 @@ export function DocViewer({ doc }: DocViewerProps) {
                         const lines = part.split('\n');
                         const lang = lines.shift()?.substring(3) || '';
                         lines.pop();
-                        const code = lines.join('\n');
+                        const originalCode = lines.join('\n');
+                        const codeKey = `${doc.id}__${originalCode}`;
+                        const displayCode = regeneratedCode[codeKey] || originalCode;
+                        const isLoading = isRegenerating[codeKey];
+
                         return (
-                            <div key={index} className="my-4 relative">
+                            <div key={index} className="my-4 relative group/code">
                                 <pre className={`bg-gray-800 text-white p-4 pt-8 rounded-md overflow-x-auto font-mono language-${lang}`}>
-                                    {code}
+                                    {displayCode}
                                 </pre>
-                                {lang && <div className="absolute top-2 right-2 text-xs text-gray-400 bg-gray-700 px-2 py-1 rounded">{lang}</div>}
+                                <div className="absolute top-2 right-2 flex items-center gap-2">
+                                  {lang && <div className="text-xs text-gray-400 bg-gray-700 px-2 py-1 rounded">{lang}</div>}
+                                  <Button 
+                                    size="icon" 
+                                    variant="ghost" 
+                                    className="h-6 w-6 text-gray-400 hover:text-white hover:bg-gray-700 opacity-0 group-hover/code:opacity-100 transition-opacity"
+                                    onClick={() => onRegenerateCode(doc.id, originalCode, doc.content)}
+                                    disabled={isLoading}
+                                    title="Generate new code sample"
+                                  >
+                                    {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                                  </Button>
+                                </div>
                             </div>
                         );
                     }

@@ -13,7 +13,8 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const GenerateCodeInputSchema = z.object({
-  text: z.string().describe('The text to generate code from.'),
+  text: z.string().describe('The documentation text to generate code from.'),
+  existingCode: z.string().optional().describe('An existing code sample to be revised.'),
 });
 export type GenerateCodeInput = z.infer<typeof GenerateCodeInputSchema>;
 
@@ -33,6 +34,13 @@ const prompt = ai.definePrompt({
   prompt: `You are an expert software developer specializing in generating code snippets based on documentation.
 
   You will use the following documentation to generate code, and return the code in the 'code' output field.
+  {{#if existingCode}}
+  You must generate a NEW and DIFFERENT code sample from the one provided below, but it should illustrate the same concept.
+  Existing code:
+  \`\`\`
+  {{{existingCode}}}
+  \`\`\`
+  {{/if}}
 
   Documentation: {{{text}}}`,
 });

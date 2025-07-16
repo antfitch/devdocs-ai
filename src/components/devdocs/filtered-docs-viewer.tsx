@@ -5,7 +5,7 @@ import type { DocItem, DocItemHeading } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
-import { ChevronRight, BookOpen } from 'lucide-react';
+import { ChevronRight, BookOpen, RefreshCw, Loader2 } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 interface FilteredDocsViewerProps {
@@ -15,6 +15,9 @@ interface FilteredDocsViewerProps {
     onSelect: (doc: DocItem, headingId?: string) => void;
     includeSections: boolean;
     samplesOnly: boolean;
+    onRegenerateCode: (docId: string, originalCode: string, docContent: string) => void;
+    regeneratedCode: Record<string, string>;
+    isRegenerating: Record<string, boolean>;
 }
 
 const getSummary = (markdown: string): string => {
@@ -88,7 +91,21 @@ const renderSimpleMarkdown = (text: string) => {
     return { __html: html };
   };
 
-const renderSectionContent = (content: string) => {
+const RenderSectionContent = ({ 
+  content, 
+  docId,
+  docContent,
+  onRegenerateCode,
+  regeneratedCode,
+  isRegenerating,
+ }: { 
+  content: string, 
+  docId: string,
+  docContent: string,
+  onRegenerateCode: (docId: string, originalCode: string, docContent: string) => void,
+  regeneratedCode: Record<string, string>,
+  isRegenerating: Record<string, boolean>,
+ }) => {
     if (!content) {
         return <p className="text-muted-foreground italic">No additional content in this section.</p>;
     }
@@ -103,13 +120,29 @@ const renderSectionContent = (content: string) => {
                     const lines = part.split('\n');
                     const lang = lines.shift()?.substring(3) || '';
                     lines.pop();
-                    const code = lines.join('\n');
+                    const originalCode = lines.join('\n');
+                    const codeKey = `${docId}__${originalCode}`;
+                    const displayCode = regeneratedCode[codeKey] || originalCode;
+                    const isLoading = isRegenerating[codeKey];
+
                     return (
-                        <div key={index} className="my-4 relative">
+                        <div key={index} className="my-4 relative group/code">
                             <pre className={`bg-gray-800 text-white p-4 pt-8 rounded-md overflow-x-auto font-mono language-${lang}`}>
-                                {code}
+                                {displayCode}
                             </pre>
-                            {lang && <div className="absolute top-2 right-2 text-xs text-gray-400 bg-gray-700 px-2 py-1 rounded">{lang}</div>}
+                            <div className="absolute top-2 right-2 flex items-center gap-2">
+                              {lang && <div className="text-xs text-gray-400 bg-gray-700 px-2 py-1 rounded">{lang}</div>}
+                              <Button 
+                                size="icon" 
+                                variant="ghost" 
+                                className="h-6 w-6 text-gray-400 hover:text-white hover:bg-gray-700 opacity-0 group-hover/code:opacity-100 transition-opacity"
+                                onClick={() => onRegenerateCode(docId, originalCode, docContent)}
+                                disabled={isLoading}
+                                title="Generate new code sample"
+                              >
+                                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                              </Button>
+                            </div>
                         </div>
                     );
                 }
@@ -122,7 +155,7 @@ const renderSectionContent = (content: string) => {
 };
 
 
-export function FilteredDocsViewer({ tags, typeFilterTags, docs, onSelect, includeSections, samplesOnly }: FilteredDocsViewerProps) {
+export function FilteredDocsViewer({ tags, typeFilterTags, docs, onSelect, includeSections, samplesOnly, onRegenerateCode, regeneratedCode, isRegenerating }: FilteredDocsViewerProps) {
   const selectedTypeTags = tags.filter(t => typeFilterTags.includes(t.toLowerCase())).map(t => t.toLowerCase());
   const selectedRegularTags = tags.filter(t => !typeFilterTags.includes(t.toLowerCase())).map(t => t.toLowerCase());
 
@@ -191,7 +224,14 @@ export function FilteredDocsViewer({ tags, typeFilterTags, docs, onSelect, inclu
                                     <div className="px-4 pb-4 pt-0 space-y-4">
                                         <div className="border-t -mx-4" />
                                         <div className="pt-2">
-                                          {renderSectionContent(getSectionContent(doc.content, heading.title))}
+                                          <RenderSectionContent 
+                                            content={getSectionContent(doc.content, heading.title)} 
+                                            docId={doc.id}
+                                            docContent={doc.content}
+                                            onRegenerateCode={onRegenerateCode}
+                                            regeneratedCode={regeneratedCode}
+                                            isRegenerating={isRegenerating}
+                                          />
                                         </div>
                                         <Button variant="outline" size="sm" onClick={() => onSelect(doc, heading.id)}>
                                             <BookOpen className="mr-2 h-4 w-4" />

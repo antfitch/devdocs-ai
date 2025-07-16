@@ -83,6 +83,10 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
 
   const [qaHistory, setQaHistory] = useState<QaItem[]>([]);
 
+  // State for code regeneration
+  const [regeneratedCode, setRegeneratedCode] = useState<Record<string, string>>({});
+  const [isRegenerating, setIsRegenerating] = useState<Record<string, boolean>>({});
+
   useEffect(() => {
     const handleMouseUp = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
@@ -135,6 +139,20 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
       toast({ variant: 'destructive', title: 'Error', description: 'Could not generate code.' });
     } finally {
       setIsAskMeLoading(false);
+    }
+  };
+
+  const handleRegenerateCode = async (docId: string, originalCode: string, docContent: string) => {
+    const codeKey = `${docId}__${originalCode}`;
+    setIsRegenerating(prev => ({...prev, [codeKey]: true}));
+    try {
+      const result = await generateCode({ text: docContent, existingCode: regeneratedCode[codeKey] || originalCode });
+      setRegeneratedCode(prev => ({ ...prev, [codeKey]: result.code }));
+    } catch (error) {
+      console.error(error);
+      toast({ variant: 'destructive', title: 'Error', description: 'Could not regenerate code.' });
+    } finally {
+      setIsRegenerating(prev => ({...prev, [codeKey]: false}));
     }
   };
 
@@ -936,7 +954,12 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                 isLoading={isAskMeLoading}
               />
             ) : showDocWhileFiltering ? (
-              <DocViewer doc={activeDoc} />
+              <DocViewer 
+                doc={activeDoc} 
+                onRegenerateCode={handleRegenerateCode} 
+                regeneratedCode={regeneratedCode} 
+                isRegenerating={isRegenerating}
+              />
             ) : viewingDocsForType || (selectedTags.length > 0 && activeTab === 'docs') ? (
               <FilteredDocsViewer 
                 tags={viewingDocsForType ? [viewingDocsForType] : selectedTags}
@@ -945,9 +968,17 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                 onSelect={handleSelectDoc}
                 includeSections={includeSections}
                 samplesOnly={samplesOnly}
+                onRegenerateCode={handleRegenerateCode}
+                regeneratedCode={regeneratedCode}
+                isRegenerating={isRegenerating}
               />
             ) : (
-              <DocViewer doc={activeDoc} />
+              <DocViewer 
+                doc={activeDoc} 
+                onRegenerateCode={handleRegenerateCode} 
+                regeneratedCode={regeneratedCode} 
+                isRegenerating={isRegenerating}
+              />
             )}
         </div>
       </SidebarInset>
