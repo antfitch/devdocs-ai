@@ -135,7 +135,7 @@ const RenderSectionContent = ({
                               <Button 
                                 size="icon" 
                                 variant="ghost" 
-                                className="h-6 w-6 text-gray-400 hover:text-white hover:bg-gray-700 opacity-0 group-hover/code:opacity-100 transition-opacity"
+                                className="h-6 w-6 text-gray-400 hover:text-white hover:bg-gray-700 transition-opacity"
                                 onClick={() => onRegenerateCode(docId, originalCode, docContent)}
                                 disabled={isLoading}
                                 title="Generate new code sample"

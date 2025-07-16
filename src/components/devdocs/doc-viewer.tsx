@@ -88,7 +88,7 @@ export function DocViewer({ doc, onRegenerateCode, regeneratedCode, isRegenerati
                                   <Button 
                                     size="icon" 
                                     variant="ghost" 
-                                    className="h-6 w-6 text-gray-400 hover:text-white hover:bg-gray-700 opacity-0 group-hover/code:opacity-100 transition-opacity"
+                                    className="h-6 w-6 text-gray-400 hover:text-white hover:bg-gray-700 transition-opacity"
                                     onClick={() => onRegenerateCode(doc.id, originalCode, doc.content)}
                                     disabled={isLoading}
                                     title="Generate new code sample"
