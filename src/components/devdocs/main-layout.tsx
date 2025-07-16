@@ -493,7 +493,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
 
   const renderPromptContent = (content: string) => {
     const renderSimpleMarkdown = (text: string) => {
-      const segments = text.split(/(`[^`]+`)/g);
+      const segments = text.split(/(`[^`]+?`)/g);
       const html = segments.map(segment => {
           if (segment.startsWith('`') && segment.endsWith('`')) {
               const codeContent = segment.slice(1, -1);
