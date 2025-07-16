@@ -34,6 +34,7 @@ const prompt = ai.definePrompt({
   prompt: `You are an expert software developer specializing in generating code snippets based on documentation.
 
   You will use the following documentation to generate code, and return the code in the 'code' output field.
+  Please ensure that the generated code does not exceed 80 characters per line unless absolutely necessary.
   {{#if existingCode}}
   You must generate a NEW and DIFFERENT code sample from the one provided below, but it should illustrate the same concept.
   Existing code:
