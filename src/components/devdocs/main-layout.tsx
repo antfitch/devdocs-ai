@@ -818,9 +818,9 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                 </ScrollArea>
               </div>
             </TabsContent>
-            <TabsContent value="prompts" className="m-0 flex-1 flex flex-col min-h-0">
-              <div className="flex flex-col h-full">
-                <div className="sticky top-0 bg-sidebar z-10 p-4 pb-2 shrink-0">
+            <TabsContent value="prompts" className="m-0 flex-1 min-h-0">
+              <div className="absolute inset-0 flex flex-col">
+                <div className="p-4 pb-2 shrink-0">
                   <h3 className="text-base font-bold">Prompts</h3>
                 </div>
                 <ScrollArea className="flex-1">
@@ -861,9 +861,9 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                 </ScrollArea>
               </div>
             </TabsContent>
-            <TabsContent value="ask" className="m-0 flex-1 flex flex-col min-h-0">
-              <div className="flex flex-col h-full">
-                <div className="sticky top-0 bg-sidebar z-10 p-4 pb-2 shrink-0">
+            <TabsContent value="ask" className="m-0 flex-1 min-h-0">
+              <div className="absolute inset-0 flex flex-col">
+                <div className="p-4 pb-2 shrink-0">
                   <h3 className="text-base font-bold">Ask AI</h3>
                 </div>
                 <ScrollArea className="flex-1">
@@ -888,9 +888,9 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                 </ScrollArea>
               </div>
             </TabsContent>
-            <TabsContent value="search" className="m-0 flex-1 flex flex-col min-h-0">
-              <div className="flex flex-col h-full">
-                <div className="sticky top-0 bg-sidebar z-10 p-4 pb-2 shrink-0">
+            <TabsContent value="search" className="m-0 flex-1 min-h-0">
+              <div className="absolute inset-0 flex flex-col">
+                <div className="p-4 pb-2 shrink-0">
                   <h3 className="text-base font-bold">Search</h3>
                 </div>
                 <div className="p-4 pt-2 flex-1">
