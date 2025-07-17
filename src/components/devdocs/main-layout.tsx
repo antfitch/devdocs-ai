@@ -619,288 +619,284 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
               </TooltipProvider>
             </TabsList>
             <TabsContent value="docs" className="m-0 flex-1 flex flex-col min-h-0">
-              <div className="sticky top-0 bg-sidebar z-10 p-4 pb-2">
-                <h3 className="text-base font-bold">Docs</h3>
-              </div>
-              <ScrollArea className="flex-1 h-full">
-                <div className="p-4 pt-2 space-y-4">
-                    <Collapsible
-                      open={openFilterCategories.includes('view-mode')}
-                      onOpenChange={() => handleToggleFilterCategory('view-mode')}
-                    >
-                      <CollapsibleTrigger className="w-full flex items-center rounded-md p-1 -ml-1 mb-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
-                        <div className="flex flex-1 items-center gap-2">
-                          <View className="h-4 w-4" />
-                          <span className="font-semibold text-sm">View mode</span>
-                        </div>
-                        <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
-                      </CollapsibleTrigger>
-                      <CollapsibleContent>
-                        <div className="pb-2">
-                          <Select
-                            value={filterMode}
-                            onValueChange={(value) => setFilterMode(value as 'topics' | 'sections' | 'samples')}
-                            id="filter-mode"
-                          >
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="topics">Topics only</SelectItem>
-                              <SelectItem value="sections">Sections only</SelectItem>
-                              <SelectItem value="samples">Samples only</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </CollapsibleContent>
-                    </Collapsible>
-                    <Collapsible
-                      open={openFilterCategories.includes('types')}
-                      onOpenChange={() => handleToggleFilterCategory('types')}
-                    >
-                      <CollapsibleTrigger className="w-full flex items-center rounded-md p-1 -ml-1 mb-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
-                        <div className="flex flex-1 items-center gap-2">
-                          <Library className="h-4 w-4" />
-                          <span className="font-semibold text-sm">Types</span>
-                        </div>
-                        <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
-                      </CollapsibleTrigger>
-                      <CollapsibleContent>
-                        <div className="space-y-1">
-                          {typeFilters
-                            .filter((filter) => (docsByType.get(filter.tag) || []).length > 0)
-                            .map((filter) => (
-                            <Collapsible 
-                              key={filter.tag}
-                              open={openFilterTypes.includes(filter.tag)}
-                              onOpenChange={() => handleToggleFilterType(filter.tag)}
+              <div className="flex flex-col h-full">
+                <div className="sticky top-0 bg-sidebar z-10 p-4 pb-2">
+                  <h3 className="text-base font-bold">Docs</h3>
+                </div>
+                <ScrollArea className="flex-1 h-full">
+                  <div className="p-4 pt-2 space-y-4">
+                      <Collapsible
+                        open={openFilterCategories.includes('view-mode')}
+                        onOpenChange={() => handleToggleFilterCategory('view-mode')}
+                      >
+                        <CollapsibleTrigger className="w-full flex items-center rounded-md p-1 -ml-1 mb-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+                          <div className="flex flex-1 items-center gap-2">
+                            <View className="h-4 w-4" />
+                            <span className="font-semibold text-sm">View mode</span>
+                          </div>
+                          <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <div className="pb-2">
+                            <Select
+                              value={filterMode}
+                              onValueChange={(value) => setFilterMode(value as 'topics' | 'sections' | 'samples')}
+                              id="filter-mode"
                             >
-                              <div className="flex items-center space-x-2">
-                                <Checkbox
-                                  id={`filter-type-${filter.tag}`}
-                                  checked={selectedTags.includes(filter.tag)}
-                                  onCheckedChange={() => handleTagToggle(filter.tag)}
-                                />
-                                <CollapsibleTrigger 
-                                  className="flex h-6 flex-1 cursor-pointer items-center justify-between rounded-md px-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                                >
-                                  <span className="text-sm font-normal">{filter.label}</span>
-                                  <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
-                                </CollapsibleTrigger>
-                              </div>
-                              <CollapsibleContent>
-                                <div className="pl-9 mt-2 space-y-1">
-                                  {(docsByType.get(filter.tag) || []).map(doc => (
-                                    <div key={doc.id} className="w-full">
-                                      <Button
-                                        variant="link"
-                                        className="p-0 h-auto w-full text-left justify-start font-normal text-muted-foreground hover:text-primary"
-                                        onClick={() => handleFilterTopicClick(doc, filter.tag)}
-                                      >
-                                        {doc.title}
-                                      </Button>
-                                      {toggledTopicId === doc.id && doc.headings && doc.headings.length > 0 && (
-                                        <SidebarMenuSub className="my-1 pl-2">
-                                          <SidebarMenuItem key={`${doc.id}-overview`}>
-                                            <SidebarMenuSubButton asChild size="sm">
-                                              <button onClick={() => handleHeadingClick('doc-viewer-top')} className="w-full text-left justify-start">
-                                                <span>Overview</span>
-                                              </button>
-                                            </SidebarMenuSubButton>
-                                          </SidebarMenuItem>
-                                          {doc.headings.map((heading) => (
-                                            <SidebarMenuItem key={heading.id}>
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="topics">Topics only</SelectItem>
+                                <SelectItem value="sections">Sections only</SelectItem>
+                                <SelectItem value="samples">Samples only</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </CollapsibleContent>
+                      </Collapsible>
+                      <Collapsible
+                        open={openFilterCategories.includes('types')}
+                        onOpenChange={() => handleToggleFilterCategory('types')}
+                      >
+                        <CollapsibleTrigger className="w-full flex items-center rounded-md p-1 -ml-1 mb-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+                          <div className="flex flex-1 items-center gap-2">
+                            <Library className="h-4 w-4" />
+                            <span className="font-semibold text-sm">Types</span>
+                          </div>
+                          <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <div className="space-y-1">
+                            {typeFilters
+                              .filter((filter) => (docsByType.get(filter.tag) || []).length > 0)
+                              .map((filter) => (
+                              <Collapsible 
+                                key={filter.tag}
+                                open={openFilterTypes.includes(filter.tag)}
+                                onOpenChange={() => handleToggleFilterType(filter.tag)}
+                              >
+                                <div className="flex items-center space-x-2">
+                                  <Checkbox
+                                    id={`filter-type-${filter.tag}`}
+                                    checked={selectedTags.includes(filter.tag)}
+                                    onCheckedChange={() => handleTagToggle(filter.tag)}
+                                  />
+                                  <CollapsibleTrigger 
+                                    className="flex h-6 flex-1 cursor-pointer items-center justify-between rounded-md px-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                                  >
+                                    <span className="text-sm font-normal">{filter.label}</span>
+                                    <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
+                                  </CollapsibleTrigger>
+                                </div>
+                                <CollapsibleContent>
+                                  <div className="pl-9 mt-2 space-y-1">
+                                    {(docsByType.get(filter.tag) || []).map(doc => (
+                                      <div key={doc.id} className="w-full">
+                                        <Button
+                                          variant="link"
+                                          className="p-0 h-auto w-full text-left justify-start font-normal text-muted-foreground hover:text-primary"
+                                          onClick={() => handleFilterTopicClick(doc, filter.tag)}
+                                        >
+                                          {doc.title}
+                                        </Button>
+                                        {toggledTopicId === doc.id && doc.headings && doc.headings.length > 0 && (
+                                          <SidebarMenuSub className="my-1 pl-2">
+                                            <SidebarMenuItem key={`${doc.id}-overview`}>
                                               <SidebarMenuSubButton asChild size="sm">
-                                                <button onClick={() => handleHeadingClick(heading.id)} className="w-full text-left justify-start">
-                                                  <span>{heading.title}</span>
+                                                <button onClick={() => handleHeadingClick('doc-viewer-top')} className="w-full text-left justify-start">
+                                                  <span>Overview</span>
                                                 </button>
                                               </SidebarMenuSubButton>
                                             </SidebarMenuItem>
-                                          ))}
-                                        </SidebarMenuSub>
-                                      )}
-                                    </div>
-                                  ))}
+                                            {doc.headings.map((heading) => (
+                                              <SidebarMenuItem key={heading.id}>
+                                                <SidebarMenuSubButton asChild size="sm">
+                                                  <button onClick={() => handleHeadingClick(heading.id)} className="w-full text-left justify-start">
+                                                    <span>{heading.title}</span>
+                                                  </button>
+                                                </SidebarMenuSubButton>
+                                              </SidebarMenuItem>
+                                            ))}
+                                          </SidebarMenuSub>
+                                        )}
+                                      </div>
+                                    ))}
+                                  </div>
+                                </CollapsibleContent>
+                              </Collapsible>
+                            ))}
+                          </div>
+                        </CollapsibleContent>
+                      </Collapsible>
+                      <Collapsible
+                        open={openFilterCategories.includes('subjects')}
+                        onOpenChange={() => handleToggleFilterCategory('subjects')}
+                        disabled={hasSelectedType && displayedSubjects.length === 0}
+                      >
+                          <CollapsibleTrigger className="w-full flex items-center rounded-md p-1 -ml-1 mb-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground disabled:opacity-50 disabled:cursor-not-allowed">
+                          <div className="flex flex-1 items-center gap-2">
+                            <BookCopy className="h-4 w-4" />
+                            <span className="font-semibold text-sm">Subjects</span>
+                          </div>
+                          <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <div className="space-y-2">
+                            {displayedSubjects.length > 0 ? (
+                              displayedSubjects.map((tag) => (
+                                <div key={tag} className="flex items-center space-x-2">
+                                  <Checkbox
+                                    id={`filter-tag-${tag}`}
+                                    checked={selectedTags.includes(tag)}
+                                    onCheckedChange={() => handleTagToggle(tag)}
+                                  />
+                                  <Label
+                                    htmlFor={`filter-tag-${tag}`}
+                                    className="font-normal capitalize"
+                                  >
+                                    {tag.replace(/-/g, ' ')}
+                                  </Label>
                                 </div>
-                              </CollapsibleContent>
-                            </Collapsible>
-                          ))}
-                        </div>
-                      </CollapsibleContent>
-                    </Collapsible>
-                    <Collapsible
-                      open={openFilterCategories.includes('subjects')}
-                      onOpenChange={() => handleToggleFilterCategory('subjects')}
-                      disabled={hasSelectedType && displayedSubjects.length === 0}
-                    >
-                        <CollapsibleTrigger className="w-full flex items-center rounded-md p-1 -ml-1 mb-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground disabled:opacity-50 disabled:cursor-not-allowed">
-                        <div className="flex flex-1 items-center gap-2">
-                          <BookCopy className="h-4 w-4" />
-                          <span className="font-semibold text-sm">Subjects</span>
-                        </div>
-                        <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
-                      </CollapsibleTrigger>
-                      <CollapsibleContent>
-                        <div className="space-y-2">
-                          {displayedSubjects.length > 0 ? (
-                            displayedSubjects.map((tag) => (
-                              <div key={tag} className="flex items-center space-x-2">
-                                <Checkbox
-                                  id={`filter-tag-${tag}`}
-                                  checked={selectedTags.includes(tag)}
-                                  onCheckedChange={() => handleTagToggle(tag)}
-                                />
-                                <Label
-                                  htmlFor={`filter-tag-${tag}`}
-                                  className="font-normal capitalize"
-                                >
-                                  {tag.replace(/-/g, ' ')}
-                                </Label>
-                              </div>
-                            ))
-                          ) : (
-                            <p className="px-2 text-sm text-muted-foreground">
-                              {hasSelectedType ? 'No subjects for the selected type.' : 'No subjects available.'}
-                            </p>
-                          )}
-                        </div>
-                      </CollapsibleContent>
-                    </Collapsible>
-                    <Collapsible
-                      open={openFilterCategories.includes('keywords')}
-                      onOpenChange={() => handleToggleFilterCategory('keywords')}
-                    >
-                        <CollapsibleTrigger className="w-full flex items-center rounded-md p-1 -ml-1 mb-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
-                        <div className="flex flex-1 items-center gap-2">
-                          <Tag className="h-4 w-4" />
-                          <span className="font-semibold text-sm">Keywords</span>
-                        </div>
-                        <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
-                      </CollapsibleTrigger>
-                      <CollapsibleContent>
-                        <div className="space-y-1 pt-2">
-                          {keywordGroups.map(({ key: groupKey, keywords }) => (
-                            <Collapsible
-                              key={groupKey}
-                              open={openKeywordGroups.includes(groupKey)}
-                              onOpenChange={() => handleToggleKeywordGroup(groupKey)}
-                            >
-                              <CollapsibleTrigger className="flex w-full cursor-pointer items-center rounded-md hover:bg-sidebar-accent hover:text-sidebar-accent-foreground p-1">
-                                <span className="text-sm font-normal capitalize flex-1 text-left pl-2">{groupKey.replace(/-/g, ', ')}</span>
-                                <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90 mr-1.5" />
-                              </CollapsibleTrigger>
-                              <CollapsibleContent>
-                                <div className="pl-8 pt-2 space-y-2">
-                                  {keywords.map((tag) => (
-                                    <div key={tag} className="flex items-center space-x-2">
-                                      <Checkbox
-                                        id={`filter-tag-${tag}`}
-                                        checked={selectedTags.includes(tag)}
-                                        onCheckedChange={() => handleTagToggle(tag)}
-                                      />
-                                      <Label
-                                        htmlFor={`filter-tag-${tag}`}
-                                        className="font-normal capitalize"
-                                      >
-                                        {tag.replace(/-/g, ' ')}
-                                      </Label>
-                                    </div>
-                                  ))}
-                                </div>
-                              </CollapsibleContent>
-                            </Collapsible>
-                          ))}
-                        </div>
-                      </CollapsibleContent>
-                    </Collapsible>
-                  </div>
-                </ScrollArea>
-            </TabsContent>
-            <TabsContent value="prompts" className="m-0 flex-1 min-h-0">
-              <div className="flex flex-col h-full">
-                <div className="sticky top-0 bg-sidebar z-10 p-4 pb-2 shrink-0">
-                  <h3 className="text-base font-bold">Prompts</h3>
-                </div>
-                <ScrollArea className="flex-1">
-                  <SidebarMenu className="p-2 pt-0">
-                    {prompts.map((doc) => (
-                      <SidebarMenuItem key={doc.id}>
-                        <Collapsible
-                          open={toggledPromptId === doc.id}
-                          onOpenChange={() => handleTogglePrompt(doc.id)}
-                        >
-                          <CollapsibleTrigger
-                            className={cn(
-                              'flex w-full items-center justify-between gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring transition hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 h-8',
-                              'data-[state=open]:bg-sidebar-accent data-[state=open]:font-medium data-[state=open]:text-sidebar-accent-foreground'
+                              ))
+                            ) : (
+                              <p className="px-2 text-sm text-muted-foreground">
+                                {hasSelectedType ? 'No subjects for the selected type.' : 'No subjects available.'}
+                              </p>
                             )}
-                          >
-                            <div className="flex items-center gap-2 truncate">
-                              {doc.icon && <DynamicIcon name={doc.icon} />}
-                              <span>{doc.title}</span>
-                            </div>
-                            <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
-                          </CollapsibleTrigger>
-                          <CollapsibleContent className="py-2 pl-8 pr-4 text-sm">
-                            <div className="prose prose-sm prose-slate dark:prose-invert max-w-none prose-p:my-2 prose-headings:my-3">
-                              {renderPromptContent(doc.content)}
-                            </div>
-                            <div className="mt-4">
-                              <Button size="sm" variant="outline" onClick={() => handleRunPrompt(doc.content)} disabled={isAskMeLoading}>
-                                <Play className="mr-2 h-3 w-3" />
-                                Run Prompt
-                              </Button>
-                            </div>
-                          </CollapsibleContent>
-                        </Collapsible>
-                      </SidebarMenuItem>
-                    ))}
-                  </SidebarMenu>
+                          </div>
+                        </CollapsibleContent>
+                      </Collapsible>
+                      <Collapsible
+                        open={openFilterCategories.includes('keywords')}
+                        onOpenChange={() => handleToggleFilterCategory('keywords')}
+                      >
+                          <CollapsibleTrigger className="w-full flex items-center rounded-md p-1 -ml-1 mb-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+                          <div className="flex flex-1 items-center gap-2">
+                            <Tag className="h-4 w-4" />
+                            <span className="font-semibold text-sm">Keywords</span>
+                          </div>
+                          <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <div className="space-y-1 pt-2">
+                            {keywordGroups.map(({ key: groupKey, keywords }) => (
+                              <Collapsible
+                                key={groupKey}
+                                open={openKeywordGroups.includes(groupKey)}
+                                onOpenChange={() => handleToggleKeywordGroup(groupKey)}
+                              >
+                                <CollapsibleTrigger className="flex w-full cursor-pointer items-center rounded-md hover:bg-sidebar-accent hover:text-sidebar-accent-foreground p-1">
+                                  <span className="text-sm font-normal capitalize flex-1 text-left pl-2">{groupKey.replace(/-/g, ', ')}</span>
+                                  <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90 mr-1.5" />
+                                </CollapsibleTrigger>
+                                <CollapsibleContent>
+                                  <div className="pl-8 pt-2 space-y-2">
+                                    {keywords.map((tag) => (
+                                      <div key={tag} className="flex items-center space-x-2">
+                                        <Checkbox
+                                          id={`filter-tag-${tag}`}
+                                          checked={selectedTags.includes(tag)}
+                                          onCheckedChange={() => handleTagToggle(tag)}
+                                        />
+                                        <Label
+                                          htmlFor={`filter-tag-${tag}`}
+                                          className="font-normal capitalize"
+                                        >
+                                          {tag.replace(/-/g, ' ')}
+                                        </Label>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </CollapsibleContent>
+                              </Collapsible>
+                            ))}
+                          </div>
+                        </CollapsibleContent>
+                      </Collapsible>
+                    </div>
                 </ScrollArea>
               </div>
             </TabsContent>
-            <TabsContent value="ask" className="m-0 flex-1 min-h-0">
-              <div className="flex flex-col h-full">
-                <div className="sticky top-0 bg-sidebar z-10 p-4 pb-2 shrink-0">
-                  <h3 className="text-base font-bold">Ask AI</h3>
-                </div>
-                <ScrollArea className="flex-1">
-                  <div className="p-4 pt-2">
-                    <AskMeAssistant
-                      selectedText={askMeSelectedText}
-                      askQuery={askQuery}
-                      setAskQuery={setAskQuery}
-                      isLoading={isAskMeLoading}
-                      selectedAction={selectedAction}
-                      inlineExplanation={inlineExplanation}
-                      inlineCode={inlineCode}
-                      onAsk={handleAsk}
-                      handleAskClick={handleAskClick}
-                      handleExplainClick={handleExplainClick}
-                      handleMakeCodeClick={handleMakeCodeClick}
-                      qaHistory={qaHistory}
-                      onClearQaHistory={handleClearQaHistory}
-                      onAskFollowup={handleAskQuestion}
-                    />
-                  </div>
-                </ScrollArea>
+            <TabsContent value="prompts" className="m-0 flex-1 flex flex-col min-h-0">
+              <div className="sticky top-0 bg-sidebar z-10 p-4 pb-2 shrink-0">
+                <h3 className="text-base font-bold">Prompts</h3>
               </div>
+              <ScrollArea className="flex-1">
+                <SidebarMenu className="p-2 pt-0">
+                  {prompts.map((doc) => (
+                    <SidebarMenuItem key={doc.id}>
+                      <Collapsible
+                        open={toggledPromptId === doc.id}
+                        onOpenChange={() => handleTogglePrompt(doc.id)}
+                      >
+                        <CollapsibleTrigger
+                          className={cn(
+                            'flex w-full items-center justify-between gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring transition hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 h-8',
+                            'data-[state=open]:bg-sidebar-accent data-[state=open]:font-medium data-[state=open]:text-sidebar-accent-foreground'
+                          )}
+                        >
+                          <div className="flex items-center gap-2 truncate">
+                            {doc.icon && <DynamicIcon name={doc.icon} />}
+                            <span>{doc.title}</span>
+                          </div>
+                          <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="py-2 pl-8 pr-4 text-sm">
+                          <div className="prose prose-sm prose-slate dark:prose-invert max-w-none prose-p:my-2 prose-headings:my-3">
+                            {renderPromptContent(doc.content)}
+                          </div>
+                          <div className="mt-4">
+                            <Button size="sm" variant="outline" onClick={() => handleRunPrompt(doc.content)} disabled={isAskMeLoading}>
+                              <Play className="mr-2 h-3 w-3" />
+                              Run Prompt
+                            </Button>
+                          </div>
+                        </CollapsibleContent>
+                      </Collapsible>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </ScrollArea>
             </TabsContent>
-            <TabsContent value="search" className="m-0 flex-1 min-h-0">
-              <div className="flex flex-col h-full">
-                <div className="sticky top-0 bg-sidebar z-10 p-4 pb-2 shrink-0">
-                  <h3 className="text-base font-bold">Search</h3>
+            <TabsContent value="ask" className="m-0 flex-1 flex flex-col min-h-0">
+              <div className="sticky top-0 bg-sidebar z-10 p-4 pb-2 shrink-0">
+                <h3 className="text-base font-bold">Ask AI</h3>
+              </div>
+              <ScrollArea className="flex-1">
+                <div className="p-4 pt-2">
+                  <AskMeAssistant
+                    selectedText={askMeSelectedText}
+                    askQuery={askQuery}
+                    setAskQuery={setAskQuery}
+                    isLoading={isAskMeLoading}
+                    selectedAction={selectedAction}
+                    inlineExplanation={inlineExplanation}
+                    inlineCode={inlineCode}
+                    onAsk={handleAsk}
+                    handleAskClick={handleAskClick}
+                    handleExplainClick={handleExplainClick}
+                    handleMakeCodeClick={handleMakeCodeClick}
+                    qaHistory={qaHistory}
+                    onClearQaHistory={handleClearQaHistory}
+                    onAskFollowup={handleAskQuestion}
+                  />
                 </div>
-                <div className="p-4 pt-2 flex-1 overflow-y-auto">
-                  <div className="relative">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="SearchMe..."
-                      className="pl-9"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                  </div>
+              </ScrollArea>
+            </TabsContent>
+            <TabsContent value="search" className="m-0 flex-1 flex flex-col min-h-0">
+              <div className="sticky top-0 bg-sidebar z-10 p-4 pb-2 shrink-0">
+                <h3 className="text-base font-bold">Search</h3>
+              </div>
+              <div className="p-4 pt-2 flex-1 overflow-y-auto">
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="SearchMe..."
+                    className="pl-9"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
                 </div>
               </div>
             </TabsContent>
