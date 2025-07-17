@@ -1002,3 +1002,5 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     </SidebarProvider>
   );
 }
+
+    
