@@ -855,11 +855,11 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                 ))}
               </SidebarMenu>
             </TabsContent>
-            <TabsContent value="ask" className="m-0 flex-1 overflow-y-auto">
-              <div className="sticky top-0 bg-sidebar z-10 p-4 pb-2">
+            <TabsContent value="ask" className="m-0 flex-1 flex flex-col min-h-0">
+              <div className="sticky top-0 bg-sidebar z-10 p-4 pb-2 shrink-0">
                 <h3 className="text-base font-bold">Ask AI</h3>
               </div>
-              <div className="p-4 pt-2">
+              <div className="p-4 pt-2 overflow-y-auto flex-1">
                 <AskMeAssistant
                   selectedText={askMeSelectedText}
                   askQuery={askQuery}
@@ -971,6 +971,13 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                 onRegenerateCode={handleRegenerateCode}
                 regeneratedCode={regeneratedCode}
                 isRegenerating={isRegenerating}
+              />
+            ) : (activeTab === 'ask' || activeTab === 'prompts') && qaHistory.length > 0 ? (
+              <AskAiResultViewer 
+                history={qaHistory}
+                onClear={handleClearQaHistory}
+                onAskQuestion={handleAskQuestion}
+                isLoading={isAskMeLoading}
               />
             ) : (
               <DocViewer 
