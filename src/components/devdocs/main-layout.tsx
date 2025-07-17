@@ -240,7 +240,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   };
 
   const handleTogglePrompt = (promptId: string) => {
-    setToggledPromptId(prevId => (prevId === promptId ? null : promptId));
+    setToggledPromptId(prevId => (prevId === promptId ? null : prevId));
   };
 
 
@@ -819,84 +819,90 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
               </div>
             </TabsContent>
             <TabsContent value="prompts" className="m-0 flex-1 flex flex-col min-h-0">
-              <div className="sticky top-0 bg-sidebar z-10 p-4 pb-2 shrink-0">
-                <h3 className="text-base font-bold">Prompts</h3>
-              </div>
-              <ScrollArea className="flex-1">
-                <SidebarMenu className="p-2 pt-0">
-                  {prompts.map((doc) => (
-                    <SidebarMenuItem key={doc.id}>
-                      <Collapsible
-                        open={toggledPromptId === doc.id}
-                        onOpenChange={() => handleTogglePrompt(doc.id)}
-                      >
-                        <CollapsibleTrigger
-                          className={cn(
-                            'flex w-full items-center justify-between gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring transition hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 h-8',
-                            'data-[state=open]:bg-sidebar-accent data-[state=open]:font-medium data-[state=open]:text-sidebar-accent-foreground'
-                          )}
+              <div className="flex flex-col h-full">
+                <div className="sticky top-0 bg-sidebar z-10 p-4 pb-2 shrink-0">
+                  <h3 className="text-base font-bold">Prompts</h3>
+                </div>
+                <ScrollArea className="flex-1">
+                  <SidebarMenu className="p-2 pt-0">
+                    {prompts.map((doc) => (
+                      <SidebarMenuItem key={doc.id}>
+                        <Collapsible
+                          open={toggledPromptId === doc.id}
+                          onOpenChange={() => handleTogglePrompt(doc.id)}
                         >
-                          <div className="flex items-center gap-2 truncate">
-                            {doc.icon && <DynamicIcon name={doc.icon} />}
-                            <span>{doc.title}</span>
-                          </div>
-                          <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
-                        </CollapsibleTrigger>
-                        <CollapsibleContent className="py-2 pl-8 pr-4 text-sm">
-                          <div className="prose prose-sm prose-slate dark:prose-invert max-w-none prose-p:my-2 prose-headings:my-3">
-                            {renderPromptContent(doc.content)}
-                          </div>
-                          <div className="mt-4">
-                            <Button size="sm" variant="outline" onClick={() => handleRunPrompt(doc.content)} disabled={isAskMeLoading}>
-                              <Play className="mr-2 h-3 w-3" />
-                              Run Prompt
-                            </Button>
-                          </div>
-                        </CollapsibleContent>
-                      </Collapsible>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              </ScrollArea>
+                          <CollapsibleTrigger
+                            className={cn(
+                              'flex w-full items-center justify-between gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring transition hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 h-8',
+                              'data-[state=open]:bg-sidebar-accent data-[state=open]:font-medium data-[state=open]:text-sidebar-accent-foreground'
+                            )}
+                          >
+                            <div className="flex items-center gap-2 truncate">
+                              {doc.icon && <DynamicIcon name={doc.icon} />}
+                              <span>{doc.title}</span>
+                            </div>
+                            <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
+                          </CollapsibleTrigger>
+                          <CollapsibleContent className="py-2 pl-8 pr-4 text-sm">
+                            <div className="prose prose-sm prose-slate dark:prose-invert max-w-none prose-p:my-2 prose-headings:my-3">
+                              {renderPromptContent(doc.content)}
+                            </div>
+                            <div className="mt-4">
+                              <Button size="sm" variant="outline" onClick={() => handleRunPrompt(doc.content)} disabled={isAskMeLoading}>
+                                <Play className="mr-2 h-3 w-3" />
+                                Run Prompt
+                              </Button>
+                            </div>
+                          </CollapsibleContent>
+                        </Collapsible>
+                      </SidebarMenuItem>
+                    ))}
+                  </SidebarMenu>
+                </ScrollArea>
+              </div>
             </TabsContent>
             <TabsContent value="ask" className="m-0 flex-1 flex flex-col min-h-0">
-              <div className="sticky top-0 bg-sidebar z-10 p-4 pb-2 shrink-0">
-                <h3 className="text-base font-bold">Ask AI</h3>
-              </div>
-              <ScrollArea className="flex-1">
-                <div className="p-4 pt-2">
-                  <AskMeAssistant
-                    selectedText={askMeSelectedText}
-                    askQuery={askQuery}
-                    setAskQuery={setAskQuery}
-                    isLoading={isAskMeLoading}
-                    selectedAction={selectedAction}
-                    inlineExplanation={inlineExplanation}
-                    inlineCode={inlineCode}
-                    onAsk={handleAsk}
-                    handleAskClick={handleAskClick}
-                    handleExplainClick={handleExplainClick}
-                    handleMakeCodeClick={handleMakeCodeClick}
-                    qaHistory={qaHistory}
-                    onClearQaHistory={handleClearQaHistory}
-                    onAskFollowup={handleAskQuestion}
-                  />
+              <div className="flex flex-col h-full">
+                <div className="sticky top-0 bg-sidebar z-10 p-4 pb-2 shrink-0">
+                  <h3 className="text-base font-bold">Ask AI</h3>
                 </div>
-              </ScrollArea>
+                <ScrollArea className="flex-1">
+                  <div className="p-4 pt-2">
+                    <AskMeAssistant
+                      selectedText={askMeSelectedText}
+                      askQuery={askQuery}
+                      setAskQuery={setAskQuery}
+                      isLoading={isAskMeLoading}
+                      selectedAction={selectedAction}
+                      inlineExplanation={inlineExplanation}
+                      inlineCode={inlineCode}
+                      onAsk={handleAsk}
+                      handleAskClick={handleAskClick}
+                      handleExplainClick={handleExplainClick}
+                      handleMakeCodeClick={handleMakeCodeClick}
+                      qaHistory={qaHistory}
+                      onClearQaHistory={handleClearQaHistory}
+                      onAskFollowup={handleAskQuestion}
+                    />
+                  </div>
+                </ScrollArea>
+              </div>
             </TabsContent>
             <TabsContent value="search" className="m-0 flex-1 flex flex-col min-h-0">
-              <div className="sticky top-0 bg-sidebar z-10 p-4 pb-2 shrink-0">
-                <h3 className="text-base font-bold">Search</h3>
-              </div>
-              <div className="p-4 pt-2 flex-1 overflow-y-auto">
-                <div className="relative">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="SearchMe..."
-                    className="pl-9"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
+              <div className="flex flex-col h-full">
+                <div className="sticky top-0 bg-sidebar z-10 p-4 pb-2 shrink-0">
+                  <h3 className="text-base font-bold">Search</h3>
+                </div>
+                <div className="p-4 pt-2 flex-1">
+                  <div className="relative">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="SearchMe..."
+                      className="pl-9"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                  </div>
                 </div>
               </div>
             </TabsContent>
@@ -998,3 +1004,5 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     </SidebarProvider>
   );
 }
+
+    
