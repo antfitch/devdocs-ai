@@ -823,7 +823,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                 <div className="p-4 pb-2 shrink-0">
                   <h3 className="text-base font-bold">Prompts</h3>
                 </div>
-                <ScrollArea className="flex-1">
+                <ScrollArea className="flex-1 min-h-0">
                   <SidebarMenu className="p-2 pt-0">
                     {prompts.map((doc) => (
                       <SidebarMenuItem key={doc.id}>
@@ -866,7 +866,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                 <div className="p-4 pb-2 shrink-0">
                   <h3 className="text-base font-bold">Ask AI</h3>
                 </div>
-                <ScrollArea className="flex-1">
+                <ScrollArea className="flex-1 min-h-0">
                   <div className="p-4 pt-2">
                     <AskMeAssistant
                       selectedText={askMeSelectedText}
@@ -1004,6 +1004,8 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     </SidebarProvider>
   );
 }
+
+    
 
     
 
