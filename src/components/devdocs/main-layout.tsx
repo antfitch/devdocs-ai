@@ -818,7 +818,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                 </ScrollArea>
               </div>
             </TabsContent>
-            <TabsContent value="prompts" className="m-0 flex-1 min-h-0">
+            <TabsContent value="prompts" className="m-0 flex-1 flex flex-col min-h-0">
               <div className="flex flex-col h-full">
                 <div className="p-4 pb-2 shrink-0">
                   <h3 className="text-base font-bold">Prompts</h3>
@@ -861,7 +861,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                 </ScrollArea>
               </div>
             </TabsContent>
-            <TabsContent value="ask" className="m-0 flex-1 min-h-0">
+            <TabsContent value="ask" className="m-0 flex-1 flex flex-col min-h-0">
               <div className="flex flex-col h-full">
                 <div className="p-4 pb-2 shrink-0">
                   <h3 className="text-base font-bold">Ask AI</h3>
@@ -888,7 +888,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                 </ScrollArea>
               </div>
             </TabsContent>
-            <TabsContent value="search" className="m-0 flex-1 min-h-0">
+            <TabsContent value="search" className="m-0 flex-1 flex flex-col min-h-0">
               <div className="flex flex-col h-full">
                 <div className="p-4 pb-2 shrink-0">
                   <h3 className="text-base font-bold">Search</h3>
@@ -1004,6 +1004,8 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     </SidebarProvider>
   );
 }
+
+    
 
     
 
