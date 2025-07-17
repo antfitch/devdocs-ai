@@ -13,6 +13,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import type { QaItem } from '@/types';
+import { AskAiResultViewer } from './ask-ai-result-viewer';
 
 interface AskMeAssistantProps {
   selectedText: string;
@@ -26,6 +28,9 @@ interface AskMeAssistantProps {
   handleAskClick: () => void;
   handleExplainClick: () => void;
   handleMakeCodeClick: () => void;
+  qaHistory: QaItem[];
+  onClearQaHistory: () => void;
+  onAskFollowup: (question: string) => void;
 }
 
 
@@ -41,6 +46,9 @@ export function AskMeAssistant({
   handleAskClick,
   handleExplainClick,
   handleMakeCodeClick,
+  qaHistory,
+  onClearQaHistory,
+  onAskFollowup,
 }: AskMeAssistantProps) {
 
   return (
@@ -148,6 +156,17 @@ export function AskMeAssistant({
             </Card>
           </div>
         ) : null}
+
+        {(qaHistory.length > 0) && (
+            <div className="pt-4 mt-4 border-t">
+                <AskAiResultViewer
+                    history={qaHistory}
+                    onClear={onClearQaHistory}
+                    onAskQuestion={onAskFollowup}
+                    isLoading={isLoading}
+                />
+            </div>
+        )}
       </div>
     </>
   );
