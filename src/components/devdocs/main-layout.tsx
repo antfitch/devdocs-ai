@@ -618,7 +618,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                 </Tooltip>
               </TooltipProvider>
             </TabsList>
-            <TabsContent value="docs" className="m-0 flex-1 flex flex-col min-h-0">
+            <TabsContent value="docs" className="m-0 flex-1 min-h-0">
               <div className="flex flex-col h-full">
                 <div className="sticky top-0 bg-sidebar z-10 p-4 pb-2">
                   <h3 className="text-base font-bold">Docs</h3>
