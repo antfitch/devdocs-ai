@@ -827,34 +827,15 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                   <SidebarMenu className="p-2 pt-0">
                     {prompts.map((doc) => (
                       <SidebarMenuItem key={doc.id}>
-                        <Collapsible
-                          open={toggledPromptId === doc.id}
-                          onOpenChange={() => handleTogglePrompt(doc.id)}
+                        <SidebarMenuButton
+                          variant="ghost"
+                          className="w-full justify-start"
+                          onClick={() => handleRunPrompt(doc.content)}
+                          disabled={isAskMeLoading}
                         >
-                          <CollapsibleTrigger
-                            className={cn(
-                              'flex w-full items-center justify-between gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring transition hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 h-8',
-                              'data-[state=open]:bg-sidebar-accent data-[state=open]:font-medium data-[state=open]:text-sidebar-accent-foreground'
-                            )}
-                          >
-                            <div className="flex items-center gap-2 truncate">
-                              {doc.icon && <DynamicIcon name={doc.icon} />}
-                              <span>{doc.title}</span>
-                            </div>
-                            <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
-                          </CollapsibleTrigger>
-                          <CollapsibleContent className="py-2 pl-8 pr-4 text-sm">
-                            <div className="prose prose-sm prose-slate dark:prose-invert max-w-none prose-p:my-2 prose-headings:my-3">
-                              {renderPromptContent(doc.content)}
-                            </div>
-                            <div className="mt-4">
-                              <Button size="sm" variant="outline" onClick={() => handleRunPrompt(doc.content)} disabled={isAskMeLoading}>
-                                <Play className="mr-2 h-3 w-3" />
-                                Run Prompt
-                              </Button>
-                            </div>
-                          </CollapsibleContent>
-                        </Collapsible>
+                          {doc.icon && <DynamicIcon name={doc.icon} />}
+                          <span>{doc.title}</span>
+                        </SidebarMenuButton>
                       </SidebarMenuItem>
                     ))}
                   </SidebarMenu>
@@ -1002,5 +983,3 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     </SidebarProvider>
   );
 }
-
-    
