@@ -836,6 +836,8 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                     qaHistory={qaHistory}
                     onClearQaHistory={handleClearQaHistory}
                     onAskFollowup={handleAskQuestion}
+                    allDocs={allDocs}
+                    onLinkClick={handleSelectDoc}
                   />
                 </ScrollArea>
               </div>
