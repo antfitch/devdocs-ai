@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { Bot, ChevronRight, MessageSquare, Search, Library, Tag, BookCopy, View, Play } from 'lucide-react';
+import { Bot, ChevronRight, MessageSquare, Search, Library, Tag, BookCopy, View } from 'lucide-react';
 import {
   SidebarProvider,
   Sidebar,
@@ -54,7 +54,6 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   const [searchQuery, setSearchQuery] = useState('');
   const [activeDoc, setActiveDoc] = useState<DocItem | null>(topics[0]);
   const [toggledTopicId, setToggledTopicId] = useState<string | null>(null);
-  const [toggledPromptId, setToggledPromptId] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState('docs');
   const [scrollToHeading, setScrollToHeading] = useState<string | null>(null);
@@ -86,28 +85,26 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     
     const queryWords = query.toLowerCase().split(/\s+/).filter(w => w.length > 2);
     
-    let bestDoc: DocItem | null = null;
-    let maxScore = 0;
-
-    allDocs.forEach(doc => {
+    const scoredDocs = allDocs.map(doc => {
       let score = 0;
-      const content = `${doc.title} ${doc.content}`.toLowerCase();
-      
+      const lowerCaseTitle = doc.title.toLowerCase();
+      const lowerCaseContent = doc.content.toLowerCase();
+      const lowerCaseTags = (doc.tags || []).join(' ').toLowerCase();
+
       queryWords.forEach(word => {
-        if (content.includes(word)) {
-          score++;
-        }
+        if (lowerCaseTitle.includes(word)) score += 10;
+        if (lowerCaseContent.includes(word)) score += 1;
+        if (lowerCaseTags.includes(word)) score += 5;
       });
 
-      if (score > maxScore) {
-        maxScore = score;
-        bestDoc = doc;
-      }
-    });
+      return { doc, score };
+    })
+    .filter(item => item.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3); // Take top 3 most relevant docs
 
-    if (bestDoc) {
-      console.log(`Found best matching doc: "${bestDoc.title}" with score ${maxScore}`);
-      return bestDoc.content;
+    if (scoredDocs.length > 0) {
+      return scoredDocs.map(item => `## ${item.doc.title}\nID: ${item.doc.id}\n${item.doc.content}`).join('\n\n---\n\n');
     }
 
     return "No relevant documentation found for your query.";
@@ -249,9 +246,10 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     handleAskQuestion(askQuery);
   };
   
-  const handleRunPrompt = (promptText: string) => {
-      setActiveTab('ask');
-      handleAskQuestion(promptText);
+  const handleRunPrompt = (doc: DocItem) => {
+    const promptText = doc.content.replace(/^---[\s\S]*?---/, '').trim();
+    setActiveTab('ask');
+    handleAskQuestion(promptText);
   };
 
   const handleClearQaHistory = () => {
@@ -263,11 +261,6 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     setInlineExplanation('');
     setInlineCode('');
   };
-
-  const handleTogglePrompt = (promptId: string) => {
-    setToggledPromptId(prevId => (prevId === promptId ? null : prevId));
-  };
-
 
   const typeFilters = useMemo(() => [
     { label: 'Get Started', tag: 'get-started' },
@@ -534,51 +527,6 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     setViewingDocsForType(typeTag);
     setShowDocWhileFiltering(false);
     setActiveDoc(null);
-  };
-
-  const renderPromptContent = (content: string) => {
-    const renderSimpleMarkdown = (text: string) => {
-      const segments = text.split(/(`[^`]+?`)/g);
-      const html = segments.map(segment => {
-          if (segment.startsWith('`') && segment.endsWith('`')) {
-              const codeContent = segment.slice(1, -1);
-              return `<code class="bg-sidebar-accent text-sidebar-accent-foreground px-1 py-0.5 rounded-sm font-mono text-xs">${codeContent}</code>`;
-          } else {
-              if (!segment) return '';
-              return segment
-                  .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
-                  .replace(/\*(.*?)\*/gim, '<em>$1</em>')
-                  .replace(/^# (.*$)/gim, '<h3 class="text-base font-bold mt-4 mb-2">$1</h3>')
-                  .replace(/^## (.*$)/gim, '<h4 class="text-sm font-bold mt-3 mb-1">$1</h4>')
-                  .replace(/> (.*$)/gim, '<blockquote class="mt-2 border-l-2 pl-2 italic text-muted-foreground">$1</blockquote>')
-                  .replace(/\n/g, '<br />')
-                  .replace(/(<\/h[1-4]>)<br \/>/gi, '$1');
-          }
-      }).join('');
-      return { __html: html };
-    }
-
-    const contentWithoutFrontmatter = content.replace(/^---[\s\S]*?---/, '').trim();
-    const contentParts = contentWithoutFrontmatter.split(/(```[\s\S]*?```)/g);
-
-    return contentParts.map((part, index) => {
-      if (part.startsWith('```')) {
-          const lines = part.split('\n');
-          const lang = lines.shift()?.substring(3) || '';
-          lines.pop();
-          const code = lines.join('\n');
-          return (
-              <div key={index} className="my-2 relative">
-                  <pre className={`bg-gray-800 text-white p-2 rounded-md overflow-x-auto font-mono text-xs`}>
-                      {code}
-                  </pre>
-                  {lang && <div className="absolute top-1 right-1 text-[10px] text-gray-400 bg-gray-700 px-1.5 py-0.5 rounded">{lang}</div>}
-              </div>
-          );
-      }
-      if (part.trim() === '') return null;
-      return <div key={index} dangerouslySetInnerHTML={renderSimpleMarkdown(part)} />;
-    });
   };
 
   const includeSections = !viewingDocsForType && (filterMode === 'sections' || filterMode === 'samples');
@@ -855,7 +803,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                         <SidebarMenuButton
                           variant="ghost"
                           className="w-full justify-start"
-                          onClick={() => handleRunPrompt(doc.content)}
+                          onClick={() => handleRunPrompt(doc)}
                           disabled={isAskMeLoading}
                         >
                           {doc.icon && <DynamicIcon name={doc.icon} />}
@@ -994,6 +942,8 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                 onClear={handleClearQaHistory}
                 onAskQuestion={handleAskQuestion}
                 isLoading={isAskMeLoading}
+                onLinkClick={handleSelectDoc}
+                allDocs={allDocs}
               />
             ) : (
               <DocViewer 

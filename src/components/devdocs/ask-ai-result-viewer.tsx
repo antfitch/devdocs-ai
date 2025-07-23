@@ -6,18 +6,21 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { Loader2, Trash2, Send } from 'lucide-react';
-import type { QaItem } from '@/types';
+import type { QaItem, DocItem } from '@/types';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Textarea } from '../ui/textarea';
+import { renderSimpleMarkdown } from '@/components/devdocs/doc-viewer';
 
 interface AskAiResultViewerProps {
   history: QaItem[];
   onClear: () => void;
   onAskQuestion: (question: string) => void;
   isLoading: boolean;
+  onLinkClick: (doc: DocItem) => void;
+  allDocs: DocItem[];
 }
 
-export function AskAiResultViewer({ history, onClear, onAskQuestion, isLoading }: AskAiResultViewerProps) {
+export function AskAiResultViewer({ history, onClear, onAskQuestion, isLoading, onLinkClick, allDocs }: AskAiResultViewerProps) {
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
   const [newQuestion, setNewQuestion] = useState('');
 
@@ -40,6 +43,18 @@ export function AskAiResultViewer({ history, onClear, onAskQuestion, isLoading }
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleAsk();
+    }
+  };
+
+  const handleAnswerClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLAnchorElement;
+    if (target.tagName === 'A' && target.href.startsWith('doc://')) {
+      e.preventDefault();
+      const docId = target.href.substring(6);
+      const doc = allDocs.find(d => d.id === docId);
+      if (doc) {
+        onLinkClick(doc);
+      }
     }
   };
 
@@ -67,7 +82,7 @@ export function AskAiResultViewer({ history, onClear, onAskQuestion, isLoading }
         )}
       </CardHeader>
       <CardContent className="p-0 flex-1 min-h-0 bg-muted/50 rounded-md">
-        <ScrollArea className="h-48">
+        <ScrollArea className="h-full">
           <div className="p-4 space-y-4 text-sm">
             {history.length === 0 ? (
               <p className="text-center text-muted-foreground py-10">
@@ -83,7 +98,11 @@ export function AskAiResultViewer({ history, onClear, onAskQuestion, isLoading }
                       <p>The AI is thinking...</p>
                     </div>
                   ) : item.answer ? (
-                    <p className="whitespace-pre-wrap">{item.answer}</p>
+                    <div 
+                      className="whitespace-pre-wrap prose prose-sm max-w-none prose-a:text-primary hover:prose-a:underline"
+                      onClick={handleAnswerClick}
+                      dangerouslySetInnerHTML={renderSimpleMarkdown(item.answer, true)}
+                    />
                   ) : null}
                 </div>
               ))

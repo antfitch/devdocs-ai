@@ -12,18 +12,7 @@ interface DocViewerProps {
   isRegenerating: Record<string, boolean>;
 }
 
-export function DocViewer({ doc, onRegenerateCode, regeneratedCode, isRegenerating }: DocViewerProps) {
-  if (!doc) {
-    return (
-      <Card className="h-full flex items-center justify-center">
-        <CardContent>
-          <p className="text-muted-foreground">Select a topic to get started.</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  const renderSimpleMarkdown = (text: string) => {
+export const renderSimpleMarkdown = (text: string, forChat = false) => {
     // This function handles rendering of non-code-block text.
     // It first splits by inline code to handle that separately.
     const segments = text.split(/(`[^`]+?`)/g);
@@ -36,23 +25,44 @@ export function DocViewer({ doc, onRegenerateCode, regeneratedCode, isRegenerati
         } else {
             // It's a regular text segment, apply other rules
             if (!segment) return '';
-            return segment
+            let processedSegment = segment
                 .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
                 .replace(/\*(.*?)\*/gim, '<em>$1</em>')
+                .replace(/> (.*$)/gim, '<blockquote class="mt-6 border-l-2 pl-6 italic">$1</blockquote>')
+                .replace(/\[(.*?)\]\(doc:\/\/(.*?)\)/gim, '<a href="doc://$2">$1</a>')
+                
+            if (!forChat) {
+              processedSegment = processedSegment
                 .replace(/^# (.*$)/gim, '<h1 class="text-4xl font-extrabold mt-8 mb-4 tracking-tight">$1</h1>')
                 .replace(/^## (.*$)/gim, (match, p1) => {
                     const id = p1.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
                     return `<h2 id="${id}" class="text-2xl font-bold mt-6 mb-3 border-b pb-2">${p1}</h2>`;
                 })
                 .replace(/^### (.*$)/gim, '<h3 class="text-xl font-bold mt-4 mb-2">$1</h3>')
-                .replace(/> (.*$)/gim, '<blockquote class="mt-6 border-l-2 pl-6 italic">$1</blockquote>')
-                .replace(/\n/g, '<br />')
-                .replace(/(<\/h[1-3]>)<br \/>/gi, '$1');
+            }
+            
+            processedSegment = processedSegment.replace(/\n/g, '<br />');
+
+            if (!forChat) {
+                processedSegment = processedSegment.replace(/(<\/h[1-3]>)<br \/>/gi, '$1');
+            }
+            return processedSegment;
         }
     }).join('');
 
     return { __html: html };
   };
+
+export function DocViewer({ doc, onRegenerateCode, regeneratedCode, isRegenerating }: DocViewerProps) {
+  if (!doc) {
+    return (
+      <Card className="h-full flex items-center justify-center">
+        <CardContent>
+          <p className="text-muted-foreground">Select a topic to get started.</p>
+        </CardContent>
+      </Card>
+    );
+  }
   
   const contentWithoutFrontmatter = doc.content.replace(/^---[\s\S]*?---/, '').trim();
   const contentForRendering = contentWithoutFrontmatter

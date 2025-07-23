@@ -20,7 +20,7 @@ const AnswerQuestionsInputSchema = z.object({
 export type AnswerQuestionsInput = z.infer<typeof AnswerQuestionsInputSchema>;
 
 const AnswerQuestionsOutputSchema = z.object({
-  answer: z.string().describe('The answer to the question.'),
+  answer: z.string().describe('The answer to the question, formatted in Markdown.'),
 });
 export type AnswerQuestionsOutput = z.infer<typeof AnswerQuestionsOutputSchema>;
 
@@ -36,7 +36,10 @@ const prompt = ai.definePrompt({
 
 You MUST use the documentation snippets below to formulate your answer.
 Do not tell the user to go read the documentation. Instead, extract the relevant information and provide a clear, concise answer to their question.
-At the end of your answer, you MUST list the titles of the documents you used as sources under a "Sources:" heading.
+
+Your entire response MUST be formatted in Markdown.
+
+You MUST include links to the source documents you used. The links should be in the format [Document Title](doc://<document-id>). For example, a link to a document about authentication would look like [Authentication](doc://authentication).
 
 Documentation snippets: {{{relevantDocs}}}
 
