@@ -91,6 +91,7 @@ export function AskMeAssistant({
                 value={askQuery}
                 onChange={(e) => setAskQuery(e.target.value)}
                 rows={5}
+                className="focus-visible:ring-0 focus-visible:ring-offset-0"
             />
             <Button onClick={onAsk} disabled={isLoading || !askQuery} className="w-full">
                 {isLoading && selectedAction === 'Ask a question' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
