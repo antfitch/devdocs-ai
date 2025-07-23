@@ -112,6 +112,9 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
 
   useEffect(() => {
     const handleMouseUp = (event: MouseEvent) => {
+      if (activeTab !== 'ask') {
+        return;
+      }
       const target = event.target as HTMLElement;
 
       // Prevent clearing selection when interacting with the sidebar
@@ -127,7 +130,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     return () => {
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [setAskMeSelectedText]);
+  }, [activeTab]);
 
   const handleFetchExplanation = async (text: string) => {
     if (!text) {
