@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { Loader2, Trash2, Send } from 'lucide-react';
@@ -21,12 +21,12 @@ interface AskAiResultViewerProps {
 }
 
 export function AskAiResultViewer({ history, onClear, onAskQuestion, isLoading, onLinkClick, allDocs }: AskAiResultViewerProps) {
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const scrollViewportRef = useRef<HTMLDivElement>(null);
   const [newQuestion, setNewQuestion] = useState('');
 
   const scrollToBottom = () => {
-    if (scrollAreaRef.current) {
-        scrollAreaRef.current.children[0].children[0].scrollTop = scrollAreaRef.current.children[0].children[0].scrollHeight;
+    if (scrollViewportRef.current) {
+        scrollViewportRef.current.scrollTop = scrollViewportRef.current.scrollHeight;
     }
   };
 
@@ -84,7 +84,7 @@ export function AskAiResultViewer({ history, onClear, onAskQuestion, isLoading, 
         )}
       </CardHeader>
       <CardContent className="p-0 flex-1 min-h-0 bg-muted/50 rounded-md">
-        <ScrollArea className="h-full" ref={scrollAreaRef}>
+        <ScrollArea className="h-full" viewportRef={scrollViewportRef}>
           <div className="p-4 space-y-4 text-sm">
             {history.length === 0 ? (
               <p className="text-center text-muted-foreground py-10">
