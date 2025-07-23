@@ -32,15 +32,17 @@ const prompt = ai.definePrompt({
   name: 'answerQuestionsPrompt',
   input: {schema: AnswerQuestionsInputSchema},
   output: {schema: AnswerQuestionsOutputSchema},
-  prompt: `You are a helpful AI assistant that answers questions about the documentation.
+  prompt: `You are a helpful AI assistant that answers questions about technical documentation. Your goal is to provide a direct, helpful answer based on the provided content.
 
-  Use the following documentation snippets to answer the question.
+You MUST use the documentation snippets below to formulate your answer.
+Do not tell the user to go read the documentation. Instead, extract the relevant information and provide a clear, concise answer to their question.
+At the end of your answer, you MUST list the titles of the documents you used as sources under a "Sources:" heading.
 
-  Documentation snippets: {{{relevantDocs}}}
+Documentation snippets: {{{relevantDocs}}}
 
-  Question: {{{question}}}
+Question: {{{question}}}
 
-  Answer:`,
+Answer:`,
 });
 
 const answerQuestionsFlow = ai.defineFlow(
