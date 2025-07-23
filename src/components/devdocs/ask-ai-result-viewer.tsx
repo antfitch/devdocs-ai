@@ -21,11 +21,13 @@ interface AskAiResultViewerProps {
 }
 
 export function AskAiResultViewer({ history, onClear, onAskQuestion, isLoading, onLinkClick, allDocs }: AskAiResultViewerProps) {
-  const messagesEndRef = useRef<null | HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [newQuestion, setNewQuestion] = useState('');
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (scrollAreaRef.current) {
+        scrollAreaRef.current.children[0].children[0].scrollTop = scrollAreaRef.current.children[0].children[0].scrollHeight;
+    }
   };
 
   useEffect(() => {
@@ -82,8 +84,8 @@ export function AskAiResultViewer({ history, onClear, onAskQuestion, isLoading, 
         )}
       </CardHeader>
       <CardContent className="p-0 flex-1 min-h-0 bg-muted/50 rounded-md">
-        <ScrollArea className="h-full">
-          <div className="p-4 pb-12 space-y-4 text-sm">
+        <ScrollArea className="h-full" ref={scrollAreaRef}>
+          <div className="p-4 space-y-4 text-sm">
             {history.length === 0 ? (
               <p className="text-center text-muted-foreground py-10">
                 Ask a question to start a conversation.
@@ -107,32 +109,31 @@ export function AskAiResultViewer({ history, onClear, onAskQuestion, isLoading, 
                 </div>
               ))
             )}
-            <div ref={messagesEndRef} />
+            <div className="pt-4">
+                <div className="relative w-full">
+                    <Textarea
+                    placeholder="Ask a follow-up question..."
+                    value={newQuestion}
+                    onChange={(e) => setNewQuestion(e.target.value)}
+                    onKeyDown={handleKeyPress}
+                    rows={2}
+                    disabled={isLoading}
+                    className="pr-12 resize-none bg-background"
+                    />
+                    <Button
+                    size="icon"
+                    className="absolute right-2 top-2 h-8 w-8"
+                    onClick={handleAsk}
+                    disabled={isLoading || !newQuestion.trim()}
+                    >
+                    {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                    <span className="sr-only">Send</span>
+                    </Button>
+                </div>
+            </div>
           </div>
         </ScrollArea>
       </CardContent>
-      <CardFooter className="p-0 pt-4">
-          <div className="relative w-full">
-            <Textarea
-              placeholder="Ask a follow-up question..."
-              value={newQuestion}
-              onChange={(e) => setNewQuestion(e.target.value)}
-              onKeyDown={handleKeyPress}
-              rows={2}
-              disabled={isLoading}
-              className="pr-12 resize-none"
-            />
-            <Button
-              size="icon"
-              className="absolute right-2 top-2 h-8 w-8"
-              onClick={handleAsk}
-              disabled={isLoading || !newQuestion.trim()}
-            >
-              {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-              <span className="sr-only">Send</span>
-            </Button>
-          </div>
-        </CardFooter>
     </Card>
   );
 }
