@@ -50,13 +50,6 @@ interface MainLayoutProps {
   allTags: string[];
 }
 
-// Mock function for vector search
-const performVectorSearch = (query: string): string => {
-    console.log(`Performing vector search for: ${query}`);
-    return "Relevant documentation snippets based on vector search would be placed here.";
-}
-
-
 export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeDoc, setActiveDoc] = useState<DocItem | null>(topics[0]);
@@ -87,6 +80,38 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   // State for code regeneration
   const [regeneratedCode, setRegeneratedCode] = useState<Record<string, string>>({});
   const [isRegenerating, setIsRegenerating] = useState<Record<string, boolean>>({});
+
+  const performVectorSearch = (query: string): string => {
+    if (!query) return "No relevant documentation found.";
+    
+    const queryWords = query.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+    
+    let bestDoc: DocItem | null = null;
+    let maxScore = 0;
+
+    allDocs.forEach(doc => {
+      let score = 0;
+      const content = `${doc.title} ${doc.content}`.toLowerCase();
+      
+      queryWords.forEach(word => {
+        if (content.includes(word)) {
+          score++;
+        }
+      });
+
+      if (score > maxScore) {
+        maxScore = score;
+        bestDoc = doc;
+      }
+    });
+
+    if (bestDoc) {
+      console.log(`Found best matching doc: "${bestDoc.title}" with score ${maxScore}`);
+      return bestDoc.content;
+    }
+
+    return "No relevant documentation found for your query.";
+  }
 
   useEffect(() => {
     const handleMouseUp = (event: MouseEvent) => {
