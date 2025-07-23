@@ -83,7 +83,7 @@ export function AskAiResultViewer({ history, onClear, onAskQuestion, isLoading, 
       </CardHeader>
       <CardContent className="p-0 flex-1 min-h-0 bg-muted/50 rounded-md">
         <ScrollArea className="h-full">
-          <div className="p-4 space-y-4 text-sm">
+          <div className="p-4 pb-12 space-y-4 text-sm">
             {history.length === 0 ? (
               <p className="text-center text-muted-foreground py-10">
                 Ask a question to start a conversation.
