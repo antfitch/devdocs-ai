@@ -26,8 +26,8 @@ export const renderSimpleMarkdown = (text: string, forChat = false) => {
             // It's a regular text segment, apply other rules
             if (!segment) return '';
             let processedSegment = segment
-                .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/gim, '<em>$1</em>')
+                .replace(/\*\*(?!\s)(.*?)(?!\s)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(?!\s)(.*?)(?!\s)\*/g, '<em>$1</em>')
                 .replace(/> (.*$)/gim, '<blockquote class="mt-6 border-l-2 pl-6 italic">$1</blockquote>')
                 .replace(/\[(.*?)\]\(doc:\/\/(.*?)\)/gim, '<a href="doc://$2">$1</a>')
                 
