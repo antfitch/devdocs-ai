@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Lightbulb, Code, Send, Loader2, HelpCircle, ChevronDown } from 'lucide-react';
+import { Lightbulb, Code, Send, Loader2, HelpCircle, ChevronDown, PenSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -17,7 +17,6 @@ import type { QaItem, DocItem } from '@/types';
 import { AskAiResultViewer } from './ask-ai-result-viewer';
 
 interface AskMeAssistantProps {
-  selectedText: string;
   askQuery: string;
   setAskQuery: (query: string) => void;
   isLoading: boolean;
@@ -26,8 +25,8 @@ interface AskMeAssistantProps {
   inlineCode: string;
   onAsk: () => void;
   handleAskClick: () => void;
-  handleExplainClick: () => void;
-  handleMakeCodeClick: () => void;
+  onExplain: (text: string) => void;
+  onGenerateCode: (text: string) => void;
   qaHistory: QaItem[];
   onClearQaHistory: () => void;
   onAskFollowup: (question: string) => void;
@@ -37,7 +36,6 @@ interface AskMeAssistantProps {
 
 
 export function AskMeAssistant({
-  selectedText,
   askQuery,
   setAskQuery,
   isLoading,
@@ -46,14 +44,35 @@ export function AskMeAssistant({
   inlineCode,
   onAsk,
   handleAskClick,
-  handleExplainClick,
-  handleMakeCodeClick,
+  onExplain,
+  onGenerateCode,
   qaHistory,
   onClearQaHistory,
   onAskFollowup,
   allDocs,
   onLinkClick
 }: AskMeAssistantProps) {
+
+  const handleCaptureAndAct = (action: 'explain' | 'generate') => {
+    const selectedText = window.getSelection()?.toString().trim() || '';
+    if (!selectedText) {
+      alert("Please select text in the main window first.");
+      return;
+    }
+    if (action === 'explain') {
+      onExplain(selectedText);
+    } else if (action === 'generate') {
+      onGenerateCode(selectedText);
+    }
+  };
+
+  const handleExplainClick = () => {
+    onExplain(''); // Clears previous explanation
+  };
+
+  const handleMakeCodeClick = () => {
+    onGenerateCode(''); // Clears previous code
+  };
 
   return (
     <>
@@ -101,24 +120,22 @@ export function AskMeAssistant({
         )}
 
         {selectedAction === 'Explain selected text' && (
-          <div className="space-y-2 pt-4 border-t">
-            <p className="text-sm text-muted-foreground">The AI will explain some text you've highlighted in the main window.</p>
-            <div className="p-2 bg-muted rounded-md text-sm text-muted-foreground max-h-28 overflow-y-auto">
-              <p className="italic">
-                {selectedText ? `"${selectedText}"` : '""'}
-              </p>
-            </div>
+          <div className="space-y-4 pt-4 border-t">
+            <p className="text-sm text-muted-foreground">First, highlight some text in the main window. Then click the button below.</p>
+            <Button onClick={() => handleCaptureAndAct('explain')} disabled={isLoading} className="w-full">
+                {isLoading && selectedAction === 'Explain selected text' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <PenSquare className="mr-2 h-4 w-4" />}
+                Explain selected text
+            </Button>
           </div>
         )}
 
         {selectedAction === 'Generate code sample' && (
-            <div className="space-y-2 pt-4 border-t">
-                <p className="text-sm text-muted-foreground">The AI will generate a code sample based on some text you've highlighted in the main window.</p>
-                <div className="p-2 bg-muted rounded-md text-sm text-muted-foreground max-h-28 overflow-y-auto">
-                <p className="italic">
-                    {selectedText ? `"${selectedText}"` : '""'}
-                </p>
-                </div>
+            <div className="space-y-4 pt-4 border-t">
+                <p className="text-sm text-muted-foreground">First, highlight some text in the main window. Then click the button below.</p>
+                <Button onClick={() => handleCaptureAndAct('generate')} disabled={isLoading} className="w-full">
+                  {isLoading && selectedAction === 'Generate code sample' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <PenSquare className="mr-2 h-4 w-4" />}
+                  Generate code from selection
+                </Button>
             </div>
         )}
 

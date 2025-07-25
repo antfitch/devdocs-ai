@@ -66,7 +66,6 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
   const [openKeywordGroups, setOpenKeywordGroups] = useState<string[]>([]);
 
   // State for AskMeAssistant
-  const [askMeSelectedText, setAskMeSelectedText] = useState('');
   const [askQuery, setAskQuery] = useState('');
   const [isAskMeLoading, setIsAskMeLoading] = useState(false);
   const [selectedAction, setSelectedAction] = useState('Ask a question');
@@ -110,29 +109,6 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     return "No relevant documentation found for your query.";
   }
 
-  useEffect(() => {
-    const handleMouseUp = (event: MouseEvent) => {
-      // Only act on selections if the "Ask AI" tab is active
-      if (activeTab !== 'ask') {
-        return;
-      }
-      
-      const target = event.target as HTMLElement;
-      // Prevent capturing selections from the sidebar itself
-      if (target.closest('[data-sidebar="sidebar"]')) {
-        return;
-      }
-      
-      const text = window.getSelection()?.toString().trim() || '';
-      setAskMeSelectedText(text);
-    };
-
-    document.addEventListener('mouseup', handleMouseUp);
-    return () => {
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [activeTab]);
-
   const handleFetchExplanation = async (text: string) => {
     if (!text) {
       setInlineExplanation('');
@@ -140,6 +116,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     }
     setIsAskMeLoading(true);
     setInlineExplanation('');
+    setSelectedAction('Explain selected text');
     try {
       const result = await explainText({ text });
       setInlineExplanation(result.explanation);
@@ -158,6 +135,7 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
     }
     setIsAskMeLoading(true);
     setInlineCode('');
+    setSelectedAction('Generate code sample');
     try {
       const result = await generateCode({ text });
       setInlineCode(result.code);
@@ -182,34 +160,17 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
       setIsRegenerating(prev => ({...prev, [codeKey]: false}));
     }
   };
-
-  useEffect(() => {
-    if (askMeSelectedText) {
-      if (selectedAction === 'Explain selected text') {
-        handleFetchExplanation(askMeSelectedText);
-      } else if (selectedAction === 'Generate code sample') {
-        handleFetchCode(askMeSelectedText);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [askMeSelectedText, selectedAction]);
   
   const handleExplainClick = () => {
     setSelectedAction('Explain selected text');
     setInlineExplanation('');
     setInlineCode('');
-    if (askMeSelectedText) {
-      handleFetchExplanation(askMeSelectedText);
-    }
   };
 
   const handleMakeCodeClick = () => {
     setSelectedAction('Generate code sample');
     setInlineExplanation('');
     setInlineCode('');
-    if (askMeSelectedText) {
-      handleFetchCode(askMeSelectedText);
-    }
   };
   
   const handleAskQuestion = async (query: string) => {
@@ -826,7 +787,6 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                 </div>
                 <ScrollArea className="flex-1 px-4">
                   <AskMeAssistant
-                    selectedText={askMeSelectedText}
                     askQuery={askQuery}
                     setAskQuery={setAskQuery}
                     isLoading={isAskMeLoading}
@@ -835,8 +795,8 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                     inlineCode={inlineCode}
                     onAsk={handleAsk}
                     handleAskClick={handleAskClick}
-                    handleExplainClick={handleExplainClick}
-                    handleMakeCodeClick={handleMakeCodeClick}
+                    onExplain={handleFetchExplanation}
+                    onGenerateCode={handleFetchCode}
                     qaHistory={qaHistory}
                     onClearQaHistory={handleClearQaHistory}
                     onAskFollowup={handleAskQuestion}
