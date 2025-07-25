@@ -120,7 +120,7 @@ export function AskMeAssistant({
             <p className="text-sm text-muted-foreground">First, highlight some text in the main window. Then click the button below.</p>
             <Button onClick={() => handleCaptureAndAct('explain')} disabled={isLoading} className="w-full">
                 {isLoading && selectedAction === 'Explain selected text' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <PenSquare className="mr-2 h-4 w-4" />}
-                Explain selected text
+                Analyze text
             </Button>
           </div>
         )}
