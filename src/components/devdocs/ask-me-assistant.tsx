@@ -25,6 +25,8 @@ interface AskMeAssistantProps {
   inlineCode: string;
   onAsk: () => void;
   handleAskClick: () => void;
+  handleExplainClick: () => void;
+  handleMakeCodeClick: () => void;
   onExplain: (text: string) => void;
   onGenerateCode: (text: string) => void;
   qaHistory: QaItem[];
@@ -44,6 +46,8 @@ export function AskMeAssistant({
   inlineCode,
   onAsk,
   handleAskClick,
+  handleExplainClick,
+  handleMakeCodeClick,
   onExplain,
   onGenerateCode,
   qaHistory,
@@ -64,14 +68,6 @@ export function AskMeAssistant({
     } else if (action === 'generate') {
       onGenerateCode(selectedText);
     }
-  };
-
-  const handleExplainClick = () => {
-    onExplain(''); // Clears previous explanation
-  };
-
-  const handleMakeCodeClick = () => {
-    onGenerateCode(''); // Clears previous code
   };
 
   return (

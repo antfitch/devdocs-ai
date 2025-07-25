@@ -795,6 +795,8 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
                     inlineCode={inlineCode}
                     onAsk={handleAsk}
                     handleAskClick={handleAskClick}
+                    handleExplainClick={handleExplainClick}
+                    handleMakeCodeClick={handleMakeCodeClick}
                     onExplain={handleFetchExplanation}
                     onGenerateCode={handleFetchCode}
                     qaHistory={qaHistory}
