@@ -112,12 +112,13 @@ export function MainLayout({ topics, prompts, allDocs, allTags }: MainLayoutProp
 
   useEffect(() => {
     const handleMouseUp = (event: MouseEvent) => {
+      // Only act on selections if the "Ask AI" tab is active
       if (activeTab !== 'ask') {
         return;
       }
+      
       const target = event.target as HTMLElement;
-
-      // Prevent clearing selection when interacting with the sidebar
+      // Prevent capturing selections from the sidebar itself
       if (target.closest('[data-sidebar="sidebar"]')) {
         return;
       }
