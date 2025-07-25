@@ -5,14 +5,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '../ui/button';
 import { RefreshCw, Loader2 } from 'lucide-react';
 
-interface DocViewerProps {
-  doc: DocItem | null;
-  onRegenerateCode: (docId: string, originalCode: string, docContent: string) => void;
-  regeneratedCode: Record<string, string>;
-  isRegenerating: Record<string, boolean>;
-}
-
 export const renderSimpleMarkdown = (text: string, forChat = false) => {
+    if (!text) return { __html: '' };
     // This function handles rendering of non-code-block text.
     // It first splits by inline code to handle that separately.
     const segments = text.split(/(`[^`]+?`)/g);

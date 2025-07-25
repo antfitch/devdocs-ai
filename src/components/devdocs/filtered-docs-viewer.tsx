@@ -67,6 +67,7 @@ const getSectionContent = (docContent: string, headingTitle: string): string => 
 };
 
 const renderSimpleMarkdown = (text: string) => {
+    if (!text) return { __html: '' };
     // This function handles rendering of non-code-block text.
     // It first splits by inline code to handle that separately.
     const segments = text.split(/(`[^`]+?`)/g);

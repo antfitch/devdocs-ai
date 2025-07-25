@@ -9,16 +9,63 @@ import { Loader2, Trash2, Send } from 'lucide-react';
 import type { QaItem, DocItem } from '@/types';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Textarea } from '../ui/textarea';
-import { renderSimpleMarkdown } from '@/components/devdocs/doc-viewer';
 
-interface AskAiResultViewerProps {
-  history: QaItem[];
-  onClear: () => void;
-  onAskQuestion: (question: string) => void;
-  isLoading: boolean;
-  onLinkClick: (doc: DocItem) => void;
-  allDocs: DocItem[];
-}
+const renderSimpleMarkdown = (text: string, forChat = false) => {
+    if (!text) return { __html: '' };
+
+    const codeBlockRegex = /(```[\s\S]*?```)/g;
+    const parts = text.split(codeBlockRegex);
+
+    const html = parts.map((part, index) => {
+        if (index % 2 === 1) {
+            // This is a code block
+            const lines = part.split('\n');
+            const lang = lines.shift()?.substring(3) || '';
+            lines.pop();
+            const code = lines.join('\n');
+            return `<pre class="bg-gray-800 text-white p-4 rounded-md overflow-x-auto"><code class="font-mono text-sm whitespace-pre">${code}</code></pre>`;
+        }
+        
+        // This is not a code block, so apply other rules
+        const inlineCodeRegex = /(`[^`]+?`)/g;
+        const segments = part.split(inlineCodeRegex);
+
+        return segments.map(segment => {
+            if (segment.startsWith('`') && segment.endsWith('`')) {
+                const codeContent = segment.slice(1, -1);
+                return `<code class="bg-muted text-muted-foreground px-1 py-0.5 rounded-sm font-mono text-sm">${codeContent}</code>`;
+            }
+
+            if (!segment) return '';
+            let processedSegment = segment
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/> (.*$)/gim, '<blockquote class="mt-6 border-l-2 pl-6 italic">$1</blockquote>')
+                .replace(/\[(.*?)\]\(doc:\/\/(.*?)\)/gim, '<a href="doc://$2">$1</a>');
+            
+            if (!forChat) {
+                processedSegment = processedSegment
+                  .replace(/^# (.*$)/gim, '<h1 class="text-4xl font-extrabold mt-8 mb-4 tracking-tight">$1</h1>')
+                  .replace(/^## (.*$)/gim, (match, p1) => {
+                      const id = p1.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+                      return `<h2 id="${id}" class="text-2xl font-bold mt-6 mb-3 border-b pb-2">${p1}</h2>`;
+                  })
+                  .replace(/^### (.*$)/gim, '<h3 class="text-xl font-bold mt-4 mb-2">$1</h3>')
+              }
+              
+              processedSegment = processedSegment.replace(/\n/g, '<br />');
+  
+              if (!forChat) {
+                  processedSegment = processedSegment.replace(/(<\/h[1-3]>)<br \/>/gi, '$1');
+              }
+              return processedSegment;
+
+        }).join('');
+
+    }).join('');
+
+    return { __html: html };
+};
 
 export function AskAiResultViewer({ history, onClear, onAskQuestion, isLoading, onLinkClick, allDocs }: AskAiResultViewerProps) {
   const scrollViewportRef = useRef<HTMLDivElement>(null);
