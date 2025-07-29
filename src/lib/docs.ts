@@ -1,3 +1,4 @@
+
 import fs from 'fs';
 import path from 'path';
 import { topics as topicMetadata } from '@/data/topics';
@@ -18,16 +19,14 @@ const addContentToDocs = (docs: any[], directory: string): DocItem[] => {
     const documentTags: string[] = [];
     if (frontmatterMatch) {
       const frontmatter = frontmatterMatch[1];
-      const lines = frontmatter.split('\n');
-      let inTags = false;
-      for (const line of lines) {
-        if (line.startsWith('tags:')) {
-          inTags = true;
-        } else if (inTags && line.trim().startsWith('- ')) {
-          documentTags.push(line.trim().substring(2).trim());
-        } else if (inTags && line.trim() !== '') {
-          // If a non-empty line that is not a tag item is found, stop parsing tags
-          inTags = false;
+      const tagBlockMatch = frontmatter.match(/tags:\s*\n((?:\s*-\s*.*\n?)*)/);
+      if (tagBlockMatch) {
+        const tagLines = tagBlockMatch[1].split('\n');
+        for (const line of tagLines) {
+          const tagMatch = line.match(/^\s*-\s*(.*)/);
+          if (tagMatch) {
+            documentTags.push(tagMatch[1].trim());
+          }
         }
       }
     }
