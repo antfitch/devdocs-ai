@@ -79,3 +79,4 @@ The "Ask AI" tab provides a dedicated interface for interacting with the AI assi
 *   **Live Vector Search:** Implement a real vector database and search mechanism to replace the current keyword search for the "Ask AI" feature to improve accuracy.
 *   **Content Management:** Integrate a headless CMS or a more robust system for managing documentation content.
 *   **User Accounts & Personalization:** Allow users to save chat history, bookmark topics, or customize their experience.
+*   **PRD Maintenance:** Whenever new functionality is added to this product, this PRD must be updated to reflect the changes.
